@@ -402,10 +402,11 @@ section \<open>Proposition 4\<close>
 proposition proposition4:
   fixes n :: nat and Ts :: "var formula list"
   defines "F \<equiv> Fn n" and "G \<equiv> BigOr Ts"
-  assumes n_greater_0: "n > 0" and
-          G_spec: "(\<forall>T\<in>set Ts. is_conj T \<and> (\<exists> Val. Val \<Turnstile> T))" and
-          equiv_F_G: "equiv F G"
-        shows "sizef G \<ge> n*2^n"
+  assumes
+    n_greater_0: "n > 0" and
+    G_spec: "(\<forall>T\<in>set Ts. is_conj T \<and> (\<exists> Val. Val \<Turnstile> T))" and
+    equiv_F_G: "equiv F G"
+  shows "sizef G \<ge> n*2^n"
 proof -
   note def_F = F_def
   note def_G = G_def G_spec
@@ -814,13 +815,16 @@ qed
 section \<open>Corollary 5\<close>
 
 corollary corollary5:
-  fixes n :: nat
-  assumes n_greater_0: "n > 0" and
-          def_Fprime: "Fprime = dualize (Fn n)" and
-          def_G: "G = BigAnd Cs \<and> (\<forall> C \<in> set Cs. is_disj C \<and> \<not>(\<forall> Val. Val \<Turnstile> C))" and
-          equiv_Fprime_G: "equiv Fprime G"
-        shows "sizef G \<ge> n*2^n"
+  fixes n :: nat and Cs :: "var formula list"
+  defines "Fprime \<equiv> dualize (Fn n)" and "G \<equiv> BigAnd Cs"
+  assumes
+    n_greater_0: "n > 0" and
+    G_spec: "(\<forall> C \<in> set Cs. is_disj C \<and> \<not>(\<forall> Val. Val \<Turnstile> C))" and
+    equiv_Fprime_G: "equiv Fprime G"
+  shows "sizef G \<ge> n*2^n"
 proof -
+  note def_Fprime = Fprime_def
+  note def_G = G_def G_spec
   have size_Fprime: "sizef Fprime = 8*n+1" 
     using def_Fprime by (simp add: size_dualized_Fn)
   have Fprime_in_dnf: "is_dnf Fprime" 
