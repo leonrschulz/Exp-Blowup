@@ -601,6 +601,145 @@ proof -
   then show ?thesis by (simp add: def_G)
 qed
 
+thm proposition4
+
+fun undnf :: "'a formula \<Rightarrow> 'a formula list" where
+"undnf (Or F G) = undnf F @ undnf G" |
+"undnf H = [H]"
+
+fun count_Or :: "'a formula \<Rightarrow> nat" where
+"count_Or (Or F G) = count_Or F + count_Or G + 1" |
+"count_Or _ = 0"
+
+lemma length_undnf: "length (undnf \<phi>) = count_Or \<phi> + 1"
+  by (induction \<phi>) simp_all
+
+
+lemma equiv_BigOr_append: "equiv (BigOr (xs @ ys)) (Or (BigOr xs) (BigOr ys))"
+  by (induction xs) (simp_all add: equiv_def)
+
+lemma transp_equiv: "transp equiv"
+  by (rule transpI) (simp add: equiv_def)
+
+lemma equiv_BigOr_undnf_if_dnf:
+  fixes \<phi> :: "'a formula"
+  shows "equiv (\<^bold>\<Or>undnf \<phi>) \<phi>"
+proof (induction \<phi> rule: is_dnf.induct)
+  case (1 F G)
+  then show ?case
+    using equiv_BigOr_append
+    by (smt (verit) Formula_Size_Lower_Bound.equiv_def formula_semantics.simps(5) undnf.simps(1))
+qed (simp_all add: equiv_def)
+
+lemma ball_undnf_is_conj:
+  fixes \<phi> :: "'a formula"
+  assumes dnf: "is_dnf \<phi>"
+  shows "\<And>T. T \<in> set (undnf \<phi>) \<Longrightarrow> is_conj T"
+  using dnf
+  by (induction \<phi> rule: is_dnf.induct) auto
+
+lemma sizef_BigOr:"sizef (BigOr xs) = sum_list (map sizef xs) + length xs + 1"
+  by (induction xs) simp_all
+
+lemma sizef_conv_sum_list_undnf: "sizef \<phi> = sum_list (map sizef (undnf \<phi>)) + count_Or \<phi>"
+  by (induction \<phi>) simp_all
+
+lemma sizef_BigOr_undnf:
+  fixes \<phi> :: "'a formula"
+  shows "sizef (BigOr (undnf \<phi>)) = sizef \<phi> + 2"
+proof -
+  have "sizef \<phi> + 2 = sizef \<phi> + 1 + 1"
+    by presburger
+  also have "\<dots> = sum_list (map sizef (undnf \<phi>)) + count_Or \<phi> + 1 + 1"
+    using sizef_conv_sum_list_undnf[of \<phi>] by presburger
+  also have "\<dots> = sum_list (map sizef (undnf \<phi>)) + length (undnf \<phi>) + 1"
+    using length_undnf[of \<phi>] by presburger
+  also have "\<dots> = sizef (BigOr (undnf \<phi>))"
+    unfolding sizef_BigOr ..
+  finally show ?thesis
+    by (rule sym)
+qed
+
+lemma sizef_BigOr_filter_le: "sizef (BigOr (filter P xs)) \<le> sizef (BigOr xs)"
+  by (induction xs) simp_all
+
+lemma ex_equiv_disj_list_if_is_dnf:
+  fixes \<phi> :: "'a formula"
+  assumes dnf: "is_dnf \<phi>"
+  shows "\<exists>(Ts :: 'a formula list). equiv \<phi> (\<^bold>\<Or>Ts) \<and>
+    sizef (BigOr Ts) \<le> sizef \<phi> + 2 \<and>
+    (\<forall>T \<in> set Ts. is_conj T) \<and>
+    (\<forall>T \<in> set Ts. \<exists>\<alpha>. \<alpha> \<Turnstile> T)"
+proof -
+  define Ts :: "'a formula list" where
+    "Ts = filter (\<lambda>T. \<exists>\<alpha>. \<alpha> \<Turnstile> T) (undnf \<phi>)"
+
+  show ?thesis
+  proof (intro exI[of _ Ts] conjI ballI)
+    have "equiv \<phi> (BigOr (undnf \<phi>))"
+      using equiv_BigOr_undnf_if_dnf
+      by (metis equiv_def)
+    then show "equiv \<phi> (BigOr Ts)"
+      unfolding Ts_def
+      by (smt (verit) BigOr_semantics
+          Formula_Size_Lower_Bound.equiv_def
+          mem_Collect_eq set_filter)
+  next
+    have "sizef (BigOr (undnf \<phi>)) = sizef \<phi> + 2"
+      using sizef_BigOr_undnf .
+    then show "sizef (BigOr Ts) \<le> sizef \<phi> + 2"
+      unfolding Ts_def
+      using sizef_BigOr_filter_le[of "\<lambda>T. \<exists>\<alpha>. \<alpha> \<Turnstile> T" "undnf \<phi>"]
+      by presburger
+  next
+    show "\<And>T. T \<in> set Ts \<Longrightarrow> is_conj T"
+      using ball_undnf_is_conj[OF dnf]
+      by (simp add: Ts_def)
+  next
+    show "\<And>T. T \<in> set Ts \<Longrightarrow> \<exists>\<alpha>. \<alpha> \<Turnstile> T"
+      by (simp add: Ts_def)
+  qed
+qed
+
+lemma proposition4':
+  fixes n :: nat
+  assumes "n > 0"
+  shows "\<exists>(F\<^sub>n :: var formula).
+    is_cnf F\<^sub>n \<and>
+    sizef F\<^sub>n = 8 * n + 1 \<and>
+    (\<forall>(G\<^sub>n :: var formula). equiv F\<^sub>n G\<^sub>n \<longrightarrow> is_dnf G\<^sub>n \<longrightarrow> sizef G\<^sub>n + 2 \<ge> n * 2 ^ n)"
+proof -
+  show ?thesis
+  proof (intro exI conjI allI impI)
+    show "is_cnf (Fn n)"
+      using Fn_in_cnf .
+  next
+    show "sizef (Fn n) = 8 * n + 1"
+      using size_Fn .
+  next
+    fix G\<^sub>n :: "var formula"
+    assume "equiv (Fn n) G\<^sub>n"
+    assume "is_dnf G\<^sub>n"
+
+    then obtain Ts :: "var formula list" where
+      "\<forall>T \<in> set Ts. is_conj T" and
+      "\<forall>T \<in> set Ts. \<exists>\<alpha>. \<alpha> \<Turnstile> T" and
+      "equiv G\<^sub>n (\<^bold>\<Or>Ts)" and
+      sizef: "sizef (BigOr Ts) \<le> sizef G\<^sub>n + 2"
+      using ex_equiv_disj_list_if_is_dnf by metis
+
+    moreover have "equiv (Fn n) (\<^bold>\<Or>Ts)"
+      using \<open>equiv (Fn n) G\<^sub>n\<close> \<open>equiv G\<^sub>n (\<^bold>\<Or>Ts)\<close>
+      by (metis equiv_def)
+
+    ultimately have "n * 2 ^ n \<le> sizef \<^bold>\<Or>Ts"
+      using proposition4[OF \<open>0 < n\<close>] by metis
+
+    then show "n * 2 ^ n \<le> sizef G\<^sub>n + 2"
+      using sizef by presburger
+  qed
+qed
+
 
 section \<open>Additional Functions for Corollary 5\<close>
 
