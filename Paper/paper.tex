@@ -102,9 +102,9 @@ A \emph{conjunctive} formula is either a literal or the conjunction of a literal
 \begin{theorem}
   Let $n > 0$ be a natural number.
   Let $Ts$ be a list of formulas.
-  Let $G = \bigvee_{T \in \textss{set} \, Ts} T$.
-  If all formulas in $Ts$ are conjunctive and satisfiable (i.e., $\forall T \in \textss{set} \, Ts. \: \exists \alpha. \: \alpha \models T$), and $F_n$ is equivalent to $G$ (i.e., $\textss{equiv} \, F_n \, G$),
-  then $\textss{sizef} \, G \ge n \cdot 2^n$.
+  Let $G = \bigvee_{T \in \mathsf{set} \, Ts} T$.
+  If all formulas in $Ts$ are conjunctive and satisfiable (i.e., $\forall T \in \mathsf{set} \, Ts. \: \exists \alpha. \: \alpha \models T$), and $F_n$ is equivalent to $G$ (i.e., $\mathsf{equiv} \, F_n \, G$),
+  then $\mathsf{sizef} \, G \ge n \cdot 2^n$.
 \end{theorem}
 
 \section{DNF to CNF}
@@ -113,9 +113,9 @@ A \emph{conjunctive} formula is either a literal or the conjunction of a literal
 \begin{corollary}
   Let $n > 0$ be a natural number.
   Let $Cs$ be a list of formulas.
-  Let $G = \bigwedge_{C \in \textss{set} \, Cs} C$.
-  If all formulas in $Cs$ are disjunctive and not tautological (i.e., $\forall C \in \textss{set} \, Cs. \: \neg (\forall \alpha. \: \alpha \models C)$), and $\textss{dualize} \, F_n$ is equivalent to $G$ (i.e., $\textss{equiv} \, (\textss{dualize} \, F_n) \, G$),
-  then $\textss{sizef} \, G \ge n \cdot 2^n$.
+  Let $G = \bigwedge_{C \in \mathsf{set} \, Cs} C$.
+  If all formulas in $Cs$ are disjunctive and not tautological (i.e., $\forall C \in \mathsf{set} \, Cs. \: \neg (\forall \alpha. \: \alpha \models C)$), and $\mathsf{dualize} \, F_n$ is equivalent to $G$ (i.e., $\mathsf{equiv} \, (\mathsf{dualize} \, F_n) \, G$),
+  then $\mathsf{sizef} \, G \ge n \cdot 2^n$.
 \end{corollary}
 
 \section{Discussion}
