@@ -82,19 +82,28 @@
 \section{Preliminaries}
 \label{sec_preliminaries}
 
-%TODO: introduce formulas.
-%TODO: specify that formulas have type "var formula".
-%TODO: introduce sizef and maybe |.| notation.
+%TODO: X introduce type var.
+%TODO: X introduce formulas.
+%TODO: X specify that formulas have type "var formula".
+%TODO: X introduce sizef and maybe |.| notation.
 %TODO: introduce the "set :: 'a list => 'a set" function.
-%TODO: introduce satisfiable
-%TODO: introduce the entailment relation
-%TODO: introduce formula equivalence
-%TODO: introduce disjunctive formulas
-%TODO: introduce tautological formulas
+%TODO: X introduce satisfiable
+%TODO: X introduce the entailment relation
+%TODO: X introduce formula equivalence
+%TODO: X introduce disjunctive formulas
+%TODO: X introduce tautological formulas
 %TODO: introduce the "dualize :: 'a formula => 'a formula" function
+A \emph{formula} is inductively defined as an atom, $\bot$, the negation of a formula, or the disjunction, conjunction or implication of two formulas. All atoms contained in such formulas are of the type \textsf{var}, representing a combination of a Boolean value and a natural number. A \emph{valuation} is defined as a function that maps an atom to a Boolean value. A valuation \emph{satisfies} a formula if the formula evaluates to True when all of its atoms are replaced by the specific truth values assigned to them by the valuation. A formula is \emph{satisfiable} if there exists a valuation that satisfies it. A formula is \emph{tautological} if it is satisfied by every valuation. Two formulas are \emph{equivalent} if they have the same truth value for every valuation. A \emph{literal} is a special case of a formula consisting of either a positive or negative atom, or a positive or negative $\bot$. A formula is \emph{conjunctive} if it is either a literal or its first subformula is a literal and its second a conjunctive formula. Analogously a formula is \emph{disjunctive} if it is either a literal or its first subformula is a literal and its second a disjunctive formula.
 
-A \emph{literal} is a special case of formula that consists either of a positive or negative atom or of a positive or negative $\bot$.
-A \emph{conjunctive} formula is either a literal or the conjunction of a literal and a conjunctive formula.
+\begin{definition}The function set :: 'a list $\Rightarrow$ 'a set converts a list into a set.
+\end{definition}
+
+\begin{definition}The function sizef :: 'a formula $\Rightarrow$ nat calculates the size of a formula but without taking $\lnot$ into account.
+\end{definition}
+
+\begin{definition}The function dualize :: 'a formula $\Rightarrow$ 'a formula converts a formula in its dualized form by replacing each literal with its complementary literal and switching the symbols $\bot$ and $\top$, as well as $\land$ and $\lor$.
+\end{definition}
+
 
 \section{CNF to DNF}
 \label{sec_CNF_to_DNF}
@@ -102,9 +111,9 @@ A \emph{conjunctive} formula is either a literal or the conjunction of a literal
 \begin{theorem}
   Let $n > 0$ be a natural number.
   Let $Ts$ be a list of formulas.
-  Let $G = \bigvee_{T \in \textss{set} \, Ts} T$.
-  If all formulas in $Ts$ are conjunctive and satisfiable (i.e., $\forall T \in \textss{set} \, Ts. \: \exists \alpha. \: \alpha \models T$), and $F_n$ is equivalent to $G$ (i.e., $\textss{equiv} \, F_n \, G$),
-  then $\textss{sizef} \, G \ge n \cdot 2^n$.
+  Let $G = \bigvee_{T \in \mathsf{set} \, Ts} T$.
+  If all formulas in $Ts$ are conjunctive and satisfiable (i.e., $\forall T \in \mathsf{set} \, Ts. \: \exists \alpha. \: \alpha \models T$), and $F_n$ is equivalent to $G$ (i.e., $\mathsf{equiv} \, F_n \, G$),
+  then $\mathsf{sizef} \, G \ge n \cdot 2^n$.
 \end{theorem}
 
 \section{DNF to CNF}
@@ -113,9 +122,9 @@ A \emph{conjunctive} formula is either a literal or the conjunction of a literal
 \begin{corollary}
   Let $n > 0$ be a natural number.
   Let $Cs$ be a list of formulas.
-  Let $G = \bigwedge_{C \in \textss{set} \, Cs} C$.
-  If all formulas in $Cs$ are disjunctive and not tautological (i.e., $\forall C \in \textss{set} \, Cs. \: \neg (\forall \alpha. \: \alpha \models C)$), and $\textss{dualize} \, F_n$ is equivalent to $G$ (i.e., $\textss{equiv} \, (\textss{dualize} \, F_n) \, G$),
-  then $\textss{sizef} \, G \ge n \cdot 2^n$.
+  Let $G = \bigwedge_{C \in \mathsf{set} \, Cs} C$.
+  If all formulas in $Cs$ are disjunctive and not tautological (i.e., $\forall C \in \mathsf{set} \, Cs. \: \neg (\forall \alpha. \: \alpha \models C)$), and $\mathsf{dualize} \, F_n$ is equivalent to $G$ (i.e., $\mathsf{equiv} \, (\mathsf{dualize} \, F_n) \, G$),
+  then $\mathsf{sizef} \, G \ge n \cdot 2^n$.
 \end{corollary}
 
 \section{Discussion}
