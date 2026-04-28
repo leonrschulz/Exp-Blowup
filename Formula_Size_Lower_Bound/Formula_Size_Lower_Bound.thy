@@ -400,13 +400,15 @@ lemma inj_on_Var[simp]: "inj_on (\<lambda>(x, y). Var x y) A" for A
 section \<open>Proposition 4\<close>
 
 proposition proposition4:
-  fixes n :: nat
+  fixes n :: nat and Ts :: "var formula list"
+  defines "F \<equiv> Fn n" and "G \<equiv> BigOr Ts"
   assumes n_greater_0: "n > 0" and
-          def_F: "F = Fn n" and
-          def_G: "G = BigOr Ts \<and> (\<forall>T\<in>set Ts. is_conj T \<and> (\<exists> Val. Val \<Turnstile> T))" and
+          G_spec: "(\<forall>T\<in>set Ts. is_conj T \<and> (\<exists> Val. Val \<Turnstile> T))" and
           equiv_F_G: "equiv F G"
         shows "sizef G \<ge> n*2^n"
 proof -
+  note def_F = F_def
+  note def_G = G_def G_spec
   have size_F: "sizef F = 8*n+1" 
     using def_F by (simp add: size_Fn)
   have in_cnf_F: "is_cnf F" 
