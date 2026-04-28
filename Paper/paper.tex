@@ -82,15 +82,21 @@
 \section{Preliminaries}
 \label{sec_preliminaries}
 
+%TODO: introduce formulas.
+%TODO: specify that formulas have type "var formula".
+%TODO: introduce definition and maybe |.| notation for sizef.
+
+A \emph{literal} is a special case of formula that consists either of a positive or negative atom or of a positive or negative $\bot$.
+A \emph{conjunctive} formula is either a literal or the conjunction of a literal and a conjunctive formula.
+
 \section{CNF to DNF}
 \label{sec_CNF_to_DNF}
 
 \begin{theorem}
   Let $n > 0$ be a natural number.
-  If$F = Fn n$,
-  $G = \bigvee_{t \in \textss{set} \, Ts} T$,
-  $\forall T \in \textss{set} \, Ts. \textss{is\_conj} \, T \land (\exists Val. Val \models T)$,
-  $\textss{equiv} \, F \, G$,
+  Let $Ts$ be a list of formulas.
+  Let $G = \bigvee_{T \in \textss{set} \, Ts} T$.
+  If all formulas in $Ts$ are conjunctive and satisfiable (i.e., $\forall T \in \textss{set} \, Ts. \: \exists \alpha. \: \alpha \models T$), and $F_n$ is equivalent to $G$ (i.e., $\textss{equiv} \, F_n \, G$),
   then $\textss{sizef} \, G \ge n \cdot 2^n$.
 \end{theorem}
 
