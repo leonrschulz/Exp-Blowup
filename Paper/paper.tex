@@ -106,7 +106,7 @@ All atoms are of the type \textsf{var}, representing a combination of a Boolean 
 A formula is \emph{conjunctive} if it is either a literal or its first subformula is a literal and its second a conjunctive formula.
 Analogously a formula is \emph{disjunctive} if it is either a literal or its first subformula is a literal and its second a disjunctive formula.
 
-A \emph{valuation} is defined as a function from atoms to Boolean values.
+A \emph{valuation} is a function from atoms to Boolean values.
 A formula can be evalutated w.r.t.\ a valuation to a Boolean value by replacing all of its atoms by the specific truth values assigned to them by the valuation
 The \emph{evaluation} of a formula w.r.t.\ a valuation is the Boolean value we get after replacing all atoms with the specific truth values assigned by the valuation.
 We say that a valuation $\alpha$ \emph{satisfies} a formula $\phi$, written $\alpha \models \phi$, if the formula evaluates to true w.r.t.\ the valuation.
