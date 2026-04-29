@@ -1262,14 +1262,6 @@ section \<open>Unused Functions & Lemmata\<close>
 
 subsection \<open>From Proposition 4\<close>
 
-fun variables :: "'a formula \<Rightarrow> 'a set " where
-"variables Bot = {}" |
-"variables (Atom v) = {v}" |
-"variables (Not F) = variables F" |
-"variables (And F G) = variables F \<union> variables G" |
-"variables (Or F G) = variables F \<union> variables G" |
-"variables (F \<^bold>\<rightarrow> G) = variables F \<union> variables G"
-
 lemma Fn_sat: "\<exists> Val. Val \<Turnstile> Fn n"
 proof -
   define Val where "Val = (\<lambda>x. case x of (Var i b) \<Rightarrow> b)"
