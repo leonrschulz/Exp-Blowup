@@ -8,14 +8,12 @@ begin
 
 section \<open>Moved to \<^session>\<open>HOL\<close>\<close>
 
-(*MDS*)
 (*TODO: Delete when a new Isabelle version is released. *)
 lemma card_Domain_le:
   assumes "finite A"
   shows "card (Domain A) \<le> card A"
   using assms by (metis card_image_le fst_eq_Domain)
 
-(*MDS*)
 (*TODO: Delete when a new Isabelle version is released. *)
 lemma card_le_card_if_mem_imp_ex_mem:
   fixes f :: "'a \<Rightarrow> 'b \<Rightarrow> 'c" and \<X> :: "'a set" and \<Y> :: "'c set"
@@ -220,7 +218,6 @@ fun sizef :: "'a formula \<Rightarrow> nat" where
 lemma Suc_0_le_sizef[simp]: "Suc 0 \<le> sizef F"
   by (induction F) simp_all
 
-(*MDS*)
 lemma card_atoms_le_sizef: "card (atoms F) \<le> sizef F"
 proof (induction F)
   case (And F1 F2)
@@ -409,7 +406,6 @@ subsection \<open>Fn function\<close>
 
 datatype var = Var nat bool
 
-(*MDS*)
 lemma inj_on_Var[simp]: "inj_on (\<lambda>(x, y). Var x y) A" for A
   by (rule inj_onI) (simp add: case_prod_beta prod_eq_iff)
 
@@ -692,7 +688,6 @@ lemma impl_not_cont_pos: "\<not> cont_pos F v \<Longrightarrow> cont_neg F v \<o
 lemma impl_not_cont: "\<not> cont F v \<Longrightarrow> \<not> cont_pos F v \<and> \<not> cont_neg F v"
   by (induction F) (auto elim: cont.elims)
 
-(*MDS*)
 lemma mem_atoms_if_cont_pos:
   assumes "cont_pos T v"
   shows "v \<in> atoms T"
@@ -818,28 +813,23 @@ proof -
       using equiv_F_G equiv_def by auto
   qed
 
-  (*MDS*)
   have n_le_card_atoms: "n \<le> card (atoms T)" if T_in: "T \<in> set Ts" for T
     using card_le_card_if_mem_imp_ex_mem[of "{1..n}" "atoms T" Var, simplified]
     using occ_var_bool_diff[rule_format, OF T_in]
     by (metis One_nat_def atLeastAtMost_iff mem_atoms_if_cont_pos)
 
-  (*MDS*)
   have all_T_ge_n: "\<forall> T \<in> set Ts. sizef T \<ge> n"
     using n_le_card_atoms card_atoms_le_sizef
     using le_trans by blast
-                                   
-  (*MDS*)
+
   define conj_of_eps where
     "conj_of_eps = (\<lambda> eps. (SOME T. T \<in> set Ts \<and> (\<forall> i \<in> {1..(length eps)}. 
                             cont_pos T (Var i (nth eps (i-1))))))"
 
-  (*MDS*)
   have T_of_conj_of_eps_in_Ts: "conj_of_eps eps \<in> set Ts" if "length eps = n" for eps
     unfolding conj_of_eps_def
     by (smt (verit, best) ex_T_cont_pos_var_eps that verit_sko_ex')
 
-  (*MDS*)
   have card_eps_le_card_Ts: "card {eps :: bool list. length eps = n} \<le> card (set Ts)"
   proof (rule card_inj_on_le [of conj_of_eps])
     show inj_conj_of_eps: "inj_on conj_of_eps {eps. length eps = n}"
