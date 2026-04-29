@@ -53,11 +53,11 @@ section \<open>Move to \<^session>\<open>Propositional_Proof_Systems\<close>\<cl
 lemma is_disj_if_is_lit_plus: "is_lit_plus \<phi> \<Longrightarrow> is_disj \<phi>"
   by (induction \<phi> rule: is_lit_plus.induct) simp_all
 
-lemma disj_is_cnf: "is_disj F \<Longrightarrow> is_cnf F"
-  by (induction F; auto)
+lemma disj_is_cnf: "is_disj \<phi> \<Longrightarrow> is_cnf \<phi>"
+  by (induction \<phi>) auto
 
-lemma cnf_in_nnf: "is_cnf F \<Longrightarrow> is_nnf F"
-  by (induction F) (simp_all add: disj_is_nnf is_disj_if_is_lit_plus)
+lemma cnf_in_nnf: "is_cnf \<phi> \<Longrightarrow> is_nnf \<phi>"
+  by (induction \<phi>) (simp_all add: disj_is_nnf is_disj_if_is_lit_plus)
 
 
 section \<open>Functions, Predicates, and Datatypes\<close>
@@ -81,14 +81,14 @@ lemma equiv_transitive[trans]: "\<And>\<xi> \<phi> \<psi>. equiv \<xi> \<phi> \<
 subsection \<open>Conjunctive Normal Form\<close>
 
 fun uncnf :: "'a formula \<Rightarrow> 'a formula list" where
-  "uncnf (And F G) = uncnf F @ uncnf G" |
-  "uncnf H = [H]"
+  "uncnf (And \<phi> \<psi>) = uncnf \<phi> @ uncnf \<psi>" |
+  "uncnf \<phi> = [\<phi>]"
 
 lemma uncnf_neq_Nil[simp]: "uncnf \<phi> \<noteq> []"
   by (induction \<phi>) simp_all
 
 fun count_And :: "'a formula \<Rightarrow> nat" where
-  "count_And (And F G) = count_And F + count_And G + 1" |
+  "count_And (And \<phi> \<psi>) = count_And \<phi> + count_And \<psi> + 1" |
   "count_And _ = 0"
 
 lemma length_uncnf: "length (uncnf \<phi>) = count_And \<phi> + 1"
@@ -96,41 +96,41 @@ lemma length_uncnf: "length (uncnf \<phi>) = count_And \<phi> + 1"
 
 lemma ball_uncnf_is_disj:
   fixes \<phi> :: "'a formula"
-  assumes cnf: "is_cnf \<phi>"
+  assumes "is_cnf \<phi>"
   shows "\<And>C. C \<in> set (uncnf \<phi>) \<Longrightarrow> is_disj C"
-  using cnf
+  using assms
   by (induction \<phi> rule: is_cnf.induct) auto
 
 
 subsection \<open>Disjunctive Normal Form\<close>
 
 fun is_conj :: "'a formula \<Rightarrow> bool" where
-  "is_conj (And F G) = (is_lit_plus F \<and> is_conj G)" |
-  "is_conj F = is_lit_plus F"
+  "is_conj (And \<phi> \<psi>) \<longleftrightarrow> (is_lit_plus \<phi> \<and> is_conj \<psi>)" |
+  "is_conj \<phi> \<longleftrightarrow> is_lit_plus \<phi>"
 
 fun is_dnf :: "'a formula \<Rightarrow> bool" where
-  "is_dnf (Or F G) = (is_dnf F \<and> is_dnf G)" |
-  "is_dnf H = is_conj H"
+  "is_dnf (Or \<phi> \<psi>) \<longleftrightarrow> (is_dnf \<phi> \<and> is_dnf \<psi>)" |
+  "is_dnf \<phi> \<longleftrightarrow> is_conj \<phi>"
 
-lemma conj_is_dnf: "is_conj F \<Longrightarrow> is_dnf F"
-  by (induction F) auto
+lemma conj_is_dnf: "is_conj \<phi> \<Longrightarrow> is_dnf \<phi>"
+  by (induction \<phi>) auto
 
 fun undnf :: "'a formula \<Rightarrow> 'a formula list" where
-  "undnf (Or F G) = undnf F @ undnf G" |
-  "undnf H = [H]"
+  "undnf (Or \<phi> \<psi>) = undnf \<phi> @ undnf \<psi>" |
+  "undnf \<phi> = [\<phi>]"
 
 lemma undnf_neq_Nil[simp]: "undnf \<phi> \<noteq> []"
   by (induction \<phi>) simp_all
 
 lemma ball_undnf_is_conj:
   fixes \<phi> :: "'a formula"
-  assumes dnf: "is_dnf \<phi>"
+  assumes "is_dnf \<phi>"
   shows "\<And>T. T \<in> set (undnf \<phi>) \<Longrightarrow> is_conj T"
-  using dnf
+  using assms
   by (induction \<phi> rule: is_dnf.induct) auto
 
 fun count_Or :: "'a formula \<Rightarrow> nat" where
-  "count_Or (Or F G) = count_Or F + count_Or G + 1" |
+  "count_Or (Or \<phi> \<psi>) = count_Or \<phi> + count_Or \<psi> + 1" |
   "count_Or _ = 0"
 
 lemma length_undnf: "length (undnf \<phi>) = count_Or \<phi> + 1"
