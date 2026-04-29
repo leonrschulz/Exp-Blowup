@@ -704,12 +704,20 @@ qed
 
 lemma proposition4':
   fixes n :: nat
-  assumes "n > 0"
   shows "\<exists>(F\<^sub>n :: var formula).
     is_cnf F\<^sub>n \<and>
     sizef F\<^sub>n = 8 * n + 1 \<and>
     (\<forall>(G\<^sub>n :: var formula). equiv F\<^sub>n G\<^sub>n \<longrightarrow> is_dnf G\<^sub>n \<longrightarrow> sizef G\<^sub>n + 2 \<ge> n * 2 ^ n)"
-proof -
+proof (cases n)
+  case 0
+  then show ?thesis
+    using Fn_in_cnf size_Fn by fastforce
+next
+  case (Suc n')
+
+  then have "0 < n"
+    by presburger
+
   show ?thesis
   proof (intro exI conjI allI impI)
     show "is_cnf (Fn n)"
@@ -1096,12 +1104,21 @@ qed
 
 lemma corollary5':
   fixes n :: nat
-  assumes "n > 0"
   shows "\<exists>(F\<^sub>n :: var formula).
     is_dnf F\<^sub>n \<and>
     sizef F\<^sub>n = 8 * n + 1 \<and>
     (\<forall>(G\<^sub>n :: var formula). equiv F\<^sub>n G\<^sub>n \<longrightarrow> is_cnf G\<^sub>n \<longrightarrow> sizef G\<^sub>n + 2 \<ge> n * 2 ^ n)"
-proof -
+proof (cases n)
+  case 0
+  then show ?thesis
+    using dualized_Fn_in_dnf size_dualized_Fn
+    by fastforce
+next
+  case (Suc n')
+
+  then have "n > 0"
+    by presburger
+
   show ?thesis
   proof (intro exI conjI allI impI)
     show "is_dnf (dualize (Fn n))"
