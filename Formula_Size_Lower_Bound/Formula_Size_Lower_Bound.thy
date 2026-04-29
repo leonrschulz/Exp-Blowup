@@ -266,8 +266,8 @@ qed simp_all
 lemma aux_exp_size: "length Ts = n \<Longrightarrow> \<forall> T \<in> set Ts. sizef T \<ge> m \<Longrightarrow> sizef (BigOr' Ts) \<ge> n * m"
   by (induction Ts arbitrary: m n rule: BigOr'.induct; fastforce)
 
-lemma exp_size: "n > 0 \<Longrightarrow> length Ts \<ge> 2^n \<Longrightarrow> \<forall> T \<in> set Ts. sizef T \<ge> m \<Longrightarrow> 
-                 sizef (BigOr' Ts) \<ge> 2^n * m"
+lemma exp_size: "n > 0 \<Longrightarrow> length Ts \<ge> 2^n \<Longrightarrow> \<forall>T \<in> set Ts. sizef T \<ge> m \<Longrightarrow>
+  sizef (BigOr' Ts) \<ge> 2^n * m"
 proof (induction Ts arbitrary: n m rule: BigOr'.induct)
   case 1
   then show ?case
@@ -376,13 +376,38 @@ next
     by simp
 next
   case (3 F v va)
-  then show ?case
-    apply simp
-    by (smt (verit, del_insts) BigOr'.elims
-        add.commute add_diff_cancel_right diff_is_0_eq
-        less_add_Suc1 less_or_eq_imp_le
-        list.distinct(1) list.sel(1,3) plus_1_eq_Suc
-        sizef.simps(5))
+
+  have "sizef (BigOr' (filter P (F # v # va))) \<le> sizef (BigOr' (F # filter P (v # va)))"
+  proof (cases "P F")
+    case True
+    then show ?thesis
+      by simp
+  next
+    case False
+    then show ?thesis
+      by (metis (no_types, lifting) BigOr'.simps(1,3)
+          One_nat_def Suc_0_le_sizef add.commute
+          filter.simps(2) less_add_Suc1 less_or_eq_imp_le
+          list.exhaust plus_1_eq_Suc
+          sizef.simps(1,5))
+  qed
+
+  also have "\<dots> \<le> sizef (BigOr' (F # v # va))"
+  proof (cases "filter P (v # va)")
+    case Nil
+    then show ?thesis
+      by simp
+  next
+    case (Cons G Gs)
+    then have "sizef (BigOr' (F # filter P (v # va))) =
+      sizef F + sizef (BigOr' (filter P (v # va))) + 1"
+      by simp
+    also have "\<dots> \<le> sizef (BigOr' (F # v # va))"
+      using 3 by simp
+    finally show ?thesis .
+  qed
+
+  finally show ?case .
 qed
 
 lemma sizef_BigAnd'_filter_le: "sizef (BigAnd' (filter P xs)) \<le> sizef (BigAnd' xs)"
@@ -431,7 +456,7 @@ lemma Fn_in_cnf: "is_cnf (Fn n)"
 lemma Fn_in_nnf: "is_nnf (Fn n)"
   using Fn_in_cnf[THEN cnf_in_nnf] .
 
-lemma Fn_sat: "\<exists> Val. Val \<Turnstile> Fn n"
+lemma Fn_sat: "\<exists>Val. Val \<Turnstile> Fn n"
 proof -
   define Val where "Val = (\<lambda>x. case x of (Var i b) \<Rightarrow> b)"
   then have "Val \<Turnstile> Fn n" 
@@ -486,8 +511,7 @@ fun dualize :: "'a formula \<Rightarrow> 'a formula" where
   "dualize (Atom v) = Not (Atom v)" |
   "dualize (Not v) = v" |
   "dualize (And F G) = Or (dualize F) (dualize G)" |
-  "dualize (Or F G) = And (dualize F) (dualize G)" |
-  "dualize (Imp F G) = Bot"
+  "dualize (Or F G) = And (dualize F) (dualize G)"
 
 lemma size_dualized_Fn: "sizef (dualize (Fn n)) = 8 * n + 1" 
   by(induction n; auto)
@@ -516,10 +540,7 @@ next
   then have a: "is_lit_plus F1 \<and> is_disj F2" 
     by simp
   have 1: "is_lit_plus (dualize F1)" 
-    using a 
-    by (metis (full_types) is_lit_plus.elims(3)[of "dualize F1"]
-        is_lit_plus.simps(10,2,4,5)
-        is_lit_plus.simps(6,7,8,9) dualize.elims[of F1 "dualize F1"])
+    using a is_lit_plus.elims(2) by fastforce
   have 2: "is_conj (dualize F2)" 
     using a
     by (smt (verit) Or.IH(2) formula.distinct(3) is_cnf.simps(5) is_conj.simps(2,3,4)
@@ -1027,21 +1048,20 @@ proof -
         using equiv_Fprime_G equiv_def by blast
       then have "equiv G (dualize (Fn n))" 
         by (simp add: def_Fprime)
-      then have "equiv G (Not (Fn n))" 
-        using Fn_in_nnf equiv_dualize equiv_def by meson
+      also have "equiv \<dots> (Not (Fn n))"
+        using equiv_dualize[OF Fn_in_nnf] .
+      finally have "equiv G (Not (Fn n))" .
       then have "equiv (Not G) (Fn n)" 
         by (simp add: equiv_def)
       then show ?thesis 
         using G_in_nnf equiv_dualize equiv_def by meson
     qed
-    then have equiv_Fn_dualized_G: "equiv (Fn n) (dualize G)" 
-      by (simp add: equiv_def)
-    have dualized_G_disj_of_conj: "\<exists> Ts. (dualize G) = BigOr' Ts \<and> (\<forall>T\<in>set Ts. is_conj T \<and> 
-                                                                              (\<exists> Val. Val \<Turnstile> T))" 
+    have dualized_G_disj_of_conj: "\<exists>Ts.
+      (dualize G) = BigOr' Ts \<and> (\<forall>T\<in>set Ts. is_conj T \<and> (\<exists> Val. Val \<Turnstile> T))"
       using def_G dualized_conj_of_disjs_is_disj_of_conjs by auto
-    show False 
-      using proposition4 
-      using dualized_G_exp_size equiv_Fn_dualized_G dualized_G_disj_of_conj 
+    show False
+      using proposition4
+      using dualized_G_exp_size \<open>equiv (dualize G) (Fn n)\<close>[symmetric] dualized_G_disj_of_conj
       by (metis le_antisym n_greater_0 nat_less_le)
   qed
 qed
