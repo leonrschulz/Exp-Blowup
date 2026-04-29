@@ -81,15 +81,15 @@ lemma equiv_transitive[trans]: "\<And>\<xi> \<phi> \<psi>. equiv \<xi> \<phi> \<
 subsection \<open>Conjunctive Normal Form\<close>
 
 fun uncnf :: "'a formula \<Rightarrow> 'a formula list" where
-"uncnf (And F G) = uncnf F @ uncnf G" |
-"uncnf H = [H]"
+  "uncnf (And F G) = uncnf F @ uncnf G" |
+  "uncnf H = [H]"
 
 lemma uncnf_neq_Nil[simp]: "uncnf \<phi> \<noteq> []"
   by (induction \<phi>) simp_all
 
 fun count_And :: "'a formula \<Rightarrow> nat" where
-"count_And (And F G) = count_And F + count_And G + 1" |
-"count_And _ = 0"
+  "count_And (And F G) = count_And F + count_And G + 1" |
+  "count_And _ = 0"
 
 lemma length_uncnf: "length (uncnf \<phi>) = count_And \<phi> + 1"
   by (induction \<phi>) simp_all
@@ -139,9 +139,9 @@ lemma length_undnf: "length (undnf \<phi>) = count_Or \<phi> + 1"
 subsection \<open>Big Conjunction\<close>
 
 fun BigAnd' :: "'a formula list \<Rightarrow> 'a formula" where
-"BigAnd' [] = (\<^bold>\<not>\<bottom>)" |
-"BigAnd' [F] = F" |
-"BigAnd' (F # Fs) = F \<^bold>\<and> BigAnd' Fs"
+  "BigAnd' [] = (\<^bold>\<not>\<bottom>)" |
+  "BigAnd' [F] = F" |
+  "BigAnd' (F # Fs) = F \<^bold>\<and> BigAnd' Fs"
 
 lemma atoms_BigAnd'[simp]: "atoms (BigAnd' Fs) = \<Union>(atoms ` set Fs)"
   by (induction Fs rule: BigAnd'.induct) simp_all
