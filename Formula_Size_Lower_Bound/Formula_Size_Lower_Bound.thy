@@ -837,32 +837,32 @@ proof -
     using occ_var_bool_diff[rule_format, OF T_in]
     by (metis One_nat_def atLeastAtMost_iff mem_atoms_if_cont_pos)
 
-  have all_T_ge_n: "\<forall> T \<in> set Ts. sizef T \<ge> n"
+  have all_T_ge_n: "\<forall>T \<in> set Ts. sizef T \<ge> n"
     using n_le_card_atoms card_atoms_le_sizef
     using le_trans by blast
 
   define conj_of_eps where
-    "conj_of_eps = (\<lambda> eps. (SOME T. T \<in> set Ts \<and> (\<forall> i \<in> {1..(length eps)}. 
-                            cont_pos T (Var i (nth eps (i-1))))))"
+    "conj_of_eps = (\<lambda>eps.
+      (SOME T. T \<in> set Ts \<and> (\<forall>i \<in> {1..(length eps)}. cont_pos T (Var i (nth eps (i - 1))))))"
 
   have T_of_conj_of_eps_in_Ts: "conj_of_eps eps \<in> set Ts" if "length eps = n" for eps
     unfolding conj_of_eps_def
     by (smt (verit, best) ex_T_cont_pos_var_eps that verit_sko_ex')
 
   have card_eps_le_card_Ts: "card {eps :: bool list. length eps = n} \<le> card (set Ts)"
-  proof (rule card_inj_on_le [of conj_of_eps])
-    show inj_conj_of_eps: "inj_on conj_of_eps {eps. length eps = n}"
+  proof (rule card_inj_on_le[of conj_of_eps])
+    show "inj_on conj_of_eps {eps. length eps = n}"
     proof (rule inj_onI)
       fix xs ys :: "bool list"
       assume
-        x_in: "xs \<in> {eps. length eps = n}" and
-        y_in: "ys \<in> {eps. length eps = n}"
+        xs_in: "xs \<in> {eps. length eps = n}" and
+        ys_in: "ys \<in> {eps. length eps = n}"
 
       have "length xs = n"
-        using x_in by simp
+        using xs_in by simp
 
       moreover have "length ys = n"
-        using y_in by simp
+        using ys_in by simp
 
       ultimately have "length xs = length ys"
         by simp
@@ -905,29 +905,24 @@ proof -
           by satx
       qed
     qed
-
+  next
     show "conj_of_eps ` {eps. length eps = n} \<subseteq> set Ts"
-    proof (intro subsetI, unfold image_iff, elim bexE, unfold mem_Collect_eq)
-      show "\<And>x eps. length eps = n \<Longrightarrow> x = conj_of_eps eps \<Longrightarrow> x \<in> set Ts"
-        using T_of_conj_of_eps_in_Ts by metis
-    qed
+      using T_of_conj_of_eps_in_Ts by auto
   next
     show "finite (set Ts)"
       by simp
   qed
 
   moreover have "card {eps :: bool list. length eps = n} = 2^n"
-    using card_lists_length_eq[of "{True, False}" n]
-    by (smt (verit, best) Collect_cong UNIV_bool card_UNIV_bool def_F finite_code insert_commute 
-        insert_iff subset_code(1))
+    using card_lists_length_eq[of "UNIV :: bool set" n, simplified] .
 
   ultimately have G_cont_exp_T: "length Ts \<ge> 2^n"
     using card_length[of Ts] by presburger
-
-  have "sizef (BigOr' Ts) \<ge> n*2^n" 
-    using exp_size by (metis all_T_ge_n G_cont_exp_T mult.commute n_greater_0)
   
-  then show ?thesis by (simp add: def_G)
+  then show ?thesis
+    unfolding G_def
+    using exp_size[of n]
+    by (metis all_T_ge_n mult.commute n_greater_0)
 qed
 
 lemma ex_equiv_disj_list_if_is_dnf:
