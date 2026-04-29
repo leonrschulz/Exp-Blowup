@@ -764,7 +764,7 @@ proof -
       (both_present) "cont_pos T (Var i False)" "cont_pos T (Var i True)"
       by satx
 
-    then show "False"
+    then show False
     proof cases
       case both_absent
       then have "\<exists> Val. Val \<Turnstile> T"
