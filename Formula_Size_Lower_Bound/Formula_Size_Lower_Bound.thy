@@ -1215,7 +1215,7 @@ lemma corollary5':
   shows "\<exists>(F\<^sub>n :: var formula).
     is_dnf F\<^sub>n \<and>
     sizef F\<^sub>n = 8 * n + 1 \<and>
-    (\<forall>(G\<^sub>n :: var formula). equiv F\<^sub>n G\<^sub>n \<longrightarrow> is_cnf G\<^sub>n \<longrightarrow> sizef G\<^sub>n + 2 \<ge> n * 2 ^ n)"
+    (\<forall>(G\<^sub>n :: var formula). equiv F\<^sub>n G\<^sub>n \<longrightarrow> is_cnf G\<^sub>n \<longrightarrow> sizef G\<^sub>n \<ge> n * 2 ^ n)"
 proof (cases n)
   case 0
   then show ?thesis
@@ -1252,7 +1252,7 @@ next
     ultimately have "n * 2 ^ n \<le> sizef (BigAnd' Cs)"
       using corollary5[OF \<open>0 < n\<close>, of Cs] by metis
 
-    then show "n * 2 ^ n \<le> sizef G\<^sub>n + 2"
+    then show "n * 2 ^ n \<le> sizef G\<^sub>n"
       using sizef by presburger
   qed
 qed
