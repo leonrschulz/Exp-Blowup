@@ -752,62 +752,52 @@ proof -
     using def_F by (simp add: Fn_in_cnf)
   have in_dnf_G: "is_dnf G" 
     using def_G is_dnf_BigOr' by auto
-  have occ_var_bool_diff: "\<forall> T \<in> set Ts. \<forall> i \<in> {1..n}. 
-                           (cont_pos T (Var i False) \<noteq> cont_pos T (Var i True))"
-  proof (rule ccontr)
-    assume "\<not>(\<forall> T \<in> set Ts. \<forall> i \<in> {1..n}. 
-            (cont_pos T (Var i False) \<noteq> cont_pos T (Var i True)))"
-    then have "\<exists> T \<in> set Ts. \<exists> i \<in> {1..n}. 
-               \<not>(cont_pos T (Var i False) \<noteq> cont_pos T (Var i True))" 
-      by simp
-    then have "\<exists> T \<in> set Ts. \<exists> i \<in> {1..n}. 
-               (\<not>(cont_pos T (Var i False)) \<and> \<not>(cont_pos T (Var i True)) \<or> 
-                 (cont_pos T (Var i False)) \<and> (cont_pos T (Var i True)))" 
-      by auto
-    then obtain T where "\<exists> i \<in> {1..n}. 
-                         (\<not>(cont_pos T (Var i False)) \<and> \<not>(cont_pos T (Var i True)) \<or> 
-                           (cont_pos T (Var i False)) \<and> (cont_pos T (Var i True)))" 
-                  and "T \<in> set Ts" 
-      by auto
-    then obtain i where T_var: "(\<not>(cont_pos T (Var i False)) \<and> \<not>(cont_pos T (Var i True)) \<or> 
-                                  (cont_pos T (Var i False)) \<and> (cont_pos T (Var i True)))" 
-                  and "i \<in> {1..n}" 
-      by blast
-    show "False" 
-      using T_var
-    proof
-      assume asm1: "\<not>(cont_pos T (Var i False)) \<and> \<not>(cont_pos T (Var i True))"
-      then have "\<exists> Val. Val \<Turnstile> T" 
+  have occ_var_bool_diff: "cont_pos T (Var i False) \<noteq> cont_pos T (Var i True)"
+    if "T \<in> set Ts" and "i \<in> {1..n}"
+    for T :: "var formula" and i :: nat
+  proof (rule notI)
+    assume "cont_pos T (Var i False) = cont_pos T (Var i True)"
+
+    then consider
+      "\<not>(cont_pos T (Var i False)) \<and> \<not>(cont_pos T (Var i True))" |
+      "(cont_pos T (Var i False)) \<and> (cont_pos T (Var i True))"
+      by satx
+
+    then show "False"
+    proof cases
+      case 1
+      then have "\<exists> Val. Val \<Turnstile> T"
         by (simp add: \<open>T \<in> set Ts\<close> def_G)
-      then obtain ValsatT where Valsat: "ValsatT \<Turnstile> T" 
+      then obtain ValsatT where Valsat: "ValsatT \<Turnstile> T"
         by auto
-      define Val where 
-        def_Val: "Val = (\<lambda> v. (if v = Var i False \<or> v = Var i True then False else ValsatT v))"
-      then have "\<forall> v \<in> {v. cont_pos T v}. ValsatT v = Val v" 
-        by (simp add: def_Val asm1)
-      then have "Val \<Turnstile> T" 
-        by (metis \<open>T \<in> set Ts\<close> def_Val not_sat_conj_neg_true def_G impl_not_cont_pos 
+      define Val where
+        "Val = (\<lambda> v. (if v = Var i False \<or> v = Var i True then False else ValsatT v))"
+      have "\<forall> v \<in> {v. cont_pos T v}. ValsatT v = Val v"
+        by (simp add: Val_def 1)
+      then have "Val \<Turnstile> T"
+        by (metis \<open>T \<in> set Ts\<close> Val_def not_sat_conj_neg_true def_G(2) impl_not_cont_pos
             mem_Collect_eq Valsat sat_conj_val_cont_ident)
-      then have "\<exists> Val. Val \<Turnstile> T \<and> Val (Var i False) = False \<and> Val (Var i True) = False" 
-        using def_Val by auto
-      then have "\<exists> Val. Val \<Turnstile> G \<and> \<not>(Val \<Turnstile> F)" 
-        using BigOr'_semantics \<open>T \<in> set Ts\<close> \<open>i \<in> {1..n}\<close> 
+      then have "\<exists> Val. Val \<Turnstile> T \<and> Val (Var i False) = False \<and> Val (Var i True) = False"
+        unfolding Val_def by auto
+      then have "\<exists> Val. Val \<Turnstile> G \<and> \<not>(Val \<Turnstile> F)"
+        using BigOr'_semantics \<open>T \<in> set Ts\<close> \<open>i \<in> {1..n}\<close>
               def_F def_G not_sat_Fn_both_false n_greater_0 by blast
-      then show False 
+      then show False
         using equiv_F_G equiv_def by auto
     next
-      assume asm2: "(cont_pos T (Var i False)) \<and> (cont_pos T (Var i True))"
-      then have "\<exists> Val. Val \<Turnstile> T" 
+      case 2
+      then have "\<exists> Val. Val \<Turnstile> T"
         by (simp add: \<open>T \<in> set Ts\<close> def_G)
-      then have "\<exists> Val. Val \<Turnstile> T \<and> Val (Var i False) = True \<and> Val (Var i True) = True" 
-        using \<open>T \<in> set Ts\<close> asm2 not_sat_conj_pos_false def_G by blast
-      then have "\<exists> Val. Val \<Turnstile> G \<and> \<not>(Val \<Turnstile> F)" 
-        using BigOr'_semantics \<open>T \<in> set Ts\<close> \<open>i \<in> {1..n}\<close> 
+      then have "\<exists> Val. Val \<Turnstile> T \<and> Val (Var i False) = True \<and> Val (Var i True) = True"
+        using \<open>T \<in> set Ts\<close> 2 not_sat_conj_pos_false def_G by blast
+      then have "\<exists> Val. Val \<Turnstile> G \<and> \<not>(Val \<Turnstile> F)"
+        using BigOr'_semantics \<open>T \<in> set Ts\<close> \<open>i \<in> {1..n}\<close>
               def_F def_G not_sat_Fn_both_true n_greater_0 by blast
-      then show False 
+      then show False
         using equiv_F_G equiv_def by auto
     qed
   qed
+
   have ex_T_cont_pos_var_eps: "\<exists> T \<in> set Ts. \<forall> i \<in> {1..n}. cont_pos T (Var i (nth eps (i-1)))" 
     if "length eps = n" for eps :: "bool list"
   proof (rule ccontr)
