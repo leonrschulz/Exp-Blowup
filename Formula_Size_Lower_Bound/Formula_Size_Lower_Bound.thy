@@ -752,6 +752,7 @@ proof -
     using def_F by (simp add: Fn_in_cnf)
   have in_dnf_G: "is_dnf G" 
     using def_G is_dnf_BigOr' by auto
+
   have occ_var_bool_diff: "cont_pos T (Var i False) \<noteq> cont_pos T (Var i True)"
     if "T \<in> set Ts" and "i \<in> {1..n}"
     for T :: "var formula" and i :: nat
@@ -759,13 +760,13 @@ proof -
     assume "cont_pos T (Var i False) = cont_pos T (Var i True)"
 
     then consider
-      "\<not>(cont_pos T (Var i False)) \<and> \<not>(cont_pos T (Var i True))" |
-      "(cont_pos T (Var i False)) \<and> (cont_pos T (Var i True))"
+      (both_absent) "\<not>(cont_pos T (Var i False))" "\<not>(cont_pos T (Var i True))" |
+      (both_present) "cont_pos T (Var i False)" "cont_pos T (Var i True)"
       by satx
 
     then show "False"
     proof cases
-      case 1
+      case both_absent
       then have "\<exists> Val. Val \<Turnstile> T"
         by (simp add: \<open>T \<in> set Ts\<close> def_G)
       then obtain ValsatT where Valsat: "ValsatT \<Turnstile> T"
@@ -773,7 +774,7 @@ proof -
       define Val where
         "Val = (\<lambda> v. (if v = Var i False \<or> v = Var i True then False else ValsatT v))"
       have "\<forall> v \<in> {v. cont_pos T v}. ValsatT v = Val v"
-        by (simp add: Val_def 1)
+        by (simp add: Val_def both_absent)
       then have "Val \<Turnstile> T"
         by (metis \<open>T \<in> set Ts\<close> Val_def not_sat_conj_neg_true def_G(2) impl_not_cont_pos
             mem_Collect_eq Valsat sat_conj_val_cont_ident)
@@ -785,11 +786,11 @@ proof -
       then show False
         using equiv_F_G equiv_def by auto
     next
-      case 2
+      case both_present
       then have "\<exists> Val. Val \<Turnstile> T"
         by (simp add: \<open>T \<in> set Ts\<close> def_G)
       then have "\<exists> Val. Val \<Turnstile> T \<and> Val (Var i False) = True \<and> Val (Var i True) = True"
-        using \<open>T \<in> set Ts\<close> 2 not_sat_conj_pos_false def_G by blast
+        using \<open>T \<in> set Ts\<close> both_present not_sat_conj_pos_false def_G by blast
       then have "\<exists> Val. Val \<Turnstile> G \<and> \<not>(Val \<Turnstile> F)"
         using BigOr'_semantics \<open>T \<in> set Ts\<close> \<open>i \<in> {1..n}\<close>
               def_F def_G not_sat_Fn_both_true n_greater_0 by blast
