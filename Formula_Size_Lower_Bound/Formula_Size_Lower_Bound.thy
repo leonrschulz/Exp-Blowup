@@ -1131,8 +1131,6 @@ next
     assume "equiv (dualize (Fn n)) G\<^sub>n"
     assume "is_cnf G\<^sub>n"
 
-    thm corollary5[OF \<open>0 < n\<close>]
-
     then obtain Cs :: "var formula list" where
       "\<forall>C \<in> set Cs. is_disj C" and
       "\<forall>C \<in> set Cs. \<not> \<Turnstile> C" and
