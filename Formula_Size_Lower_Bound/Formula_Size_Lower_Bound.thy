@@ -409,6 +409,10 @@ subsection \<open>Fn function\<close>
 
 datatype var = Var nat bool
 
+(*MDS*)
+lemma inj_on_Var[simp]: "inj_on (\<lambda>(x, y). Var x y) A" for A
+  by (rule inj_onI) (simp add: case_prod_beta prod_eq_iff)
+
 fun Fn :: "nat \<Rightarrow> var formula" where
   "Fn 0 = (\<^bold>\<not>\<bottom>)"|
   "Fn (Suc n) =
@@ -440,7 +444,214 @@ proof -
     by auto
 qed
 
-subsection \<open>Miscellaneous\<close>
+lemma not_sat_Fn_both_false:
+  assumes "n \<noteq> 0" and "\<exists>i \<in> {1..n}. Val (Var i False) = False \<and> Val (Var i True) = False"
+  shows "\<not> Val \<Turnstile> Fn n"
+  using assms
+proof (induction n)
+  case 0
+  then show ?case 
+    by simp
+next
+  case (Suc n)
+  have "\<not> Val (Var (Suc n) False) \<and> \<not> Val (Var (Suc n) True) \<or> 
+        Val (Var (Suc n) False) \<and> Val (Var (Suc n) True) \<or> \<not> Val \<Turnstile> Fn n" 
+    by (metis One_nat_def Suc.IH Suc.prems(2) Suc_leI atLeastAtMost_iff le_antisym 
+        le_neq_implies_less nat_le_linear)
+  then show ?case 
+    by simp
+qed
+
+lemma not_sat_Fn_both_true:
+  assumes "n \<noteq> 0" and "\<exists>i \<in> {1..n}. Val (Var i False) = True \<and> Val (Var i True) = True"
+  shows "\<not> Val \<Turnstile> Fn n"
+  using assms
+proof (induction n)
+  case 0
+  then show ?case 
+    by simp
+next
+  case (Suc n)
+  have "\<not> Val (Var (Suc n) False) \<and> \<not> Val (Var (Suc n) True) \<or> 
+        Val (Var (Suc n) False) \<and> Val (Var (Suc n) True) \<or> \<not> Val \<Turnstile> Fn n" 
+    by (metis One_nat_def Suc.IH Suc.prems(2) Suc_leI atLeastAtMost_iff le_antisym 
+        le_neq_implies_less nat_le_linear)
+  then show ?case 
+    by simp
+qed
+
+
+subsection \<open>Dualize Function\<close>
+                                         
+text \<open>Should only be applied to a formula for which @{const is_nnf} holds.\<close>
+
+fun dualize :: "'a formula \<Rightarrow> 'a formula" where
+  "dualize Bot = Not Bot" |
+  "dualize (Atom v) = Not (Atom v)" |
+  "dualize (Not v) = v" |
+  "dualize (And F G) = Or (dualize F) (dualize G)" |
+  "dualize (Or F G) = And (dualize F) (dualize G)" |
+  "dualize (Imp F G) = Bot"
+
+lemma size_dualized_Fn: "sizef (dualize (Fn n)) = 8 * n + 1" 
+  by(induction n; auto)
+
+lemma dualized_Fn_in_dnf: "is_dnf (dualize (Fn n))"
+  by(induction n; auto)
+
+lemma size_ident_dualize: "is_nnf F \<Longrightarrow> sizef F = sizef (dualize F)"
+  by (induction F; simp)
+
+lemma equiv_dualize: "is_nnf F \<Longrightarrow> equiv (dualize F) (Not F)"
+  by (induction F) (simp_all add: equiv_def)
+
+lemma dualized_cnf_in_dnf: "is_cnf F \<Longrightarrow> is_dnf (dualize F)"
+proof (induction F)
+  case (Not F)
+  have "is_lit_plus (Not F)" 
+    using Not.prems by auto
+  then have "is_dnf F" 
+    by (metis conj_is_dnf Not.prems cnf_in_nnf is_conj.simps(2,3) is_lit_plus.simps(1,3) 
+        is_nnf_NotD)
+  then show ?case 
+    by simp
+next
+  case (Or F1 F2)
+  then have a: "is_lit_plus F1 \<and> is_disj F2" 
+    by simp
+  have 1: "is_lit_plus (dualize F1)" 
+    using a 
+    by (metis (full_types) is_lit_plus.elims(3)[of "dualize F1"]
+        is_lit_plus.simps(10,2,4,5)
+        is_lit_plus.simps(6,7,8,9) dualize.elims[of F1 "dualize F1"])
+  have 2: "is_conj (dualize F2)" 
+    using a
+    by (smt (verit) Or.IH(2) formula.distinct(3) is_cnf.simps(5) is_conj.simps(2,3,4)
+        is_disj.elims(2) is_disj.simps(4) is_dnf.simps(5) is_lit_plus.elims(2)
+        is_lit_plus.simps(1,11,2,3,4,9) dualize.simps(1,2,3,5))
+  show ?case 
+    using 1 2 by simp
+qed simp_all
+
+lemma dualized_conj_is_disj: "is_conj F \<Longrightarrow> is_disj (dualize F)"
+proof (induction F)
+  case (Not F)
+  then show ?case 
+    by (metis is_conj.simps(4) is_disj.simps(2,3) is_lit_plus.simps(1,3)
+        is_nnf.simps(6) is_nnf_NotD dualize.simps(3))
+next
+  case (And F1 F2)
+  then show ?case
+    by (metis is_cnf.simps(5) is_conj.simps(1) is_disj.simps(1) is_dnf.simps(5)
+        dualize.simps(4,5) dualized_cnf_in_dnf)
+qed simp_all
+
+lemma dualized_dnf_in_cnf: "is_dnf F \<Longrightarrow> is_cnf (dualize F)"
+proof (induction F)
+  case (Not F)
+  then show ?case 
+    by (metis is_cnf.simps(2,3) is_conj.simps(4) is_disj.simps(2,3) is_dnf.simps(4)
+        is_lit_plus.simps(1,3) is_nnf.simps(6) is_nnf_NotD dualize.simps(3))
+next
+  case (And F1 F2)
+  have "is_conj (And F1 F2)" 
+    using \<open>is_dnf (F1 \<^bold>\<and> F2)\<close> by simp
+  then have "is_lit_plus F1" and "is_conj F2" 
+    by auto
+  have 1: "is_lit_plus (dualize F1)" 
+    using \<open>is_lit_plus F1\<close> 
+    by (metis is_lit_plus.elims(2) is_lit_plus.simps(1,2,3,4) dualize.simps(1,2,3))
+  have 2: "is_disj (dualize F2)" 
+    using \<open>is_conj F2\<close> by (simp add: dualized_conj_is_disj)
+  have "is_lit_plus (dualize F1) \<and> is_disj (dualize F2)" 
+    using 1 2 by simp
+  then show ?case 
+    by simp
+qed auto
+
+lemma dualized_disj_not_taut_impl_sat: "is_disj F \<Longrightarrow> \<exists>Val. \<not> Val \<Turnstile> F \<Longrightarrow> \<exists>Val. Val \<Turnstile> dualize F"
+proof (induction F)
+  case (Or F1 F2)
+  have F_is_nnf: "is_nnf (F1 \<^bold>\<or> F2)" 
+    using Or.prems(1) disj_is_nnf by blast
+  then have equiv: "equiv (Not (F1 \<^bold>\<or> F2))(dualize (F1 \<^bold>\<or> F2))" 
+    using equiv_dualize equiv_def by blast
+  obtain Val where Val_def: "\<not> Val \<Turnstile> F1 \<^bold>\<or> F2" 
+    using Or.prems(2) by auto
+  then have "Val \<Turnstile> Not (F1 \<^bold>\<or> F2)" 
+    by auto
+  then have "Val \<Turnstile> dualize (F1 \<^bold>\<or> F2)" 
+    using equiv by (simp add: equiv_def)
+  then show ?case 
+    by auto
+qed auto
+
+lemma dualized_conj_of_disjs_is_disj_of_conjs: 
+  "(\<forall> C \<in> set Cs. is_disj C \<and> (\<exists> Val. \<not>(Val \<Turnstile> C))) \<Longrightarrow> 
+   \<exists> Ts. (dualize (BigAnd' Cs)) = BigOr' Ts \<and> (\<forall>T\<in>set Ts. is_conj T \<and> (\<exists> Val. Val \<Turnstile> T))"
+proof (induction Cs)
+  case Nil
+  then show ?case
+    by (metis BigAnd'.simps(1) BigOr'.simps(1) dualize.simps(3) empty_iff list.set(1))
+next
+  case (Cons C Cs)
+  have is_disj_C: "is_disj C" 
+    using Cons.prems by simp
+  have is_no_taut_C: "\<exists>\<alpha>. \<not> \<alpha> \<Turnstile> C" 
+    using Cons.prems by simp
+  have "\<exists>Ts. dualize (BigAnd' Cs) = BigOr' Ts \<and> (\<forall>T\<in>set Ts. is_conj T \<and> (\<exists>Val. Val \<Turnstile> T))" 
+    by (simp add: Cons.IH Cons.prems)
+  then obtain TsCs where 
+    def_TsCs: "dualize (BigAnd' Cs) = BigOr' TsCs \<and> (\<forall>T\<in>set TsCs. is_conj T \<and> (\<exists>Val. Val \<Turnstile> T))" 
+    by auto
+  define Ts where 
+    "Ts = [dualize C] @ TsCs"
+  then have 1: "BigOr' Ts = Or (dualize C) (dualize (BigAnd' Cs))" if "Cs \<noteq> []"
+    by (metis BigAnd'.simps(2,3) BigOr'.simps(1,3) Cons.prems append_Cons append_Nil def_TsCs
+        dualize.simps(4) dualized_disj_not_taut_impl_sat formula.distinct(15)
+        formula_semantics.simps(2) list.exhaust list.set_intros(1,2) that)
+  have a2: "is_conj (dualize C)"
+    using is_disj_C
+    by (metis disj_is_cnf is_conj.simps(1) is_disj.simps(1) is_dnf.simps(5) 
+        is_lit_plus.simps(2) dualize.simps(5) dualized_cnf_in_dnf)
+  have b2: "\<forall>T\<in>set TsCs. is_conj T" 
+    using def_TsCs by auto
+  have 2: "(\<forall>T\<in>set Ts. is_conj T)" 
+    using Ts_def a2 b2 by auto
+  have a3: "\<exists>\<alpha>. \<alpha> \<Turnstile> dualize C" 
+    using is_disj_C is_no_taut_C dualized_disj_not_taut_impl_sat by auto
+  have b3: "\<forall>T\<in>set TsCs. (\<exists>Val. Val \<Turnstile> T)" 
+    using def_TsCs by auto
+  have 3: "\<forall>T\<in>set Ts. (\<exists>Val. Val \<Turnstile> T)" 
+    using Ts_def a3 b3 by auto
+  have 4: "\<exists>Ts. Or (dualize C) (dualize (BigAnd' Cs)) = BigOr' Ts \<and>
+    (\<forall>T\<in>set Ts. is_conj T \<and> (\<exists>Val. Val \<Turnstile> T))" if "Cs \<noteq> []"
+    using 1[OF that] 2 3 by metis
+  show ?case
+  proof (intro exI[of _ Ts] conjI ballI)
+    show "dualize (BigAnd' (C # Cs)) = BigOr' Ts"
+    proof (cases "Cs = []")
+      case True
+      then show ?thesis
+        by (metis BigAnd'.simps(2) BigOr'.simps(2) def_TsCs Ts_def dualize.simps(3)
+            list.set_intros(1) formula_semantics.simps(2) BigOr'.simps(3) append.right_neutral
+            neq_Nil_conv BigAnd'.simps(1) formula.distinct(15))
+    next
+      case False
+      then show ?thesis
+        by (metis "1" BigAnd'.simps(3) dualize.simps(4) neq_Nil_conv)
+    qed
+  next
+    show "\<And>T. T \<in> set Ts \<Longrightarrow> is_conj T"
+      by (metis 2)
+  next
+    show "\<And>T. T \<in> set Ts \<Longrightarrow> \<exists>Val. Val \<Turnstile> T"
+      by (metis 3)
+  qed
+qed
+
+
+subsection \<open>Formula Contains Atom\<close>
 
 text \<open>Should only be applied to a formula for which @{const is_nnf} holds.\<close>
 
@@ -487,45 +698,6 @@ lemma mem_atoms_if_cont_pos:
   shows "v \<in> atoms T"
   using assms by (induction T v rule: cont_pos.induct) auto
 
-
-section \<open>Required Lemmata for Proposition 4\<close>
-
-lemma not_sat_Fn_both_false:
-  assumes "n \<noteq> 0" and "\<exists>i \<in> {1..n}. Val (Var i False) = False \<and> Val (Var i True) = False"
-  shows "\<not> Val \<Turnstile> Fn n"
-  using assms
-proof (induction n)
-  case 0
-  then show ?case 
-    by simp
-next
-  case (Suc n)
-  have "\<not> Val (Var (Suc n) False) \<and> \<not> Val (Var (Suc n) True) \<or> 
-        Val (Var (Suc n) False) \<and> Val (Var (Suc n) True) \<or> \<not> Val \<Turnstile> Fn n" 
-    by (metis One_nat_def Suc.IH Suc.prems(2) Suc_leI atLeastAtMost_iff le_antisym 
-        le_neq_implies_less nat_le_linear)
-  then show ?case 
-    by simp
-qed
-
-lemma not_sat_Fn_both_true:
-  assumes "n \<noteq> 0" and "\<exists>i \<in> {1..n}. Val (Var i False) = True \<and> Val (Var i True) = True"
-  shows "\<not> Val \<Turnstile> Fn n"
-  using assms
-proof (induction n)
-  case 0
-  then show ?case 
-    by simp
-next
-  case (Suc n)
-  have "\<not> Val (Var (Suc n) False) \<and> \<not> Val (Var (Suc n) True) \<or> 
-        Val (Var (Suc n) False) \<and> Val (Var (Suc n) True) \<or> \<not> Val \<Turnstile> Fn n" 
-    by (metis One_nat_def Suc.IH Suc.prems(2) Suc_leI atLeastAtMost_iff le_antisym 
-        le_neq_implies_less nat_le_linear)
-  then show ?case 
-    by simp
-qed
-
 lemma not_sat_conj_pos_false: 
   assumes "is_conj F" and "\<exists>v. cont_pos F v \<and> \<not>(Val v)"
   shows "\<not>(Val \<Turnstile> F)"
@@ -543,10 +715,6 @@ lemma sat_conj_val_cont_ident:
   shows "Val2 \<Turnstile> F"
   using assms
   by (induction F) (auto elim: cont_neg.elims is_lit_plus.elims)
-
-(*MDS*)
-lemma inj_on_Var[simp]: "inj_on (\<lambda>(x, y). Var x y) A" for A
-  by (rule inj_onI) (simp add: case_prod_beta prod_eq_iff)
 
 
 section \<open>Proposition 4\<close>
@@ -831,179 +999,6 @@ next
 
     then show "n * 2 ^ n \<le> sizef G\<^sub>n"
       using sizef by presburger
-  qed
-qed
-
-
-section \<open>Additional Functions for Corollary 5\<close>
-
-text \<open>Should only be applied to a formula for which @{const is_nnf} holds.\<close>
-
-fun dualize :: "'a formula \<Rightarrow> 'a formula" where
-  "dualize Bot = Not Bot" |
-  "dualize (Atom v) = Not (Atom v)" |
-  "dualize (Not v) = v" |
-  "dualize (And F G) = Or (dualize F) (dualize G)" |
-  "dualize (Or F G) = And (dualize F) (dualize G)" |
-  "dualize (Imp F G) = Bot"
-
-
-section \<open>Required Lemmata for Corollary 5\<close>
-
-lemma size_dualized_Fn: "sizef (dualize (Fn n)) = 8 * n + 1" 
-  by(induction n; auto)
-
-lemma dualized_Fn_in_dnf: "is_dnf (dualize (Fn n))"
-  by(induction n; auto)
-
-lemma size_ident_dualize: "is_nnf F \<Longrightarrow> sizef F = sizef (dualize F)"
-  by (induction F; simp)
-
-lemma equiv_dualize: "is_nnf F \<Longrightarrow> equiv (dualize F) (Not F)"
-  by (induction F) (simp_all add: equiv_def)
-
-lemma dualized_cnf_in_dnf: "is_cnf F \<Longrightarrow> is_dnf (dualize F)"
-proof (induction F)
-  case (Not F)
-  have "is_lit_plus (Not F)" 
-    using Not.prems by auto
-  then have "is_dnf F" 
-    by (metis conj_is_dnf Not.prems cnf_in_nnf is_conj.simps(2,3) is_lit_plus.simps(1,3) 
-        is_nnf_NotD)
-  then show ?case 
-    by simp
-next
-  case (Or F1 F2)
-  then have a: "is_lit_plus F1 \<and> is_disj F2" 
-    by simp
-  have 1: "is_lit_plus (dualize F1)" 
-    using a 
-    by (metis (full_types) is_lit_plus.elims(3)[of "dualize F1"]
-        is_lit_plus.simps(10,2,4,5)
-        is_lit_plus.simps(6,7,8,9) dualize.elims[of F1 "dualize F1"])
-  have 2: "is_conj (dualize F2)" 
-    using a
-    by (smt (verit) Or.IH(2) formula.distinct(3) is_cnf.simps(5) is_conj.simps(2,3,4)
-        is_disj.elims(2) is_disj.simps(4) is_dnf.simps(5) is_lit_plus.elims(2)
-        is_lit_plus.simps(1,11,2,3,4,9) dualize.simps(1,2,3,5))
-  show ?case 
-    using 1 2 by simp
-qed simp_all
-
-lemma dualized_conj_is_disj: "is_conj F \<Longrightarrow> is_disj (dualize F)"
-proof (induction F)
-  case (Not F)
-  then show ?case 
-    by (metis is_conj.simps(4) is_disj.simps(2,3) is_lit_plus.simps(1,3)
-        is_nnf.simps(6) is_nnf_NotD dualize.simps(3))
-next
-  case (And F1 F2)
-  then show ?case
-    by (metis is_cnf.simps(5) is_conj.simps(1) is_disj.simps(1) is_dnf.simps(5)
-        dualize.simps(4,5) dualized_cnf_in_dnf)
-qed simp_all
-
-lemma dualized_dnf_in_cnf: "is_dnf F \<Longrightarrow> is_cnf (dualize F)"
-proof (induction F)
-  case (Not F)
-  then show ?case 
-    by (metis is_cnf.simps(2,3) is_conj.simps(4) is_disj.simps(2,3) is_dnf.simps(4)
-        is_lit_plus.simps(1,3) is_nnf.simps(6) is_nnf_NotD dualize.simps(3))
-next
-  case (And F1 F2)
-  have "is_conj (And F1 F2)" 
-    using \<open>is_dnf (F1 \<^bold>\<and> F2)\<close> by simp
-  then have "is_lit_plus F1" and "is_conj F2" 
-    by auto
-  have 1: "is_lit_plus (dualize F1)" 
-    using \<open>is_lit_plus F1\<close> 
-    by (metis is_lit_plus.elims(2) is_lit_plus.simps(1,2,3,4) dualize.simps(1,2,3))
-  have 2: "is_disj (dualize F2)" 
-    using \<open>is_conj F2\<close> by (simp add: dualized_conj_is_disj)
-  have "is_lit_plus (dualize F1) \<and> is_disj (dualize F2)" 
-    using 1 2 by simp
-  then show ?case 
-    by simp
-qed auto
-
-lemma dualized_disj_not_taut_impl_sat: "is_disj F \<Longrightarrow> \<exists>Val. \<not> Val \<Turnstile> F \<Longrightarrow> \<exists>Val. Val \<Turnstile> dualize F"
-proof (induction F)
-  case (Or F1 F2)
-  have F_is_nnf: "is_nnf (F1 \<^bold>\<or> F2)" 
-    using Or.prems(1) disj_is_nnf by blast
-  then have equiv: "equiv (Not (F1 \<^bold>\<or> F2))(dualize (F1 \<^bold>\<or> F2))" 
-    using equiv_dualize equiv_def by blast
-  obtain Val where Val_def: "\<not> Val \<Turnstile> F1 \<^bold>\<or> F2" 
-    using Or.prems(2) by auto
-  then have "Val \<Turnstile> Not (F1 \<^bold>\<or> F2)" 
-    by auto
-  then have "Val \<Turnstile> dualize (F1 \<^bold>\<or> F2)" 
-    using equiv by (simp add: equiv_def)
-  then show ?case 
-    by auto
-qed auto
-
-lemma dualized_conj_of_disjs_is_disj_of_conjs: 
-  "(\<forall> C \<in> set Cs. is_disj C \<and> (\<exists> Val. \<not>(Val \<Turnstile> C))) \<Longrightarrow> 
-   \<exists> Ts. (dualize (BigAnd' Cs)) = BigOr' Ts \<and> (\<forall>T\<in>set Ts. is_conj T \<and> (\<exists> Val. Val \<Turnstile> T))"
-proof (induction Cs)
-  case Nil
-  then show ?case
-    by (metis BigAnd'.simps(1) BigOr'.simps(1) dualize.simps(3) empty_iff list.set(1))
-next
-  case (Cons C Cs)
-  have is_disj_C: "is_disj C" 
-    using Cons.prems by simp
-  have is_no_taut_C: "\<exists>\<alpha>. \<not> \<alpha> \<Turnstile> C" 
-    using Cons.prems by simp
-  have "\<exists>Ts. dualize (BigAnd' Cs) = BigOr' Ts \<and> (\<forall>T\<in>set Ts. is_conj T \<and> (\<exists>Val. Val \<Turnstile> T))" 
-    by (simp add: Cons.IH Cons.prems)
-  then obtain TsCs where 
-    def_TsCs: "dualize (BigAnd' Cs) = BigOr' TsCs \<and> (\<forall>T\<in>set TsCs. is_conj T \<and> (\<exists>Val. Val \<Turnstile> T))" 
-    by auto
-  define Ts where 
-    "Ts = [dualize C] @ TsCs"
-  then have 1: "BigOr' Ts = Or (dualize C) (dualize (BigAnd' Cs))" if "Cs \<noteq> []"
-    by (metis BigAnd'.simps(2,3) BigOr'.simps(1,3) Cons.prems append_Cons append_Nil def_TsCs
-        dualize.simps(4) dualized_disj_not_taut_impl_sat formula.distinct(15)
-        formula_semantics.simps(2) list.exhaust list.set_intros(1,2) that)
-  have a2: "is_conj (dualize C)"
-    using is_disj_C
-    by (metis disj_is_cnf is_conj.simps(1) is_disj.simps(1) is_dnf.simps(5) 
-        is_lit_plus.simps(2) dualize.simps(5) dualized_cnf_in_dnf)
-  have b2: "\<forall>T\<in>set TsCs. is_conj T" 
-    using def_TsCs by auto
-  have 2: "(\<forall>T\<in>set Ts. is_conj T)" 
-    using Ts_def a2 b2 by auto
-  have a3: "\<exists>\<alpha>. \<alpha> \<Turnstile> dualize C" 
-    using is_disj_C is_no_taut_C dualized_disj_not_taut_impl_sat by auto
-  have b3: "\<forall>T\<in>set TsCs. (\<exists>Val. Val \<Turnstile> T)" 
-    using def_TsCs by auto
-  have 3: "\<forall>T\<in>set Ts. (\<exists>Val. Val \<Turnstile> T)" 
-    using Ts_def a3 b3 by auto
-  have 4: "\<exists>Ts. Or (dualize C) (dualize (BigAnd' Cs)) = BigOr' Ts \<and>
-    (\<forall>T\<in>set Ts. is_conj T \<and> (\<exists>Val. Val \<Turnstile> T))" if "Cs \<noteq> []"
-    using 1[OF that] 2 3 by metis
-  show ?case
-  proof (intro exI[of _ Ts] conjI ballI)
-    show "dualize (BigAnd' (C # Cs)) = BigOr' Ts"
-    proof (cases "Cs = []")
-      case True
-      then show ?thesis
-        by (metis BigAnd'.simps(2) BigOr'.simps(2) def_TsCs Ts_def dualize.simps(3)
-            list.set_intros(1) formula_semantics.simps(2) BigOr'.simps(3) append.right_neutral
-            neq_Nil_conv BigAnd'.simps(1) formula.distinct(15))
-    next
-      case False
-      then show ?thesis
-        by (metis "1" BigAnd'.simps(3) dualize.simps(4) neq_Nil_conv)
-    qed
-  next
-    show "\<And>T. T \<in> set Ts \<Longrightarrow> is_conj T"
-      by (metis 2)
-  next
-    show "\<And>T. T \<in> set Ts \<Longrightarrow> \<exists>Val. Val \<Turnstile> T"
-      by (metis 3)
   qed
 qed
 
