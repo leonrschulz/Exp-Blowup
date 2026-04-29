@@ -799,30 +799,37 @@ proof -
     qed
   qed
 
-  have ex_T_cont_pos_var_eps: "\<exists> T \<in> set Ts. \<forall> i \<in> {1..n}. cont_pos T (Var i (nth eps (i-1)))" 
+  have ex_T_cont_pos_var_eps: "\<exists>T \<in> set Ts. \<forall>i \<in> {1..n}. cont_pos T (Var i (nth eps (i-1)))"
     if "length eps = n" for eps :: "bool list"
   proof (rule ccontr)
-    assume "\<not> (\<exists> T \<in> set Ts. \<forall> i \<in> {1..n}. cont_pos T (Var i (nth eps (i-1))))"
-    then have "\<forall> T \<in> set Ts. \<exists> i \<in> {1..n}. \<not>(cont_pos T (Var i (nth eps (i-1))))" 
-      by simp
-    then have content_T: "\<forall> T \<in> set Ts. \<exists> i \<in> {1..n}. cont_pos T (Var i (\<not>(nth eps (i-1))))" 
-      using occ_var_bool_diff by (metis (full_types))
+    assume assm: "\<not> (\<exists>T \<in> set Ts. \<forall>i \<in> {1..n}. cont_pos T (Var i (nth eps (i-1))))"
+
     define Val where 
-      def_Val: "Val = (\<lambda>x. case x of (Var i b) \<Rightarrow> (if b = (nth eps (i-1)) then True else False))"
-    have "Val \<Turnstile> Fn n" 
-      using def_Val by (induction n; simp)
-    then have 1: "Val \<Turnstile> F" 
-      by (simp add: def_F)
-    have "\<forall> i \<in> {1..n}. \<not> (Val (Var i (\<not>(nth eps (i-1)))))" 
-      using def_Val by auto
-    then have "\<forall> T \<in> set Ts. \<not>(Val \<Turnstile> T)" 
-      by (metis not_sat_conj_pos_false def_G content_T)
-    then have 2: "\<not>(Val \<Turnstile> G)" 
-      using def_G by auto
-    have "Val \<Turnstile> F \<and> \<not>(Val \<Turnstile> G)" 
-      using 1 2 by auto
-    then show False 
-      using equiv_F_G equiv_def by auto
+      "Val = (\<lambda>x. case x of (Var i b) \<Rightarrow> b = nth eps (i-1))"
+
+    have "Val \<Turnstile> F"
+    proof -
+      have "Val \<Turnstile> Fn n"
+        using Val_def by (induction n) simp_all
+      then show ?thesis
+        by (simp add: def_F)
+    qed
+
+    moreover have "\<not>(Val \<Turnstile> G)"
+    proof -
+      have "\<forall>T \<in> set Ts. \<exists> i \<in> {1..n}. cont_pos T (Var i (\<not>(nth eps (i-1))))"
+        using assm occ_var_bool_diff by (metis (full_types))
+      then have "\<forall> T \<in> set Ts. \<not>(Val \<Turnstile> T)"
+        by (metis (mono_tags, lifting) G_spec Val_def not_sat_conj_pos_false var.case)
+      then show ?thesis
+        unfolding G_def by auto
+    qed
+
+    ultimately have "\<not> equiv F G"
+      by (auto simp add: equiv_def)
+
+    then show False
+      using equiv_F_G by contradiction
   qed
 
   have n_le_card_atoms: "n \<le> card (atoms T)" if T_in: "T \<in> set Ts" for T
