@@ -6,7 +6,7 @@ imports
   Propositional_Proof_Systems.CNF_Formulas     
 begin
 
-subsection \<open>Moved to Isabelle-devel\<close>
+section \<open>Moved to \<^session>\<open>HOL\<close>\<close>
 
 (*MDS*)
 (*TODO: Delete when a new Isabelle version is released. *)
@@ -50,7 +50,95 @@ proof -
 qed
 
 
-section \<open>Functions & Datatypes\<close>
+section \<open>Move to \<^session>\<open>Propositional_Proof_Systems\<close>\<close>
+
+lemma is_disj_if_is_lit_plus: "is_lit_plus \<phi> \<Longrightarrow> is_disj \<phi>"
+  by (induction \<phi> rule: is_lit_plus.induct) simp_all
+
+lemma disj_is_cnf: "is_disj F \<Longrightarrow> is_cnf F"
+  by (induction F; auto)
+
+lemma cnf_in_nnf: "is_cnf F \<Longrightarrow> is_nnf F"
+  by (induction F) (simp_all add: disj_is_nnf is_disj_if_is_lit_plus)
+
+
+section \<open>Functions, Predicates, and Datatypes\<close>
+
+
+subsection \<open>Formula Equivalence\<close>
+
+definition equiv :: "'a formula \<Rightarrow> 'a formula \<Rightarrow> bool" where
+  "equiv F G \<longleftrightarrow> (\<forall>\<alpha>. (\<alpha> \<Turnstile> F) \<longleftrightarrow> (\<alpha> \<Turnstile> G))"
+
+lemma equiv_reflexive: "\<And>\<phi>. equiv \<phi> \<phi>"
+  unfolding equiv_def by simp
+
+lemma equiv_symmetric[sym]: "\<And>\<phi> \<psi>. equiv \<phi> \<psi> \<Longrightarrow> equiv \<psi> \<phi>"
+  unfolding equiv_def by simp
+
+lemma equiv_transitive[trans]: "\<And>\<xi> \<phi> \<psi>. equiv \<xi> \<phi> \<Longrightarrow> equiv \<phi> \<psi> \<Longrightarrow> equiv \<xi> \<psi>"
+  unfolding equiv_def by simp
+
+
+subsection \<open>Conjunctive Normal Form\<close>
+
+fun uncnf :: "'a formula \<Rightarrow> 'a formula list" where
+"uncnf (And F G) = uncnf F @ uncnf G" |
+"uncnf H = [H]"
+
+lemma uncnf_neq_Nil[simp]: "uncnf \<phi> \<noteq> []"
+  by (induction \<phi>) simp_all
+
+fun count_And :: "'a formula \<Rightarrow> nat" where
+"count_And (And F G) = count_And F + count_And G + 1" |
+"count_And _ = 0"
+
+lemma length_uncnf: "length (uncnf \<phi>) = count_And \<phi> + 1"
+  by (induction \<phi>) simp_all
+
+lemma ball_uncnf_is_disj:
+  fixes \<phi> :: "'a formula"
+  assumes cnf: "is_cnf \<phi>"
+  shows "\<And>C. C \<in> set (uncnf \<phi>) \<Longrightarrow> is_disj C"
+  using cnf
+  by (induction \<phi> rule: is_cnf.induct) auto
+
+
+subsection \<open>Disjunctive Normal Form\<close>
+
+fun is_conj :: "'a formula \<Rightarrow> bool" where
+  "is_conj (And F G) = (is_lit_plus F \<and> is_conj G)" |
+  "is_conj F = is_lit_plus F"
+
+fun is_dnf :: "'a formula \<Rightarrow> bool" where
+  "is_dnf (Or F G) = (is_dnf F \<and> is_dnf G)" |
+  "is_dnf H = is_conj H"
+
+lemma conj_is_dnf: "is_conj F \<Longrightarrow> is_dnf F"
+  by (induction F) auto
+
+fun undnf :: "'a formula \<Rightarrow> 'a formula list" where
+  "undnf (Or F G) = undnf F @ undnf G" |
+  "undnf H = [H]"
+
+lemma undnf_neq_Nil[simp]: "undnf \<phi> \<noteq> []"
+  by (induction \<phi>) simp_all
+
+lemma ball_undnf_is_conj:
+  fixes \<phi> :: "'a formula"
+  assumes dnf: "is_dnf \<phi>"
+  shows "\<And>T. T \<in> set (undnf \<phi>) \<Longrightarrow> is_conj T"
+  using dnf
+  by (induction \<phi> rule: is_dnf.induct) auto
+
+fun count_Or :: "'a formula \<Rightarrow> nat" where
+  "count_Or (Or F G) = count_Or F + count_Or G + 1" |
+  "count_Or _ = 0"
+
+lemma length_undnf: "length (undnf \<phi>) = count_Or \<phi> + 1"
+  by (induction \<phi>) simp_all
+
+subsection \<open>Big Conjunction\<close>
 
 fun BigAnd' :: "'a formula list \<Rightarrow> 'a formula" where
 "BigAnd' [] = (\<^bold>\<not>\<bottom>)" |
@@ -63,6 +151,15 @@ lemma atoms_BigAnd'[simp]: "atoms (BigAnd' Fs) = \<Union>(atoms ` set Fs)"
 lemma BigAnd'_semantics[simp]: "A \<Turnstile> BigAnd' Ts \<longleftrightarrow> (\<forall>f \<in> set Ts. A \<Turnstile> f)"
   by (induction Ts rule: BigAnd'.induct) simp_all
 
+lemma is_cnf_BigAnd':  "(\<forall>C \<in> set Cs. is_disj C \<and> \<not>(\<forall> Val. Val \<Turnstile> C)) \<Longrightarrow> is_cnf (BigAnd' Cs)"
+  by (induction Cs rule: BigAnd'.induct) (simp_all add: disj_is_cnf)
+
+lemma equiv_BigAnd'_append: "equiv (BigAnd' (xs @ ys)) (And (BigAnd' xs) (BigAnd' ys))"
+  by (induction xs) (simp_all add: equiv_def)
+
+
+subsection \<open>Big Disjunction\<close>
+
 fun BigOr' :: "'a formula list \<Rightarrow> 'a formula" where
   "BigOr' Nil = \<bottom>" |
   "BigOr' [F] = F" |
@@ -74,95 +171,7 @@ lemma atoms_BigOr'[simp]: "atoms (BigOr' Fs) = \<Union>(atoms ` set Fs)"
 lemma BigOr'_semantics[simp]: "A \<Turnstile> BigOr' Ts \<longleftrightarrow> (\<exists>f \<in> set Ts. A \<Turnstile> f)"
   by (induction Ts rule: BigOr'.induct) simp_all
 
-fun is_conj :: "'a formula \<Rightarrow> bool" where
-"is_conj (And F G) = (is_lit_plus F \<and> is_conj G)" |
-"is_conj F = is_lit_plus F"
-
-fun is_dnf :: "'a formula \<Rightarrow> bool" where
-"is_dnf (Or F G) = (is_dnf F \<and> is_dnf G)" |
-"is_dnf H = is_conj H"
-
-text \<open>Should only be applied to a formula for which @{const is_nnf} holds.\<close>
-fun cont_pos :: "'a formula \<Rightarrow> 'a \<Rightarrow> bool" where
-"cont_pos Bot l = False" |
-"cont_pos (Atom v) l = (v = l)" |
-"cont_pos (Not (Atom v)) l = False" |
-"cont_pos (Not F) l = False" |
-"cont_pos (And F G) l = (cont_pos F l \<or> cont_pos G l)" |
-"cont_pos (Or F G) l = (cont_pos F l \<or> cont_pos G l)" |
-"cont_pos (Imp F G) l = False"
-
-text \<open>Should only be applied to a formula for which @{const is_nnf} holds.\<close>
-fun cont_neg :: "'a formula \<Rightarrow> 'a \<Rightarrow> bool" where
-"cont_neg Bot l = False" |
-"cont_neg (Atom v) l = False" |
-"cont_neg (Not (Atom v)) l = (v = l)" |
-"cont_neg (Not F) l = False" |
-"cont_neg (And F G) l = (cont_neg F l \<or> cont_neg G l)" |
-"cont_neg (Or F G) l = (cont_neg F l \<or> cont_neg G l)" |
-"cont_neg (Imp F G) l = False"
-
-text \<open>Should only be applied to a formula for which @{const is_nnf} holds.\<close>
-fun cont :: "'a formula \<Rightarrow> 'a \<Rightarrow> bool" where
-"cont Bot l = False" |
-"cont (Atom v) l = (v = l)" |
-"cont (Not (Atom v)) l = (v = l)" |
-"cont (Not F) l = False" |
-"cont (And F G) l = (cont F l \<or> cont G l)" |
-"cont (Or F G) l = (cont F l \<or> cont G l)" |
-"cont (Imp F G) l = False"
-
-datatype var = Var nat bool
-
-fun Fn :: "nat \<Rightarrow> var formula" where
-"Fn 0 = (\<^bold>\<not>\<bottom>)"|
-"Fn (Suc n) = And
-               (And
-                (Or
-                 (Atom (Var (Suc n) False))
-                 (Atom (Var (Suc n) True))
-                )
-                (Or
-                 (Not (Atom (Var (Suc n) False)))
-                 (Not (Atom (Var (Suc n) True)))
-                )
-               )
-               (Fn n)"
-
-definition equiv :: "'a formula \<Rightarrow> 'a formula \<Rightarrow> bool" where
-"equiv F G = (\<forall> Val. (Val \<Turnstile> F) \<longleftrightarrow> (Val \<Turnstile> G))"
-
-lemma equiv_symmetric[sym]: "\<And>\<phi> \<psi>. equiv \<phi> \<psi> \<Longrightarrow> equiv \<psi> \<phi>"
-  unfolding equiv_def by simp
-
-lemma equiv_transitive[trans]: "\<And>\<xi> \<phi> \<psi>. equiv \<xi> \<phi> \<Longrightarrow> equiv \<phi> \<psi> \<Longrightarrow> equiv \<xi> \<psi>"
-  unfolding equiv_def by simp
-
-text \<open>Similar to @{const size}, but ignores @{term "\<^bold>\<not>"} when calculating the size.\<close>
-fun sizef :: "'a formula \<Rightarrow> nat" where
-"sizef Bot = 1" |
-"sizef (Atom a) = 1" |
-"sizef (Not F) = sizef F" |
-"sizef (And F G) = sizef F + sizef G + 1" |
-"sizef (Or F G) = sizef F + sizef G + 1" |
-"sizef (Imp F G) = sizef F + sizef G + 1" 
-
-lemma Suc_0_le_sizef[simp]: "Suc 0 \<le> sizef F"
-  by (induction F) simp_all
-
-
-section \<open>Required Lemmata for Proposition 4\<close>
-
-lemma size_Fn: "sizef(Fn n) = 8*n+1"
-  by (induction n; auto)
-
-lemma Fn_in_cnf: "is_cnf(Fn n)"
-  by (induction n; auto)
-
-lemma conj_is_dnf: "is_conj F \<Longrightarrow> is_dnf F"
-  by (induction F; auto)
-
-lemma is_dnf_BigOr':  "(\<forall> T \<in> set Ts. is_conj T \<and> (\<exists> Val. Val \<Turnstile> T)) \<Longrightarrow> is_dnf (BigOr' Ts)"
+lemma is_dnf_BigOr':  "(\<forall>T \<in> set Ts. is_conj T \<and> (\<exists> Val. Val \<Turnstile> T)) \<Longrightarrow> is_dnf (BigOr' Ts)"
 proof (induction Ts)
   case Nil
   then show ?case by simp
@@ -173,176 +182,43 @@ next
         is_dnf.simps(1) neq_Nil_conv)
 qed
 
-lemma not_sat_Fn_both_false:
-  fixes Val
-  assumes a1:"n \<noteq> 0" and
-          a2: "\<exists>i \<in> {1..n}. Val (Var i False) = False \<and> Val (Var i True) = False"
-        shows "\<not> Val \<Turnstile> Fn n"
-  using a1 a2
-proof (induction n)
-  case 0
-  then show ?case 
-    by simp
-next
-  case (Suc n)
-  have "\<not> Val (Var (Suc n) False) \<and> \<not> Val (Var (Suc n) True) \<or> 
-        Val (Var (Suc n) False) \<and> Val (Var (Suc n) True) \<or> \<not> Val \<Turnstile> Fn n" 
-    by (metis One_nat_def Suc.IH Suc.prems(2) Suc_leI atLeastAtMost_iff le_antisym 
-        le_neq_implies_less nat_le_linear)
-  then show ?case 
-    by simp
-qed
+lemma equiv_BigOr'_append: "equiv (BigOr' (xs @ ys)) (Or (BigOr' xs) (BigOr' ys))"
+  by (induction xs) (simp_all add: equiv_def)
 
-lemma not_sat_Fn_both_true:
-  fixes Val
-  assumes a1:"n \<noteq> 0" and
-          a2: "\<exists>i \<in> {1..n}. Val (Var i False) = True \<and> Val (Var i True) = True"
-        shows "\<not> Val \<Turnstile> Fn n"
-  using a1 a2
-proof (induction n)
-  case 0
-  then show ?case 
-    by simp
-next
-  case (Suc n)
-  have "\<not> Val (Var (Suc n) False) \<and> \<not> Val (Var (Suc n) True) \<or> 
-        Val (Var (Suc n) False) \<and> Val (Var (Suc n) True) \<or> \<not> Val \<Turnstile> Fn n" 
-    by (metis One_nat_def Suc.IH Suc.prems(2) Suc_leI atLeastAtMost_iff le_antisym 
-        le_neq_implies_less nat_le_linear)
-  then show ?case 
-    by simp
-qed
+lemma equiv_BigOr'_undnf_if_dnf:
+  fixes \<phi> :: "'a formula"
+  shows "equiv (BigOr' (undnf \<phi>)) \<phi>"
+proof (induction \<phi> rule: is_dnf.induct)
+  case (1 F G)
+  then show ?case
+    using equiv_BigOr'_append
+    by (smt (verit) equiv_def formula_semantics.simps(5) undnf.simps(1))
+qed (simp_all add: equiv_def)
 
-lemma not_sat_conj_pos_false: 
-  assumes a1: " is_conj F" and
-          a2: "\<exists> v. cont_pos F v \<and> \<not>(Val v)"
-        shows "\<not>(Val \<Turnstile> F)"
-  using a1 a2
-proof (induction F)
-  case (Atom x)
-  then show ?case 
-    by simp
-next
-  case Bot
-  then show ?case 
-    by simp
-next
-  case (Not F)
-  then show ?case 
-    by (metis cont_pos.elims(2) formula.distinct(19,21,3))
-next
-  case (And F1 F2)
-  then show ?case 
-    by (metis cont_pos.simps(9) formula_semantics.simps(2,4) is_conj.simps(1,2,4) 
-        is_lit_plus.elims(2))
-next
-  case (Or F1 F2)
-  then show ?case 
-    by simp
-next
-  case (Imp F1 F2)
-  then show ?case 
-    by simp
-qed
+lemma equiv_BigAnd'_uncnf_if_cnf:
+  fixes \<phi> :: "'a formula"
+  shows "equiv (BigAnd' (uncnf \<phi>)) \<phi>"
+proof (induction \<phi> rule: uncnf.induct)
+  case (1 F G)
+  then show ?case
+    by (smt (verit) equiv_def equiv_BigAnd'_append formula_semantics.simps(4) uncnf.simps(1))
+qed (simp_all add: equiv_def)
 
-lemma not_sat_conj_neg_true: 
-  assumes a1: "is_conj F" and
-          a2: "\<exists> v. cont_neg F v \<and> Val v"
-        shows "\<not>(Val \<Turnstile> F)"
-  using a1 a2
-proof (induction F)
-  case (Atom x)
-  then show ?case 
-    by simp
-next
-  case Bot
-  then show ?case 
-    by simp
-next
-  case (Not F)
-  then show ?case 
-    by (metis cont_neg.elims(2) formula.distinct(19,21) formula_semantics.simps(1,3))
-next
-  case (And F1 F2)
-  then show ?case 
-    by (metis cont_neg.simps(9) formula_semantics.simps(2,4) is_conj.simps(1,2,4) 
-        is_lit_plus.elims(2))
-next
-  case (Or F1 F2)
-  then show ?case 
-    by simp
-next
-  case (Imp F1 F2)
-  then show ?case 
-    by simp
-qed
 
-lemma impl_not_cont_pos: "\<not> cont_pos F v \<Longrightarrow> cont_neg F v \<or> \<not> (cont F v)"
-proof (induction F)
-  case (Atom x)
-  then show ?case 
-    by simp
-next
-  case Bot
-  then show ?case 
-    by simp
-next
-  case (Not F)
-  then show ?case 
-    by (smt (verit) cont.elims(1) cont.simps(3,4,5,6,7,8) cont_neg.simps(3))
-next
-  case (And F1 F2)
-  then show ?case 
-    by auto
-next
-  case (Or F1 F2)
-  then show ?case 
-    by auto
-next
-  case (Imp F1 F2)
-  then show ?case 
-    by simp
-qed
+subsection \<open>Formula Size\<close>
 
-lemma sat_conj_val_cont_ident:
-  assumes a1: "Val1 \<Turnstile> F" and
-          a2: "\<forall> v \<in> {v. cont F v}. Val1 v = Val2 v" and
-          a3: "is_conj F" 
-        shows "Val2 \<Turnstile> F"
-  using a1 a2 a3
-proof (induction F)
-  case (Atom x)
-  then show ?case 
-    by simp
-next
-  case Bot
-  then show ?case 
-    by simp
-next
-  case (Not F)
-  then show ?case 
-    by (metis cont.simps(3) formula_semantics.simps(1,2,3) is_conj.simps(4) is_nnf.simps(6) 
-        is_nnf_NotD mem_Collect_eq)
-next
-  case (And F1 F2)
-  then show ?case 
-    by (metis cont.simps(9) formula_semantics.simps(2,4) is_conj.simps(1,2,4) 
-        is_lit_plus.elims(2) mem_Collect_eq)
-next
-  case (Or F1 F2)
-  then show ?case 
-    by simp
-next
-  case (Imp F1 F2)
-  then show ?case 
-    by simp
-qed
+text \<open>Similar to @{const size}, but ignores @{term "\<^bold>\<not>"} when calculating the size.\<close>
 
-(*MDS*)
-lemma mem_atoms_if_cont_pos:
-  assumes "cont_pos T v"
-  shows "v \<in> atoms T"
-  using assms by (induction T v rule: cont_pos.induct) auto
+fun sizef :: "'a formula \<Rightarrow> nat" where
+  "sizef Bot = 1" |
+  "sizef (Atom a) = 1" |
+  "sizef (Not F) = sizef F" |
+  "sizef (And F G) = sizef F + sizef G + 1" |
+  "sizef (Or F G) = sizef F + sizef G + 1" |
+  "sizef (Imp F G) = sizef F + sizef G + 1" 
+
+lemma Suc_0_le_sizef[simp]: "Suc 0 \<le> sizef F"
+  by (induction F) simp_all
 
 (*MDS*)
 lemma card_atoms_le_sizef: "card (atoms F) \<le> sizef F"
@@ -446,6 +322,228 @@ next
     by (simp add: Ts_def)
 qed
 
+lemma sizef_BigOr': "xs \<noteq> [] \<Longrightarrow> sizef (BigOr' xs) + 1 = sum_list (map sizef xs) + length xs"
+  by (induction xs rule: BigOr'.induct) simp_all
+
+lemma sizef_BigAnd': "xs \<noteq> [] \<Longrightarrow> sizef (BigAnd' xs) + 1 = sum_list (map sizef xs) + length xs"
+  by (induction xs rule: BigAnd'.induct) simp_all
+
+lemma sizef_conv_sum_list_undnf: "sizef \<phi> = sum_list (map sizef (undnf \<phi>)) + count_Or \<phi>"
+  by (induction \<phi>) simp_all
+
+lemma sizef_conv_sum_list_uncnf: "sizef \<phi> = sum_list (map sizef (uncnf \<phi>)) + count_And \<phi>"
+  by (induction \<phi>) simp_all
+
+lemma sizef_BigOr'_undnf:
+  fixes \<phi> :: "'a formula"
+  shows "sizef (BigOr' (undnf \<phi>)) = sizef \<phi>"
+proof -
+  have "sizef \<phi> + 1 = sum_list (map sizef (undnf \<phi>)) + count_Or \<phi> + 1"
+    using sizef_conv_sum_list_undnf[of \<phi>] by presburger
+
+  also have "\<dots> = sum_list (map sizef (undnf \<phi>)) + length (undnf \<phi>)"
+    using length_undnf[of \<phi>] by presburger
+
+  also have "\<dots> = sizef (BigOr' (undnf \<phi>)) + 1"
+    using sizef_BigOr'[of "undnf \<phi>", simplified] by presburger
+
+  finally show ?thesis
+    by presburger
+qed
+
+lemma sizef_BigAnd'_uncnf:
+  fixes \<phi> :: "'a formula"
+  shows "sizef (BigAnd' (uncnf \<phi>)) = sizef \<phi>"
+proof -
+  have "sizef \<phi> + 1 = sum_list (map sizef (uncnf \<phi>)) + count_And \<phi> + 1"
+    using sizef_conv_sum_list_uncnf[of \<phi>] by presburger
+
+  also have "\<dots> = sum_list (map sizef (uncnf \<phi>)) + length (uncnf \<phi>)"
+    using length_uncnf[of \<phi>] by presburger
+
+  also have "\<dots> = sizef (BigAnd' (uncnf \<phi>)) + 1"
+    using sizef_BigAnd'[of "uncnf \<phi>", simplified] by presburger
+
+  finally show ?thesis
+    by presburger
+qed
+
+lemma sizef_BigOr'_filter_le: "sizef (BigOr' (filter P xs)) \<le> sizef (BigOr' xs)"
+proof (induction xs rule: BigOr'.induct)
+  case 1
+  then show ?case
+    by simp
+next
+  case (2 F)
+  then show ?case
+    by simp
+next
+  case (3 F v va)
+  then show ?case
+    apply simp
+    by (smt (verit, del_insts) BigOr'.elims
+        add.commute add_diff_cancel_right diff_is_0_eq
+        less_add_Suc1 less_or_eq_imp_le
+        list.distinct(1) list.sel(1,3) plus_1_eq_Suc
+        sizef.simps(5))
+qed
+
+lemma sizef_BigAnd'_filter_le: "sizef (BigAnd' (filter P xs)) \<le> sizef (BigAnd' xs)"
+proof (induction xs rule: BigAnd'.induct)
+  case 1
+  then show ?case
+    by simp
+next
+  case (2 F)
+  then show ?case
+    by simp
+next
+  case (3 F v va)
+  then show ?case
+    by (metis BigAnd'.simps(1) BigOr'.simps(1) add_diff_cancel_right diff_is_0_eq sizef.simps(3)
+        sizef_BigAnd' sizef_BigOr' sizef_BigOr'_filter_le)
+qed
+
+
+subsection \<open>Fn function\<close>
+
+datatype var = Var nat bool
+
+fun Fn :: "nat \<Rightarrow> var formula" where
+  "Fn 0 = (\<^bold>\<not>\<bottom>)"|
+  "Fn (Suc n) =
+    And
+      (And
+        (Or
+          (Atom (Var (Suc n) False))
+          (Atom (Var (Suc n) True)))
+      (Or
+        (Not (Atom (Var (Suc n) False)))
+        (Not (Atom (Var (Suc n) True)))))
+    (Fn n)"
+
+lemma size_Fn: "sizef (Fn n) = 8*n+1"
+  by (induction n; auto)
+
+lemma Fn_in_cnf: "is_cnf (Fn n)"
+  by (induction n; auto)
+
+lemma Fn_in_nnf: "is_nnf (Fn n)"
+  using Fn_in_cnf[THEN cnf_in_nnf] .
+
+lemma Fn_sat: "\<exists> Val. Val \<Turnstile> Fn n"
+proof -
+  define Val where "Val = (\<lambda>x. case x of (Var i b) \<Rightarrow> b)"
+  then have "Val \<Turnstile> Fn n" 
+    by (induction n; simp)
+  then show ?thesis 
+    by auto
+qed
+
+subsection \<open>Miscellaneous\<close>
+
+text \<open>Should only be applied to a formula for which @{const is_nnf} holds.\<close>
+
+fun cont_pos :: "'a formula \<Rightarrow> 'a \<Rightarrow> bool" where
+  "cont_pos Bot l = False" |
+  "cont_pos (Atom v) l = (v = l)" |
+  "cont_pos (Not (Atom v)) l = False" |
+  "cont_pos (Not F) l = False" |
+  "cont_pos (And F G) l = (cont_pos F l \<or> cont_pos G l)" |
+  "cont_pos (Or F G) l = (cont_pos F l \<or> cont_pos G l)" |
+  "cont_pos (Imp F G) l = False"
+
+text \<open>Should only be applied to a formula for which @{const is_nnf} holds.\<close>
+
+fun cont_neg :: "'a formula \<Rightarrow> 'a \<Rightarrow> bool" where
+  "cont_neg Bot l = False" |
+  "cont_neg (Atom v) l = False" |
+  "cont_neg (Not (Atom v)) l = (v = l)" |
+  "cont_neg (Not F) l = False" |
+  "cont_neg (And F G) l = (cont_neg F l \<or> cont_neg G l)" |
+  "cont_neg (Or F G) l = (cont_neg F l \<or> cont_neg G l)" |
+  "cont_neg (Imp F G) l = False"
+
+text \<open>Should only be applied to a formula for which @{const is_nnf} holds.\<close>
+
+fun cont :: "'a formula \<Rightarrow> 'a \<Rightarrow> bool" where
+  "cont Bot l = False" |
+  "cont (Atom v) l = (v = l)" |
+  "cont (Not (Atom v)) l = (v = l)" |
+  "cont (Not F) l = False" |
+  "cont (And F G) l = (cont F l \<or> cont G l)" |
+  "cont (Or F G) l = (cont F l \<or> cont G l)" |
+  "cont (Imp F G) l = False"
+
+lemma impl_not_cont_pos: "\<not> cont_pos F v \<Longrightarrow> cont_neg F v \<or> \<not> (cont F v)"
+  by (induction F) (auto elim: cont.elims)
+
+lemma impl_not_cont: "\<not> cont F v \<Longrightarrow> \<not> cont_pos F v \<and> \<not> cont_neg F v"
+  by (induction F) (auto elim: cont.elims)
+
+(*MDS*)
+lemma mem_atoms_if_cont_pos:
+  assumes "cont_pos T v"
+  shows "v \<in> atoms T"
+  using assms by (induction T v rule: cont_pos.induct) auto
+
+
+section \<open>Required Lemmata for Proposition 4\<close>
+
+lemma not_sat_Fn_both_false:
+  assumes "n \<noteq> 0" and "\<exists>i \<in> {1..n}. Val (Var i False) = False \<and> Val (Var i True) = False"
+  shows "\<not> Val \<Turnstile> Fn n"
+  using assms
+proof (induction n)
+  case 0
+  then show ?case 
+    by simp
+next
+  case (Suc n)
+  have "\<not> Val (Var (Suc n) False) \<and> \<not> Val (Var (Suc n) True) \<or> 
+        Val (Var (Suc n) False) \<and> Val (Var (Suc n) True) \<or> \<not> Val \<Turnstile> Fn n" 
+    by (metis One_nat_def Suc.IH Suc.prems(2) Suc_leI atLeastAtMost_iff le_antisym 
+        le_neq_implies_less nat_le_linear)
+  then show ?case 
+    by simp
+qed
+
+lemma not_sat_Fn_both_true:
+  assumes "n \<noteq> 0" and "\<exists>i \<in> {1..n}. Val (Var i False) = True \<and> Val (Var i True) = True"
+  shows "\<not> Val \<Turnstile> Fn n"
+  using assms
+proof (induction n)
+  case 0
+  then show ?case 
+    by simp
+next
+  case (Suc n)
+  have "\<not> Val (Var (Suc n) False) \<and> \<not> Val (Var (Suc n) True) \<or> 
+        Val (Var (Suc n) False) \<and> Val (Var (Suc n) True) \<or> \<not> Val \<Turnstile> Fn n" 
+    by (metis One_nat_def Suc.IH Suc.prems(2) Suc_leI atLeastAtMost_iff le_antisym 
+        le_neq_implies_less nat_le_linear)
+  then show ?case 
+    by simp
+qed
+
+lemma not_sat_conj_pos_false: 
+  assumes "is_conj F" and "\<exists>v. cont_pos F v \<and> \<not>(Val v)"
+  shows "\<not>(Val \<Turnstile> F)"
+  using assms
+  by (induction F) (auto elim: cont_pos.elims is_lit_plus.elims)
+
+lemma not_sat_conj_neg_true: 
+  assumes "is_conj F" and "\<exists>v. cont_neg F v \<and> Val v"
+  shows "\<not>(Val \<Turnstile> F)"
+  using assms
+  by (induction F) (auto elim: cont_neg.elims is_lit_plus.elims)
+
+lemma sat_conj_val_cont_ident:
+  assumes "Val1 \<Turnstile> F" and "\<forall> v \<in> {v. cont F v}. Val1 v = Val2 v" and "is_conj F"
+  shows "Val2 \<Turnstile> F"
+  using assms
+  by (induction F) (auto elim: cont_neg.elims is_lit_plus.elims)
+
 (*MDS*)
 lemma inj_on_Var[simp]: "inj_on (\<lambda>(x, y). Var x y) A" for A
   by (rule inj_onI) (simp add: case_prod_beta prod_eq_iff)
@@ -458,7 +556,7 @@ proposition proposition4:
   defines "F \<equiv> Fn n" and "G \<equiv> BigOr' Ts"
   assumes
     n_greater_0: "n > 0" and
-    G_spec: "(\<forall>T\<in>set Ts. is_conj T \<and> (\<exists> Val. Val \<Turnstile> T))" and
+    G_spec: "(\<forall>T\<in>set Ts. is_conj T \<and> (\<exists>Val. Val \<Turnstile> T))" and
     equiv_F_G: "equiv F G"
   shows "sizef G \<ge> n*2^n"
 proof -
@@ -655,87 +753,6 @@ proof -
   then show ?thesis by (simp add: def_G)
 qed
 
-fun undnf :: "'a formula \<Rightarrow> 'a formula list" where
-"undnf (Or F G) = undnf F @ undnf G" |
-"undnf H = [H]"
-
-lemma undnf_neq_Nil[simp]: "undnf \<phi> \<noteq> []"
-  by (induction \<phi>) simp_all
-
-fun count_Or :: "'a formula \<Rightarrow> nat" where
-"count_Or (Or F G) = count_Or F + count_Or G + 1" |
-"count_Or _ = 0"
-
-lemma length_undnf: "length (undnf \<phi>) = count_Or \<phi> + 1"
-  by (induction \<phi>) simp_all
-
-
-lemma equiv_BigOr'_append: "equiv (BigOr' (xs @ ys)) (Or (BigOr' xs) (BigOr' ys))"
-  by (induction xs) (simp_all add: equiv_def)
-
-lemma transp_equiv: "transp equiv"
-  by (rule transpI) (simp add: equiv_def)
-
-lemma equiv_BigOr'_undnf_if_dnf:
-  fixes \<phi> :: "'a formula"
-  shows "equiv (BigOr' (undnf \<phi>)) \<phi>"
-proof (induction \<phi> rule: is_dnf.induct)
-  case (1 F G)
-  then show ?case
-    using equiv_BigOr'_append
-    by (smt (verit) equiv_def formula_semantics.simps(5) undnf.simps(1))
-qed (simp_all add: equiv_def)
-
-lemma ball_undnf_is_conj:
-  fixes \<phi> :: "'a formula"
-  assumes dnf: "is_dnf \<phi>"
-  shows "\<And>T. T \<in> set (undnf \<phi>) \<Longrightarrow> is_conj T"
-  using dnf
-  by (induction \<phi> rule: is_dnf.induct) auto
-
-lemma sizef_BigOr': "xs \<noteq> [] \<Longrightarrow> sizef (BigOr' xs) + 1 = sum_list (map sizef xs) + length xs"
-  by (induction xs rule: BigOr'.induct) simp_all
-
-lemma sizef_conv_sum_list_undnf: "sizef \<phi> = sum_list (map sizef (undnf \<phi>)) + count_Or \<phi>"
-  by (induction \<phi>) simp_all
-
-lemma sizef_BigOr'_undnf:
-  fixes \<phi> :: "'a formula"
-  shows "sizef (BigOr' (undnf \<phi>)) = sizef \<phi>"
-proof -
-  have "sizef \<phi> + 1 = sum_list (map sizef (undnf \<phi>)) + count_Or \<phi> + 1"
-    using sizef_conv_sum_list_undnf[of \<phi>] by presburger
-
-  also have "\<dots> = sum_list (map sizef (undnf \<phi>)) + length (undnf \<phi>)"
-    using length_undnf[of \<phi>] by presburger
-
-  also have "\<dots> = sizef (BigOr' (undnf \<phi>)) + 1"
-    using sizef_BigOr'[of "undnf \<phi>", simplified] by presburger
-
-  finally show ?thesis
-    by presburger
-qed
-
-lemma sizef_BigOr'_filter_le: "sizef (BigOr' (filter P xs)) \<le> sizef (BigOr' xs)"
-proof (induction xs rule: BigOr'.induct)
-  case 1
-  then show ?case
-    by simp
-next
-  case (2 F)
-  then show ?case
-    by simp
-next
-  case (3 F v va)
-  then show ?case
-    apply simp
-    by (smt (verit, del_insts) BigOr'.elims
-        add.commute add_diff_cancel_right diff_is_0_eq
-        less_add_Suc1 less_or_eq_imp_le
-        list.distinct(1) list.sel(1,3) plus_1_eq_Suc
-        sizef.simps(5))
-qed
-
 lemma ex_equiv_disj_list_if_is_dnf:
   fixes \<phi> :: "'a formula"
   assumes dnf: "is_dnf \<phi>"
@@ -821,109 +838,38 @@ qed
 section \<open>Additional Functions for Corollary 5\<close>
 
 text \<open>Should only be applied to a formula for which @{const is_nnf} holds.\<close>
+
 fun dualize :: "'a formula \<Rightarrow> 'a formula" where
-"dualize Bot = Not Bot" |
-"dualize (Atom v) = Not (Atom v)" |
-"dualize (Not v) = v" |
-"dualize (And F G) = Or (dualize F) (dualize G)" |
-"dualize (Or F G) = And (dualize F) (dualize G)" |
-"dualize (Imp F G) = Bot"
+  "dualize Bot = Not Bot" |
+  "dualize (Atom v) = Not (Atom v)" |
+  "dualize (Not v) = v" |
+  "dualize (And F G) = Or (dualize F) (dualize G)" |
+  "dualize (Or F G) = And (dualize F) (dualize G)" |
+  "dualize (Imp F G) = Bot"
 
 
 section \<open>Required Lemmata for Corollary 5\<close>
 
-lemma size_dualized_Fn: "sizef (dualize (Fn n)) = 8*n+1" 
+lemma size_dualized_Fn: "sizef (dualize (Fn n)) = 8 * n + 1" 
   by(induction n; auto)
 
 lemma dualized_Fn_in_dnf: "is_dnf (dualize (Fn n))"
   by(induction n; auto)
 
-lemma disj_is_cnf: "is_disj F \<Longrightarrow> is_cnf F"
-  by (induction F; auto)
-
-lemma is_cnf_BigAnd':  "(\<forall> C \<in> set Cs. is_disj C \<and> \<not>(\<forall> Val. Val \<Turnstile> C)) \<Longrightarrow> is_cnf (BigAnd' Cs)"
-  by (induction Cs rule: BigAnd'.induct) (simp_all add: disj_is_cnf)
-
 lemma size_ident_dualize: "is_nnf F \<Longrightarrow> sizef F = sizef (dualize F)"
   by (induction F; simp)
 
 lemma equiv_dualize: "is_nnf F \<Longrightarrow> equiv (dualize F) (Not F)"
-proof (induction F)
-  case (Atom x)
-  then show ?case 
-    by (simp add: equiv_def)
-next
-  case Bot
-  then show ?case 
-    by (simp add: equiv_def)
-next
-  case (Not F)
-  then show ?case 
-    by (simp add: equiv_def)
-next
-  case (And F1 F2)
-  then show ?case 
-    by (simp add: equiv_def)
-next
-  case (Or F1 F2)
-  then show ?case 
-    by (simp add: equiv_def)
-next
-  case (Imp F1 F2)
-  then show ?case 
-    by simp
-qed
-
-lemma Fn_in_nnf: "is_nnf (Fn n)" 
-  by(induction n; auto)
-
-lemma cnf_in_nnf: "is_cnf F \<Longrightarrow> is_nnf F"
-proof (induction F)
-  case (Atom x)
-  then show ?case 
-    by simp
-next
-  case Bot
-  then show ?case 
-    by simp
-next
-  case (Not F)
-  then show ?case 
-    by simp
-next
-  case (And F1 F2)
-  then show ?case 
-    by simp
-next
-  case (Or F1 F2)
-  then show ?case 
-    using disj_is_nnf is_cnf.simps(5) by blast
-next
-  case (Imp F1 F2)
-  then show ?case 
-    by simp
-qed
+  by (induction F) (simp_all add: equiv_def)
 
 lemma dualized_cnf_in_dnf: "is_cnf F \<Longrightarrow> is_dnf (dualize F)"
 proof (induction F)
-  case (Atom x)
-  then show ?case 
-    by simp
-next
-  case Bot
-  then show ?case 
-    by simp
-next
   case (Not F)
   have "is_lit_plus (Not F)" 
     using Not.prems by auto
   then have "is_dnf F" 
     by (metis conj_is_dnf Not.prems cnf_in_nnf is_conj.simps(2,3) is_lit_plus.simps(1,3) 
         is_nnf_NotD)
-  then show ?case 
-    by simp
-next
-  case (And F1 F2)
   then show ?case 
     by simp
 next
@@ -942,30 +888,46 @@ next
         is_lit_plus.simps(1,11,2,3,4,9) dualize.simps(1,2,3,5))
   show ?case 
     using 1 2 by simp
+qed simp_all
+
+lemma dualized_conj_is_disj: "is_conj F \<Longrightarrow> is_disj (dualize F)"
+proof (induction F)
+  case (Not F)
+  then show ?case 
+    by (metis is_conj.simps(4) is_disj.simps(2,3) is_lit_plus.simps(1,3)
+        is_nnf.simps(6) is_nnf_NotD dualize.simps(3))
 next
-  case (Imp F1 F2)
+  case (And F1 F2)
+  then show ?case
+    by (metis is_cnf.simps(5) is_conj.simps(1) is_disj.simps(1) is_dnf.simps(5)
+        dualize.simps(4,5) dualized_cnf_in_dnf)
+qed simp_all
+
+lemma dualized_dnf_in_cnf: "is_dnf F \<Longrightarrow> is_cnf (dualize F)"
+proof (induction F)
+  case (Not F)
+  then show ?case 
+    by (metis is_cnf.simps(2,3) is_conj.simps(4) is_disj.simps(2,3) is_dnf.simps(4)
+        is_lit_plus.simps(1,3) is_nnf.simps(6) is_nnf_NotD dualize.simps(3))
+next
+  case (And F1 F2)
+  have "is_conj (And F1 F2)" 
+    using \<open>is_dnf (F1 \<^bold>\<and> F2)\<close> by simp
+  then have "is_lit_plus F1" and "is_conj F2" 
+    by auto
+  have 1: "is_lit_plus (dualize F1)" 
+    using \<open>is_lit_plus F1\<close> 
+    by (metis is_lit_plus.elims(2) is_lit_plus.simps(1,2,3,4) dualize.simps(1,2,3))
+  have 2: "is_disj (dualize F2)" 
+    using \<open>is_conj F2\<close> by (simp add: dualized_conj_is_disj)
+  have "is_lit_plus (dualize F1) \<and> is_disj (dualize F2)" 
+    using 1 2 by simp
   then show ?case 
     by simp
-qed
+qed auto
 
 lemma dualized_disj_not_taut_impl_sat: "is_disj F \<Longrightarrow> \<exists>Val. \<not> Val \<Turnstile> F \<Longrightarrow> \<exists>Val. Val \<Turnstile> dualize F"
 proof (induction F)
-  case (Atom x)
-  then show ?case 
-    by auto
-next
-  case Bot
-  then show ?case 
-    by auto
-next
-  case (Not F)
-  then show ?case 
-    by auto
-next
-  case (And F1 F2)
-  then show ?case 
-    by auto
-next
   case (Or F1 F2)
   have F_is_nnf: "is_nnf (F1 \<^bold>\<or> F2)" 
     using Or.prems(1) disj_is_nnf by blast
@@ -979,11 +941,7 @@ next
     using equiv by (simp add: equiv_def)
   then show ?case 
     by auto
-next
-  case (Imp F1 F2)
-  then show ?case 
-    by auto
-qed
+qed auto
 
 lemma dualized_conj_of_disjs_is_disj_of_conjs: 
   "(\<forall> C \<in> set Cs. is_disj C \<and> (\<exists> Val. \<not>(Val \<Turnstile> C))) \<Longrightarrow> 
@@ -1103,78 +1061,6 @@ proof -
   qed
 qed
 
-fun uncnf :: "'a formula \<Rightarrow> 'a formula list" where
-"uncnf (And F G) = uncnf F @ uncnf G" |
-"uncnf H = [H]"
-
-lemma uncnf_neq_Nil[simp]: "uncnf \<phi> \<noteq> []"
-  by (induction \<phi>) simp_all
-
-fun count_And :: "'a formula \<Rightarrow> nat" where
-"count_And (And F G) = count_And F + count_And G + 1" |
-"count_And _ = 0"
-
-lemma sizef_BigAnd': "xs \<noteq> [] \<Longrightarrow> sizef (BigAnd' xs) + 1 = sum_list (map sizef xs) + length xs"
-  by (induction xs rule: BigAnd'.induct) simp_all
-
-lemma length_uncnf: "length (uncnf \<phi>) = count_And \<phi> + 1"
-  by (induction \<phi>) simp_all
-
-lemma sizef_conv_sum_list_uncnf: "sizef \<phi> = sum_list (map sizef (uncnf \<phi>)) + count_And \<phi>"
-  by (induction \<phi>) simp_all
-
-lemma sizef_BigAnd'_uncnf:
-  fixes \<phi> :: "'a formula"
-  shows "sizef (BigAnd' (uncnf \<phi>)) = sizef \<phi>"
-proof -
-  have "sizef \<phi> + 1 = sum_list (map sizef (uncnf \<phi>)) + count_And \<phi> + 1"
-    using sizef_conv_sum_list_uncnf[of \<phi>] by presburger
-
-  also have "\<dots> = sum_list (map sizef (uncnf \<phi>)) + length (uncnf \<phi>)"
-    using length_uncnf[of \<phi>] by presburger
-
-  also have "\<dots> = sizef (BigAnd' (uncnf \<phi>)) + 1"
-    using sizef_BigAnd'[of "uncnf \<phi>", simplified] by presburger
-
-  finally show ?thesis
-    by presburger
-qed
-
-lemma ball_uncnf_is_disj:
-  fixes \<phi> :: "'a formula"
-  assumes cnf: "is_cnf \<phi>"
-  shows "\<And>C. C \<in> set (uncnf \<phi>) \<Longrightarrow> is_disj C"
-  using cnf
-  by (induction \<phi> rule: is_cnf.induct) auto
-
-lemma sizef_BigAnd'_filter_le: "sizef (BigAnd' (filter P xs)) \<le> sizef (BigAnd' xs)"
-proof (induction xs rule: BigAnd'.induct)
-  case 1
-  then show ?case
-    by simp
-next
-  case (2 F)
-  then show ?case
-    by simp
-next
-  case (3 F v va)
-  then show ?case
-    by (metis BigAnd'.simps(1) BigOr'.simps(1) add_diff_cancel_right diff_is_0_eq sizef.simps(3)
-        sizef_BigAnd' sizef_BigOr' sizef_BigOr'_filter_le)
-qed
-
-lemma equiv_BigAnd'_append: "equiv (BigAnd' (xs @ ys)) (And (BigAnd' xs) (BigAnd' ys))"
-  by (induction xs) (simp_all add: equiv_def)
-
-lemma equiv_BigAnd'_uncnf_if_cnf:
-  fixes \<phi> :: "'a formula"
-  shows "equiv (BigAnd' (uncnf \<phi>)) \<phi>"
-proof (induction \<phi> rule: uncnf.induct)
-  case (1 F G)
-  then show ?case
-    by (smt (verit) equiv_def equiv_BigAnd'_append formula_semantics.simps(4) uncnf.simps(1))
-qed (simp_all add: equiv_def)
-
 lemma ex_equiv_conj_list_if_is_cnf:
   fixes \<phi> :: "'a formula"
   assumes cnf: "is_cnf \<phi>"
@@ -1255,118 +1141,6 @@ next
     then show "n * 2 ^ n \<le> sizef G\<^sub>n"
       using sizef by presburger
   qed
-qed
-
-
-section \<open>Unused Functions & Lemmata\<close>
-
-subsection \<open>From Proposition 4\<close>
-
-lemma Fn_sat: "\<exists> Val. Val \<Turnstile> Fn n"
-proof -
-  define Val where "Val = (\<lambda>x. case x of (Var i b) \<Rightarrow> b)"
-  then have "Val \<Turnstile> Fn n" 
-    by (induction n; simp)
-  then show ?thesis 
-    by auto
-qed
-
-lemma impl_not_cont: "\<not> cont F v \<Longrightarrow> \<not> cont_pos F v \<and> \<not> cont_neg F v"
-proof (induction F)
-  case (Atom x)
-  then show ?case 
-    by simp
-next
-  case Bot
-  then show ?case 
-    by simp
-next
-  case (Not F)
-  then show ?case 
-    by (smt (verit) cont.elims(1) cont_neg.simps(3,4,5,6,7,8) cont_pos.elims(1) 
-        formula.distinct(11,19,21,23,3))
-next
-  case (And F1 F2)
-  then show ?case 
-    by simp
-next
-  case (Or F1 F2)
-  then show ?case 
-    by simp
-next
-  case (Imp F1 F2)
-  then show ?case 
-    by simp
-qed
-
-subsection \<open>From Corollary 5\<close>
-
-lemma dualized_conj_is_disj: "is_conj F \<Longrightarrow> is_disj (dualize F)"
-proof (induction F)
-  case (Atom x)
-  then show ?case 
-    by simp
-next
-  case Bot
-  then show ?case 
-    by simp
-next
-  case (Not F)
-  then show ?case 
-    by (metis is_conj.simps(4) is_disj.simps(2,3) is_lit_plus.simps(1,3)
-        is_nnf.simps(6) is_nnf_NotD dualize.simps(3))
-next
-  case (And F1 F2)
-  then show ?case
-    by (metis is_cnf.simps(5) is_conj.simps(1) is_disj.simps(1) is_dnf.simps(5)
-        dualize.simps(4,5) dualized_cnf_in_dnf)
-next
-  case (Or F1 F2)
-  then show ?case 
-    by simp
-next
-  case (Imp F1 F2)
-  then show ?case 
-    by simp
-qed
-
-lemma dualized_dnf_in_cnf: "is_dnf F \<Longrightarrow> is_cnf (dualize F)"
-proof (induction F)
-  case (Atom x)
-  then show ?case 
-    by auto
-next
-  case Bot
-  then show ?case 
-    by auto
-next
-  case (Not F)
-  then show ?case 
-    by (metis is_cnf.simps(2,3) is_conj.simps(4) is_disj.simps(2,3) is_dnf.simps(4)
-        is_lit_plus.simps(1,3) is_nnf.simps(6) is_nnf_NotD dualize.simps(3))
-next
-  case (And F1 F2)
-  have "is_conj (And F1 F2)" 
-    using \<open>is_dnf (F1 \<^bold>\<and> F2)\<close> by simp
-  then have "is_lit_plus F1" and "is_conj F2" 
-    by auto
-  have 1: "is_lit_plus (dualize F1)" 
-    using \<open>is_lit_plus F1\<close> 
-    by (metis is_lit_plus.elims(2) is_lit_plus.simps(1,2,3,4) dualize.simps(1,2,3))
-  have 2: "is_disj (dualize F2)" 
-    using \<open>is_conj F2\<close> by (simp add: dualized_conj_is_disj)
-  have "is_lit_plus (dualize F1) \<and> is_disj (dualize F2)" 
-    using 1 2 by simp
-  then show ?case 
-    by simp
-next
-  case (Or F1 F2)
-  then show ?case 
-    by auto
-next
-  case (Imp F1 F2)
-  then show ?case 
-    by auto
 qed
 
 end
