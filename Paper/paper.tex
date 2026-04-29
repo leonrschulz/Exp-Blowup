@@ -66,6 +66,16 @@
 \ArticleNo{23}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\theoremstyle{definition}
+\newtheorem{definitionx}[theorem]{Definition}
+
+\crefname{definitionx}{Definition}{Definitions}
+\Crefname{definitionx}{Definition}{Definitions}
+
+\input{def.tex}
+
+%TODO: Change label of proof environment to "Proof sketch"
+
 \begin{document}
 
 \maketitle
@@ -76,56 +86,121 @@
 \section{Introduction}
 \label{sec_intro}
 
-\section{Background}
+\section{Background (JJ)}
 \label{sec_background}
+
+% TODO: What are the two proposition and corollary.
+% TODO: Cite at least the book, and check for transitive citations.
+% TODO: All definitions required to understand the proposition and corollary.
+% TODO: With proof sketch so the formalization can later compare the result.
+% TODO: Related work?
 
 \section{Preliminaries}
 \label{sec_preliminaries}
 
-%TODO: X introduce type var.
-%TODO: X introduce formulas.
-%TODO: X specify that formulas have type "var formula".
-%TODO: X introduce sizef and maybe |.| notation.
-%TODO: introduce the "set :: 'a list => 'a set" function.
-%TODO: X introduce satisfiable
-%TODO: X introduce the entailment relation
-%TODO: X introduce formula equivalence
-%TODO: X introduce disjunctive formulas
-%TODO: X introduce tautological formulas
-%TODO: introduce the "dualize :: 'a formula => 'a formula" function
-A \emph{formula} is inductively defined as an atom, $\bot$, the negation of a formula, or the disjunction, conjunction or implication of two formulas. All atoms contained in such formulas are of the type \textsf{var}, representing a combination of a Boolean value and a natural number. A \emph{valuation} is defined as a function that maps an atom to a Boolean value. A valuation \emph{satisfies} a formula if the formula evaluates to True when all of its atoms are replaced by the specific truth values assigned to them by the valuation. A formula is \emph{satisfiable} if there exists a valuation that satisfies it. A formula is \emph{tautological} if it is satisfied by every valuation. Two formulas are \emph{equivalent} if they have the same truth value for every valuation. A \emph{literal} is a special case of a formula consisting of either a positive or negative atom, or a positive or negative $\bot$. A formula is \emph{conjunctive} if it is either a literal or its first subformula is a literal and its second a conjunctive formula. Analogously a formula is \emph{disjunctive} if it is either a literal or its first subformula is a literal and its second a disjunctive formula.
+%TODO: introduce BigOr' and BigAnd' with the notation
 
-\begin{definition}The function set :: 'a list $\Rightarrow$ 'a set converts a list into a set.
-\end{definition}
+A \emph{formula} is inductively defined as either an atom, falsehood ($\bot$), the negation of a formula, or the disjunction, conjunction or implication of two formulas.
+A \emph{literal} is a special case of a formula consisting of either a positive or negative atom, or a positive or negative $\bot$.
+All atoms are of the type \textsf{var}, representing a combination of a Boolean value and a natural number.
+A formula is \emph{conjunctive} if it is either a literal or its first subformula is a literal and its second a conjunctive formula.
+Analogously a formula is \emph{disjunctive} if it is either a literal or its first subformula is a literal and its second a disjunctive formula.
 
-\begin{definition}The function sizef :: 'a formula $\Rightarrow$ nat calculates the size of a formula but without taking $\lnot$ into account.
-\end{definition}
+A \emph{valuation} is defined as a function from atoms to Boolean values.
+A formula can be evalutated w.r.t.\ a valuation to a Boolean value by replacing all of its atoms by the specific truth values assigned to them by the valuation
+The \emph{evaluation} of a formula w.r.t.\ a valuation is the Boolean value we get after replacing all atoms with the specific truth values assigned by the valuation.
+We say that a valuation $\alpha$ \emph{satisfies} a formula $\phi$, written $\alpha \models \phi$, if the formula evaluates to true w.r.t.\ the valuation.
+A formula is
+\emph{satisfiable} if there exists a valuation that satisfies it and
+\emph{tautological} if it is satisfied by every valuation.
+Two formulas are \emph{equivalent} if they have the same truth value for every valuation.
 
-\begin{definition}The function dualize :: 'a formula $\Rightarrow$ 'a formula converts a formula in its dualized form by replacing each literal with its complementary literal and switching the symbols $\bot$ and $\top$, as well as $\land$ and $\lor$.
-\end{definition}
+\begin{definitionx}
+  \label{def_set}
+  The function $\tyAnnot{\cst{set}}{\tyList{\yA} \Rightarrow \tySet{\yA}}$ converts a list into a set.
+\end{definitionx}
+
+\begin{definitionx}
+  \label{def_sizef}
+  The function $\tyAnnot{\cstSizef}{\tyFormula{\yA} \Rightarrow \tyNat}$ counts the number of atoms, $\bot$, disjunctions, conjunctions, and implications in a formula;
+  the negations are ignore.
+\end{definitionx}
+
+\begin{definitionx}
+  \label{def_dualize}
+  The function $\tyAnnot{\cst{dualize}}{\tyFormula{\yA} \Rightarrow \tyFormula{\yA}}$ converts a formula in negation normal form to its dualized form by replacing each literal with its complementary:
+  an atom $A$ becomes $\neg A$,
+  $\bot$ becomes $\neg\bot$,
+  a negation $\neg \phi$ becomes $\phi$,
+  $\phi \lor \psi$ becomes $\isaAp{\cst{dualize}}{\phi} \land \isaAp{\cst{dualize}}{\psi}$, and
+  $\phi \land \psi$ becomes $\isaAp{\cst{dualize}}{\phi} \lor \isaAp{\cst{dualize}}{\psi}$.
+\end{definitionx}
 
 
 \section{CNF to DNF}
 \label{sec_CNF_to_DNF}
 
-\begin{theorem}
+\begin{lemma}[TODO: Find Nice name (e.g., Weak ...)]
+  \label{thm_cnf_to_dnf_blowup}
   Let $n > 0$ be a natural number.
   Let $Ts$ be a list of formulas.
   Let $G = \bigvee_{T \in \mathsf{set} \, Ts} T$.
-  If all formulas in $Ts$ are conjunctive and satisfiable (i.e., $\forall T \in \mathsf{set} \, Ts. \: \exists \alpha. \: \alpha \models T$), and $F_n$ is equivalent to $G$ (i.e., $\mathsf{equiv} \, F_n \, G$),
-  then $\mathsf{sizef} \, G \ge n \cdot 2^n$.
+  If all formulas in $Ts$ are conjunctive and satisfiable (i.e., $\forallIn{T}{\isaAp{\cst{set}}{Ts}}{\existsOne{\alpha}{\alpha \models T}}$), and $F_n$ is equivalent to $G$,
+  then $\isaAp{\cstSizef}{G} \ge n \cdot 2^n$.
+\end{lemma}
+\begin{proof}
+  TODO (LRS): write good sketch of the important intermediate steps.
+
+  Paragraph for step 1
+
+  Paragraph for step 3 from step 1
+
+  Paragraph for step 2
+
+  Paragraph for step 4 from step 2
+
+  Paragraph for step 5 from step 3 and 4.
+\end{proof}
+
+\begin{theorem}[The actuall thing]
+  \label{thm_cnf_to_dnf_blowup_math}
+  Let $n$ be a natural number.
+  There exists a formula $F_n$ in CNF with $\isaAp{\cstSizef}{F_n} = 8 \cdot n + 1$ such that all equivalent formulas $G_n$ in DNF have $\isaAp{\cstSizef}{G_n} \ge n \cdot 2^n$.
 \end{theorem}
+\begin{proof}
+  TODO: write very rough sketch.
+\end{proof}
 
 \section{DNF to CNF}
 \label{sec_DNF_to_CNF}
 
-\begin{corollary}
+\begin{lemma}[TODO: Find Nice Name]
   Let $n > 0$ be a natural number.
   Let $Cs$ be a list of formulas.
   Let $G = \bigwedge_{C \in \mathsf{set} \, Cs} C$.
-  If all formulas in $Cs$ are disjunctive and not tautological (i.e., $\forall C \in \mathsf{set} \, Cs. \: \neg (\forall \alpha. \: \alpha \models C)$), and $\mathsf{dualize} \, F_n$ is equivalent to $G$ (i.e., $\mathsf{equiv} \, (\mathsf{dualize} \, F_n) \, G$),
-  then $\mathsf{sizef} \, G \ge n \cdot 2^n$.
-\end{corollary}
+  If all formulas in $Cs$ are disjunctive and not tautological (i.e., $\forallIn{C}{\isaAp{\cst{set}}{Cs}}{\neg (\forall \alpha. \: \alpha \models C)}$), and $\isaAp{\cst{dualize}}{F_n}$ is equivalent to $G$,
+  then $\isaAp{\cstSizef}{G} \ge n \cdot 2^n$.
+\end{lemma}
+\begin{proof}
+  TODO (LRS): write very rough sketch
+
+  Paragraph for step 1
+
+  Paragraph for step 2
+
+  Paragraph for step 3
+
+  Paragraph for contradiction from step 1, 2, 3, and \cref{thm_cnf_to_dnf_blowup}
+\end{proof}
+
+\begin{theorem}[The actuall thing]
+  \label{thm_dnf_to_cnf_blowup_math}
+  Let $n$ be a natural number.
+  TODO (LRS): Write the theorem.
+\end{theorem}
+\begin{proof}
+  TODO: write very rough sketch.
+\end{proof}
 
 \section{Discussion}
 \label{sec_discussion}
