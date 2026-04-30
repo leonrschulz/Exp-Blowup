@@ -896,15 +896,15 @@ proof -
             using \<open>i < n\<close> by force
         qed
 
-        ultimately have False if "conj_of_eps xs = conj_of_eps ys"
-          unfolding that
-          using \<open>nth xs i \<noteq> nth ys i\<close>
-          using occ_var_bool_diff[rule_format, OF T_of_conj_of_eps_in_Ts[OF \<open>length ys = n\<close>], 
-                                  of "Suc i"]
-          using \<open>i < n\<close> by auto
+        moreover have "
+          cont_pos (conj_of_eps ys) (Var (Suc i) False) \<noteq>
+          cont_pos (conj_of_eps ys) (Var (Suc i) True)"
+          using \<open>i < n\<close> occ_var_bool_diff[OF T_of_conj_of_eps_in_Ts[OF \<open>length ys = n\<close>], of "Suc i"]
+          by simp
 
-        then show "conj_of_eps xs \<noteq> conj_of_eps ys"
-          by satx
+        ultimately show "conj_of_eps xs \<noteq> conj_of_eps ys"
+          using \<open>xs ! i \<noteq> ys ! i\<close>
+          by (metis (mono_tags))
       qed
     qed
   next
