@@ -66,6 +66,8 @@
 \ArticleNo{23}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\usepackage{cleveref} %TODO: clarify why this import is necessary
+
 \theoremstyle{definition}
 \newtheorem{definitionx}[theorem]{Definition}
 
@@ -178,17 +180,18 @@ Two formulas are \emph{equivalent} if they have the same truth value for every v
   then $\isaAp{\cstSizef}{G} \ge n \cdot 2^n$.
 \end{lemma}
 \begin{proof}
-  TODO (LRS): write good sketch of the important intermediate steps.
-
-  Paragraph for step 1
-
-  Paragraph for step 3 from step 1
-
-  Paragraph for step 2
-
-  Paragraph for step 4 from step 2
-
-  Paragraph for step 5 from step 3 and 4.
+  %TODO (LRS): X write good sketch of the important intermediate steps.
+  %Paragraph for step 1
+  %Paragraph for step 3 from step 1
+  %Paragraph for step 2
+  %Paragraph for step 4 from step 2
+  %Paragraph for step 5 from step 3 and 4.
+  This can be proved within five steps. 
+  \textbf{(1)} First, we show that every conjunctive formula $T \in \isaAp{\cst{set}}{Ts}$ contains for all $i \in \{1,...,n\}$ either the variable $x_{i,0}$ or $x_{i,1}$ positively.
+  \textbf{(2)} From this, we derive that every $T \in \isaAp{\cst{set}}{Ts}$ has $\isaAp{\cstSizef}{T} \ge n$.
+  \textbf{(3)} Furthermore, we proof that for every Boolean list $\epsilon = (\epsilon_1,...,\epsilon_n) \in \{0,1\}^n$ there exists a $T \in \isaAp{\cst{set}}{Ts}$ that contains the corresponding variables $x_{1,\epsilon_1},...,x_{n,\epsilon_n}$ positively.
+  \textbf{(4)} From this, we derive that $Ts$ contains at least $2^n$ conjunctive formulas $T$.
+  \textbf{(5)} Finally, we show that $\isaAp{\cstSizef}{G} \ge n \cdot 2^n$ by combining the results from steps 3 and 4.
 \end{proof}
 
 \begin{theorem}[The actuall thing]
@@ -211,21 +214,22 @@ Two formulas are \emph{equivalent} if they have the same truth value for every v
   then $\isaAp{\cstSizef}{G} \ge n \cdot 2^n$.
 \end{lemma}
 \begin{proof}
-  TODO (LRS): write very rough sketch
-
-  Paragraph for step 1
-
-  Paragraph for step 2
-
-  Paragraph for step 3
-
-  Paragraph for contradiction from step 1, 2, 3, and \cref{thm_cnf_to_dnf_blowup}
+  %TODO (LRS): X write very rough sketch
+  %Paragraph for step 1
+  %Paragraph for step 2
+  %Paragraph for step 3
+  %Paragraph for contradiction from step 1, 2, 3, and \cref{thm_cnf_to_dnf_blowup}
+  We proof this by contradiction utilizing \cref{thm_cnf_to_dnf_blowup}. By doing so, we assume $\isaAp{\cstSizef}{G} < n \cdot 2^n$ and from that derive false in three steps.
+  \textbf{(1)} First, we prove that the formula $\isaAp{\cst{dualize}}{G}$ has the same size as $G$, thus $\isaAp{\cstSizef}{\isaAp{\cst{dualize}}{G}} < n \cdot 2^n$.
+  \textbf{(2)} Moreover, we show that $\isaAp{\cst{dualize}}{G_n}$ is equivalent to $F_n$.
+  \textbf{(3)} Also, we prove that there exists a list $Ts$, where every formula contained in $Ts$ is both conjunctive and satisfiable, such that $\isaAp{\cst{dualize}}{G_n}$ is syntactically equal to it. From steps 2 and 3, it follows that \cref{thm_cnf_to_dnf_blowup} holds for $F_n$ and $\isaAp{\cst{dualize}}{G_n}$. According to \cref{thm_cnf_to_dnf_blowup}, it therefore must be the case that $\isaAp{\cstSizef}{\isaAp{\cst{dualize}}{G}} \ge n \cdot 2^n$. This contradicts the result of step 1, completing the proof.
 \end{proof}
 
 \begin{theorem}[The actuall thing]
   \label{thm_dnf_to_cnf_blowup_math}
   Let $n$ be a natural number.
-  TODO (LRS): Write the theorem.
+  There exists a formula $F_n$ in DNF with $\isaAp{\cstSizef}{F_n} = 8 \cdot n + 1$ such that every equivalent formula $G_n$ in CNF has $\isaAp{\cstSizef}{G_n} \ge n \cdot 2^n$.
+  %TODO (LRS): X Write the theorem.
 \end{theorem}
 \begin{proof}
   TODO: write very rough sketch.

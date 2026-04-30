@@ -771,8 +771,10 @@ proof -
         by (simp add: \<open>T \<in> set Ts\<close> def_G)
       then obtain ValsatT where Valsat: "ValsatT \<Turnstile> T"
         by auto
+
       define Val where
         "Val = (\<lambda> v. (if v = Var i False \<or> v = Var i True then False else ValsatT v))"
+
       have "\<forall> v \<in> {v. cont_pos T v}. ValsatT v = Val v"
         by (simp add: Val_def both_absent)
       then have "Val \<Turnstile> T"
@@ -792,8 +794,8 @@ proof -
       then have "\<exists> Val. Val \<Turnstile> T \<and> Val (Var i False) = True \<and> Val (Var i True) = True"
         using \<open>T \<in> set Ts\<close> both_present not_sat_conj_pos_false def_G by blast
       then have "\<exists> Val. Val \<Turnstile> G \<and> \<not>(Val \<Turnstile> F)"
-        using BigOr'_semantics \<open>T \<in> set Ts\<close> \<open>i \<in> {1..n}\<close>
-              def_F def_G not_sat_Fn_both_true n_greater_0 by blast
+        unfolding G_def F_def
+        using BigOr'_semantics \<open>T \<in> set Ts\<close> \<open>i \<in> {1..n}\<close> not_sat_Fn_both_true n_greater_0 by blast
       then show False
         using equiv_F_G equiv_def by auto
     qed
@@ -837,10 +839,6 @@ proof -
     using occ_var_bool_diff[rule_format, OF T_in]
     by (metis One_nat_def atLeastAtMost_iff mem_atoms_if_cont_pos)
 
-  have all_T_ge_n: "\<forall>T \<in> set Ts. sizef T \<ge> n"
-    using n_le_card_atoms card_atoms_le_sizef
-    using le_trans by blast
-
   define conj_of_eps where
     "conj_of_eps = (\<lambda>eps.
       (SOME T. T \<in> set Ts \<and> (\<forall>i \<in> {1..(length eps)}. cont_pos T (Var i (nth eps (i - 1))))))"
@@ -849,7 +847,10 @@ proof -
     unfolding conj_of_eps_def
     by (smt (verit, best) ex_T_cont_pos_var_eps that verit_sko_ex')
 
-  have card_eps_le_card_Ts: "card {eps :: bool list. length eps = n} \<le> card (set Ts)"
+  have "2^n = card {eps :: bool list. length eps = n}"
+    using card_lists_length_eq[of "UNIV :: bool set" n, simplified, symmetric] .
+
+  also have "\<dots> \<le> card (set Ts)"
   proof (rule card_inj_on_le[of conj_of_eps])
     show "inj_on conj_of_eps {eps. length eps = n}"
     proof (rule inj_onI)
@@ -894,15 +895,15 @@ proof -
             using \<open>i < n\<close> by force
         qed
 
-        ultimately have False if "conj_of_eps xs = conj_of_eps ys"
-          unfolding that
-          using \<open>nth xs i \<noteq> nth ys i\<close>
-          using occ_var_bool_diff[rule_format, OF T_of_conj_of_eps_in_Ts[OF \<open>length ys = n\<close>], 
-                                  of "Suc i"]
-          using \<open>i < n\<close> by auto
+        moreover have "
+          cont_pos (conj_of_eps ys) (Var (Suc i) False) \<noteq>
+          cont_pos (conj_of_eps ys) (Var (Suc i) True)"
+          using \<open>i < n\<close> occ_var_bool_diff[OF T_of_conj_of_eps_in_Ts[OF \<open>length ys = n\<close>], of "Suc i"]
+          by simp
 
-        then show "conj_of_eps xs \<noteq> conj_of_eps ys"
-          by satx
+        ultimately show "conj_of_eps xs \<noteq> conj_of_eps ys"
+          using \<open>xs ! i \<noteq> ys ! i\<close>
+          by (metis (mono_tags))
       qed
     qed
   next
@@ -913,16 +914,19 @@ proof -
       by simp
   qed
 
-  moreover have "card {eps :: bool list. length eps = n} = 2^n"
-    using card_lists_length_eq[of "UNIV :: bool set" n, simplified] .
+  also have "\<dots> \<le> length Ts"
+    using card_length[of Ts] .
 
-  ultimately have G_cont_exp_T: "length Ts \<ge> 2^n"
-    using card_length[of Ts] by presburger
+  finally have "length Ts \<ge> 2^n" .
+
+  moreover have "\<forall>T \<in> set Ts. sizef T \<ge> n"
+    using n_le_card_atoms card_atoms_le_sizef
+    using le_trans by blast
   
-  then show ?thesis
+  ultimately show ?thesis
     unfolding G_def
-    using exp_size[of n]
-    by (metis all_T_ge_n mult.commute n_greater_0)
+    using exp_size[OF n_greater_0]
+    by (metis mult.commute)
 qed
 
 lemma ex_equiv_disj_list_if_is_dnf:
