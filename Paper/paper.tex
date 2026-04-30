@@ -233,8 +233,8 @@ Two formulas $\phi$ and $\psi$ are \emph{equivalent} if they have the same truth
   We proceed with five steps:
   \textbf{(1)}~First, we show that every conjunctive formula $T \in \isaAp{\cst{set}}{Ts}$ contains for all $i \in \{1,...,n\}$ either the variable $x_{i,0}$ or $x_{i,1}$ positively.
   \textbf{(2)}~From this, we derive that every $T \in \isaAp{\cst{set}}{Ts}$ has $\isaAp{\cstSizef}{T} \ge n$.
-  \textbf{(3)}~Furthermore, we prove that for every Boolean list $\epsilon = [\epsilon_1,...,\epsilon_n]$ there exists a $T \in \isaAp{\cst{set}}{Ts}$ that contains the corresponding variables $x_{1,\epsilon_1},...,x_{n,\epsilon_n}$ positively.
-  \textbf{(4)}~From this, we derive that $Ts$ contains at least $2^n$ conjunctive formulas $T$.
+  \textbf{(3)}~Furthermore, we prove using step 1 that for every Boolean list $\epsilon = [\epsilon_1,...,\epsilon_n]$ there exists a $T \in \isaAp{\cst{set}}{Ts}$ that contains the corresponding variables $x_{1,\epsilon_1},...,x_{n,\epsilon_n}$ positively.
+  \textbf{(4)}~From this, step 1, and the fact that there are $2^n$ Boolean lists of length $n$, we derive that $\listLength{Ts} \ge 2^n$.
   \textbf{(5)}~Finally, we show that $\isaAp{\cstSizef}{G} \ge n \cdot 2^n$ by combining the results from steps 2 and 4.
 \end{proof}
 
