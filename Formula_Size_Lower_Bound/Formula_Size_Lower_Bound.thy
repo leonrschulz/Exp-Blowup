@@ -839,10 +839,6 @@ proof -
     using occ_var_bool_diff[rule_format, OF T_in]
     by (metis One_nat_def atLeastAtMost_iff mem_atoms_if_cont_pos)
 
-  have all_T_ge_n: "\<forall>T \<in> set Ts. sizef T \<ge> n"
-    using n_le_card_atoms card_atoms_le_sizef
-    using le_trans by blast
-
   define conj_of_eps where
     "conj_of_eps = (\<lambda>eps.
       (SOME T. T \<in> set Ts \<and> (\<forall>i \<in> {1..(length eps)}. cont_pos T (Var i (nth eps (i - 1))))))"
@@ -851,7 +847,10 @@ proof -
     unfolding conj_of_eps_def
     by (smt (verit, best) ex_T_cont_pos_var_eps that verit_sko_ex')
 
-  have card_eps_le_card_Ts: "card {eps :: bool list. length eps = n} \<le> card (set Ts)"
+  have "2^n = card {eps :: bool list. length eps = n}"
+    using card_lists_length_eq[of "UNIV :: bool set" n, simplified, symmetric] .
+
+  also have "\<dots> \<le> card (set Ts)"
   proof (rule card_inj_on_le[of conj_of_eps])
     show "inj_on conj_of_eps {eps. length eps = n}"
     proof (rule inj_onI)
@@ -915,16 +914,19 @@ proof -
       by simp
   qed
 
-  moreover have "card {eps :: bool list. length eps = n} = 2^n"
-    using card_lists_length_eq[of "UNIV :: bool set" n, simplified] .
+  also have "\<dots> \<le> length Ts"
+    using card_length[of Ts] .
 
-  ultimately have G_cont_exp_T: "length Ts \<ge> 2^n"
-    using card_length[of Ts] by presburger
+  finally have "length Ts \<ge> 2^n" .
+
+  moreover have "\<forall>T \<in> set Ts. sizef T \<ge> n"
+    using n_le_card_atoms card_atoms_le_sizef
+    using le_trans by blast
   
-  then show ?thesis
+  ultimately show ?thesis
     unfolding G_def
-    using exp_size[of n]
-    by (metis all_T_ge_n mult.commute n_greater_0)
+    using exp_size[OF n_greater_0]
+    by (metis mult.commute)
 qed
 
 lemma ex_equiv_disj_list_if_is_dnf:
