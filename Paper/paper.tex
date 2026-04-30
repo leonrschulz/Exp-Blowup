@@ -93,10 +93,10 @@
 
 \begin{theorem} \label{dnfblowup}
   There are formulas $F_n$ in CNF with $|F_n| = O(n)$, such that
-  every equivalent formula $G_n$ in DNF is of size $|G_n| \geq n2^n$. 
+  every equivalent formula $G_n$ in DNF is of size $|G_n| \geq n2^n$.
 \end{theorem}
 \begin{proof}
-The formulas $F_n$ are defined as $F_n = \bigwedge_{i=1} ( x_{i,0} \lor x_{i,1} ) \land (\neg
+The formulas $F_n$ are defined as $F_n = \bigwedge_{i=1}^n ( x_{i,0} \lor x_{i,1} ) \land (\neg
 x_{i,0} \lor \neg x_{i,1})$.
 
 If $G_n = \bigvee_{j\leq m} T_j$ is a formula in CNF equivalent to $F_n$, then the following two claims hold, which together prove the statement.
@@ -107,11 +107,11 @@ Claim 2. For every vector
 $\epsilon = (\epsilon_1 , \ldots ,\epsilon_n) \in \{ 0,1 \}^n$,
 there is one of the terms $T_j$ in  $G_n$, which contains the literals
 $x_{1,\epsilon_1}, \ldots , x_{n,\epsilon_n}$.
-In particular, $G_n$ has at least $2^n$ many terms. 
+In particular, $G_n$ has at least $2^n$ many terms.
 \end{proof}
 
 \begin{corollary} \label{cnfblowup}
-  There are formulas $F'_n$ in DNF with $|F'_n| = O(n)$, such that 
+  There are formulas $F'_n$ in DNF with $|F'_n| = O(n)$, such that
   every equivalent formula $G_n$ in CNF is of size $|G_n| \geq n2^n$.
 \end{corollary}
 
@@ -119,7 +119,7 @@ In particular, $G_n$ has at least $2^n$ many terms.
   Let $F'_n := {\bar F}_n$ for the formulas $F_n$ of Theorem~\ref{dnfblowup}.
   If there were formulas  $G_n \equiv F'_n$ in CNF with $G_n < n2^n$,
   then ${\bar G}_n \equiv F_n$ would be a formula in DNF with
-  $|{\bar G}_n| = |G_n| < n2^n$, contradicting Theorem~\ref{dnfblowup}. 
+  $|{\bar G}_n| = |G_n| < n2^n$, contradicting Theorem~\ref{dnfblowup}.
 \end{proof}
 
 % TODO: Cite at least the book, and check for transitive citations.
@@ -131,9 +131,12 @@ In particular, $G_n$ has at least $2^n$ many terms.
 \label{sec_preliminaries}
 
 %TODO: introduce BigOr' and BigAnd' with the notation
+%TODO: define the F_n function
 
 A \emph{formula} is inductively defined as either an atom, falsehood ($\bot$), the negation of a formula, or the disjunction, conjunction or implication of two formulas.
 A \emph{literal} is a special case of a formula consisting of either a positive or negative atom, or a positive or negative $\bot$.
+%TODO: introduce notation x_{i,b} for i :: nat and b :: bool
+%TODO: rephrase to use the notation instead of the type var
 All atoms are of the type \textsf{var}, representing a combination of a Boolean value and a natural number.
 A formula is \emph{conjunctive} if it is either a literal or its first subformula is a literal and its second a conjunctive formula.
 Analogously a formula is \emph{disjunctive} if it is either a literal or its first subformula is a literal and its second a disjunctive formula.
@@ -141,10 +144,10 @@ Analogously a formula is \emph{disjunctive} if it is either a literal or its fir
 A \emph{valuation} is a function from atoms to Boolean values.
 The \emph{evaluation} of a formula w.r.t.\ a valuation is the Boolean value we get after replacing all atoms with the specific truth values assigned by the valuation.
 We say that a valuation $\alpha$ \emph{satisfies} a formula $\phi$, written $\alpha \models \phi$, if the formula evaluates to true w.r.t.\ the valuation.
-A formula is
-\emph{satisfiable} if there exists a valuation that satisfies it and
-\emph{tautological} if it is satisfied by every valuation.
-Two formulas are \emph{equivalent} if they have the same truth value for every valuation.
+A formula $\phi$ is
+\emph{satisfiable} if there exists a valuation that satisfies it (i.e., $\existsOne{\alpha}{\alpha \models \phi}$) and
+\emph{tautological} if it is satisfied by every valuation (i.e., $\forallOne{\alpha}{\alpha \models \phi}$).
+Two formulas $\phi$ and $\psi$ are \emph{equivalent} if they have the same truth value for every valuation (i.e., $\forallOne{\alpha}{\alpha \models \phi \iff \alpha \models \psi}$).
 
 \begin{definitionx}
   \label{def_set}
@@ -159,6 +162,7 @@ Two formulas are \emph{equivalent} if they have the same truth value for every v
 
 \begin{definitionx}
   \label{def_dualize}
+  %TODO: tune spacing around type parameters here.
   The function $\tyAnnot{\cst{dualize}}{\tyFormula{\yA} \Rightarrow \tyFormula{\yA}}$ converts a formula in negation normal form to its dualized form by replacing each literal with its complementary:
   an atom $A$ becomes $\neg A$,
   $\bot$ becomes $\neg\bot$,
@@ -171,27 +175,26 @@ Two formulas are \emph{equivalent} if they have the same truth value for every v
 \section{CNF to DNF}
 \label{sec_CNF_to_DNF}
 
+\begin{lemma}
+  \label{thm_boring_lemma}
+\end{lemma}
+
 \begin{lemma}[TODO: Find Nice name (e.g., Weak ...)]
   \label{thm_cnf_to_dnf_blowup}
   Let $n > 0$ be a natural number.
   Let $Ts$ be a list of formulas.
-  Let $G = \bigvee_{T \in \mathsf{set} \, Ts} T$.
-  If all formulas in $Ts$ are conjunctive and satisfiable (i.e., $\forallIn{T}{\isaAp{\cst{set}}{Ts}}{\existsOne{\alpha}{\alpha \models T}}$), and $F_n$ is equivalent to $G$,
+  Let $G = \bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$.
+  If all formulas in $Ts$ are conjunctive and satisfiable, and $F_n$ is equivalent to $G$,
   then $\isaAp{\cstSizef}{G} \ge n \cdot 2^n$.
 \end{lemma}
 \begin{proof}
-  %TODO (LRS): X write good sketch of the important intermediate steps.
-  %Paragraph for step 1
-  %Paragraph for step 3 from step 1
-  %Paragraph for step 2
-  %Paragraph for step 4 from step 2
-  %Paragraph for step 5 from step 3 and 4.
-  This can be proved within five steps. 
-  \textbf{(1)} First, we show that every conjunctive formula $T \in \isaAp{\cst{set}}{Ts}$ contains for all $i \in \{1,...,n\}$ either the variable $x_{i,0}$ or $x_{i,1}$ positively.
-  \textbf{(2)} From this, we derive that every $T \in \isaAp{\cst{set}}{Ts}$ has $\isaAp{\cstSizef}{T} \ge n$.
-  \textbf{(3)} Furthermore, we proof that for every Boolean list $\epsilon = (\epsilon_1,...,\epsilon_n) \in \{0,1\}^n$ there exists a $T \in \isaAp{\cst{set}}{Ts}$ that contains the corresponding variables $x_{1,\epsilon_1},...,x_{n,\epsilon_n}$ positively.
-  \textbf{(4)} From this, we derive that $Ts$ contains at least $2^n$ conjunctive formulas $T$.
-  \textbf{(5)} Finally, we show that $\isaAp{\cstSizef}{G} \ge n \cdot 2^n$ by combining the results from steps 3 and 4.
+  %TODO LRS: search for interesting lemmas to be use here (e.g., Step n: We show stuff using \cref{thm_boring_lemma}.)
+  We proceed with five steps:
+  \textbf{(1)}~First, we show that every conjunctive formula $T \in \isaAp{\cst{set}}{Ts}$ contains for all $i \in \{1,...,n\}$ either the variable $x_{i,0}$ or $x_{i,1}$ positively.
+  \textbf{(2)}~From this, we derive that every $T \in \isaAp{\cst{set}}{Ts}$ has $\isaAp{\cstSizef}{T} \ge n$.
+  \textbf{(3)}~Furthermore, we proof that for every Boolean list $\epsilon = [\epsilon_1,...,\epsilon_n]$ there exists a $T \in \isaAp{\cst{set}}{Ts}$ that contains the corresponding variables $x_{1,\epsilon_1},...,x_{n,\epsilon_n}$ positively.
+  \textbf{(4)}~From this, we derive that $Ts$ contains at least $2^n$ conjunctive formulas $T$.
+  \textbf{(5)}~Finally, we show that $\isaAp{\cstSizef}{G} \ge n \cdot 2^n$ by combining the results from steps 2 and 4.
 \end{proof}
 
 \begin{theorem}[The actuall thing]
@@ -209,27 +212,26 @@ Two formulas are \emph{equivalent} if they have the same truth value for every v
 \begin{lemma}[TODO: Find Nice Name]
   Let $n > 0$ be a natural number.
   Let $Cs$ be a list of formulas.
-  Let $G = \bigwedge_{C \in \mathsf{set} \, Cs} C$.
-  If all formulas in $Cs$ are disjunctive and not tautological (i.e., $\forallIn{C}{\isaAp{\cst{set}}{Cs}}{\neg (\forall \alpha. \: \alpha \models C)}$), and $\isaAp{\cst{dualize}}{F_n}$ is equivalent to $G$,
+  Let $G = \bigwedge_{i = 0}^{\listLength{Cs}} \listNth{Cs}{i}$.
+  If all formulas in $Cs$ are disjunctive and not tautological, and $\isaAp{\cst{dualize}}{F_n}$ is equivalent to $G$,
   then $\isaAp{\cstSizef}{G} \ge n \cdot 2^n$.
 \end{lemma}
 \begin{proof}
-  %TODO (LRS): X write very rough sketch
-  %Paragraph for step 1
-  %Paragraph for step 2
-  %Paragraph for step 3
-  %Paragraph for contradiction from step 1, 2, 3, and \cref{thm_cnf_to_dnf_blowup}
-  We proof this by contradiction utilizing \cref{thm_cnf_to_dnf_blowup}. By doing so, we assume $\isaAp{\cstSizef}{G} < n \cdot 2^n$ and from that derive false in three steps.
-  \textbf{(1)} First, we prove that the formula $\isaAp{\cst{dualize}}{G}$ has the same size as $G$, thus $\isaAp{\cstSizef}{\isaAp{\cst{dualize}}{G}} < n \cdot 2^n$.
-  \textbf{(2)} Moreover, we show that $\isaAp{\cst{dualize}}{G_n}$ is equivalent to $F_n$.
-  \textbf{(3)} Also, we prove that there exists a list $Ts$, where every formula contained in $Ts$ is both conjunctive and satisfiable, such that $\isaAp{\cst{dualize}}{G_n}$ is syntactically equal to it. From steps 2 and 3, it follows that \cref{thm_cnf_to_dnf_blowup} holds for $F_n$ and $\isaAp{\cst{dualize}}{G_n}$. According to \cref{thm_cnf_to_dnf_blowup}, it therefore must be the case that $\isaAp{\cstSizef}{\isaAp{\cst{dualize}}{G}} \ge n \cdot 2^n$. This contradicts the result of step 1, completing the proof.
+  %TODO LRS: search for interesting lemmas to be use here (e.g., Step n: We show stuff using Lemma xy.)
+  We proof this by contradiction utilizing \cref{thm_cnf_to_dnf_blowup}.
+  We assume $\isaAp{\cstSizef}{G} < n \cdot 2^n$ and from that derive false in five steps.
+  \textbf{(1)} First, we prove that the formula $\isaAp{\cst{dualize}}{G}$ has the same size as $G$, thus $\isaAp{\cstSizef}{(\isaAp{\cst{dualize}}{G})} < n \cdot 2^n$.
+  \textbf{(2)} Moreover, we show that $\isaAp{\cst{dualize}}{G}$ is equivalent to $F_n$.
+  \textbf{(3)} Also, we prove that there exists a list $Ts$, where every formula contained in $Ts$ is both conjunctive and satisfiable, such that $\isaAp{\cst{dualize}}{G}$ is syntactically equal to it (TODO: replace it by the actual thing).
+  \textbf{(4)} From steps 2 and 3, it follows that \cref{thm_cnf_to_dnf_blowup} holds for $F_n$ and $\isaAp{\cst{dualize}}{G}$.
+  According to \cref{thm_cnf_to_dnf_blowup}, it therefore must be the case that $\isaAp{\cstSizef}{(\isaAp{\cst{dualize}}{G})} \ge n \cdot 2^n$.
+  \textbf{(5)} The result of step 1 contradicts the result of step 4, completing the proof.
 \end{proof}
 
 \begin{theorem}[The actuall thing]
   \label{thm_dnf_to_cnf_blowup_math}
   Let $n$ be a natural number.
   There exists a formula $F_n$ in DNF with $\isaAp{\cstSizef}{F_n} = 8 \cdot n + 1$ such that every equivalent formula $G_n$ in CNF has $\isaAp{\cstSizef}{G_n} \ge n \cdot 2^n$.
-  %TODO (LRS): X Write the theorem.
 \end{theorem}
 \begin{proof}
   TODO: write very rough sketch.
