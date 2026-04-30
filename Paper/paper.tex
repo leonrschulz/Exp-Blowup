@@ -93,14 +93,33 @@
   There are formulas $F_n$ in CNF with $|F_n| = O(n)$, such that
   every equivalent formula $G_n$ in DNF is of size $|G_n| \geq n2^n$. 
 \end{theorem}
+\begin{proof}
+The formulas $F_n$ are defined as $F_n = \bigwedge_{i=1} ( x_{i,0} \lor x_{i,1} ) \land (\neg
+x_{i,0} \lor \neg x_{i,1})$.
+
+If $G_n = \bigvee_{j\leq m} T_j$ is a formula in CNF equivalent to $F_n$, then the following two claims hold, which together prove the statement.
+
+Claim 1. Each of the terms $T_j$ contains exactly one of the literals $x_{i,0}$ and $x_{i,1}$, for every $i\leq n$. In particular, every term $T_j$ is of size at least $n$.
+
+Claim 2. For every vector
+$\epsilon = (\epsilon_1 , \ldots ,\epsilon_n) \in \{ 0,1 \}^n$,
+there is one of the terms $T_j$ in  $G_n$, which contains the literals
+$x_{1,\epsilon_1}, \ldots , x_{n,\epsilon_n}$.
+In particular, $G_n$ has at least $2^n$ many terms. 
+\end{proof}
 
 \begin{corollary} \label{cnfblowup}
   There are formulas $F'_n$ in DNF with $|F'_n| = O(n)$, such that 
   every equivalent formula $G_n$ in CNF is of size $|G_n| \geq n2^n$.
 \end{corollary}
 
+\begin{proof}
+  Let $F'_n := {\bar F}_n$ for the formulas $F_n$ of Theorem~\ref{dnfblowup}.
+  If there were formulas  $G_n \equiv F'_n$ in CNF with $G_n < n2^n$,
+  then ${\bar G}_n \equiv F_n$ would be a formula in DNF with
+  $|{\bar G}_n| = |G_n| < n2^n$, contradicting Theorem~\ref{dnfblowup}. 
+\end{proof}
 
-% TODO: What are the two proposition and corollary.
 % TODO: Cite at least the book, and check for transitive citations.
 % TODO: All definitions required to understand the proposition and corollary.
 % TODO: With proof sketch so the formalization can later compare the result.
