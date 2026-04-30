@@ -91,6 +91,35 @@
 \section{Background}
 \label{sec_background}
 
+A \emph{literal} is a variable $x$ oder a negated variable
+$\neg x$. The literals $x$ and $\neg x$ are \emph{complements}
+of each other.
+%The complement of a lieral $a$ is denoted by $\bar{a}$.
+
+A formula $F$ is in \emph{negation normal form} (NNF), if $F$ contains
+no implications, and negations in $F$ only occur immediately in front
+of variables, i.e., $F$ is built from literals by conjunction and
+disjunction only.
+
+For a formula $F$ in NNF we define the dual formula $\bar F$ in NNF
+by replacing every literal by its complement, and interchanging the
+symbols $\land$ and $\lor$.
+For every formula $F$ in NNF, $\bar{F}$ is equivalent to $\neg F$.
+
+\begin{definition}
+  We define the following classes of formulas:
+\begi{itemize}
+\item A \emph{term} is a conjunktion $a_1 \lor \ldots \lor a_k$
+  of literals.
+\item A \emph{clause} is a disjunction $a_1 \lor \ldots \lor a_k$ von Literalen.
+\item A formula in \emph{disjunctive normal form} (DNF) is a
+  disjunction $T_1 \lor \ldots \lor T_m$ of terms.
+\item A formula in \emph{conjunctive normal form} (CNF) is a
+  conjunction $C_1 \land \ldots \land C_m$ of clauses.
+\end{itemize}
+\end{definition}
+Note that every formula in DNF or CNF is also in NNF.  
+
 \begin{theorem} \label{dnfblowup}
   There are formulas $F_n$ in CNF with $|F_n| = O(n)$, such that
   every equivalent formula $G_n$ in DNF is of size $|G_n| \geq n2^n$.
