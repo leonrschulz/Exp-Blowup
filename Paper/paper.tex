@@ -91,6 +91,10 @@
 \section{Background}
 \label{sec_background}
 
+Formulas of propositional logic are constructed from variables
+(or \emph{atoms}) with the logical connectives negation $\neg$,
+disjunction $\lor$, conjunction $\land$ and implication $\to$.
+
 A \emph{literal} is a variable $x$ oder a negated variable
 $\neg x$. The literals $x$ and $\neg x$ are \emph{complements}
 of each other.
@@ -109,7 +113,7 @@ For every formula $F$ in NNF, $\bar{F}$ is equivalent to $\neg F$.
 \begin{definition}
   We define the following classes of formulas:
 \begi{itemize}
-\item A \emph{term} is a conjunktion $a_1 \lor \ldots \lor a_k$
+\item A \emph{term} is a conjunction $a_1 \lor \ldots \lor a_k$
   of literals.
 \item A \emph{clause} is a disjunction $a_1 \lor \ldots \lor a_k$ von Literalen.
 \item A formula in \emph{disjunctive normal form} (DNF) is a
@@ -118,11 +122,16 @@ For every formula $F$ in NNF, $\bar{F}$ is equivalent to $\neg F$.
   conjunction $C_1 \land \ldots \land C_m$ of clauses.
 \end{itemize}
 \end{definition}
-Note that every formula in DNF or CNF is also in NNF.  
+Note that every formula in DNF or CNF is also in NNF.
+
+Every formula can be transformed into an equivalent formula in DNF,
+and in DNF, but the cost of this transformation is an exponential
+increase in size in the worst case.
 
 \begin{theorem} \label{dnfblowup}
-  There are formulas $F_n$ in CNF with $|F_n| = O(n)$, such that
-  every equivalent formula $G_n$ in DNF is of size $|G_n| \geq n2^n$.
+  For all sufficiently large $n\in\Nat$, there are formulas $F_n$ in
+  CNF with $|F_n| = O(n)$, such that every equivalent formula $G_n$ in
+  DNF is of size $|G_n| \geq n2^n$.
 \end{theorem}
 \begin{proof}
 The formulas $F_n$ are defined as $F_n = \bigwedge_{i=1}^n ( x_{i,0} \lor x_{i,1} ) \land (\neg
@@ -140,8 +149,9 @@ In particular, $G_n$ has at least $2^n$ many terms.
 \end{proof}
 
 \begin{corollary} \label{cnfblowup}
-  There are formulas $F'_n$ in DNF with $|F'_n| = O(n)$, such that
-  every equivalent formula $G_n$ in CNF is of size $|G_n| \geq n2^n$.
+  For all sufficiently large $n\in\Nat$, there are formulas $F'_n$ in
+  DNF with $|F'_n| = O(n)$, such that every equivalent formula $G_n$
+  in CNF is of size $|G_n| \geq n2^n$.
 \end{corollary}
 
 \begin{proof}
