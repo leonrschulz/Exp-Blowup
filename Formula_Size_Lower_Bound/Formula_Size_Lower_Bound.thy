@@ -434,6 +434,7 @@ datatype var = Var nat bool
 lemma inj_on_Var[simp]: "inj_on (\<lambda>(x, y). Var x y) A" for A
   by (rule inj_onI) (simp add: case_prod_beta prod_eq_iff)
 
+(* TODO: check if this could be replace by Fn (Suc 0) = ... and Fn (Suc (Suc n)) = ... *)
 fun Fn :: "nat \<Rightarrow> var formula" where
   "Fn 0 = (\<^bold>\<not>\<bottom>)"|
   "Fn (Suc n) =
@@ -783,8 +784,8 @@ proof -
       then have "\<exists> Val. Val \<Turnstile> T \<and> Val (Var i False) = False \<and> Val (Var i True) = False"
         unfolding Val_def by auto
       then have "\<exists> Val. Val \<Turnstile> G \<and> \<not>(Val \<Turnstile> F)"
-        using BigOr'_semantics \<open>T \<in> set Ts\<close> \<open>i \<in> {1..n}\<close>
-              def_F def_G not_sat_Fn_both_false n_greater_0 by blast
+        unfolding G_def F_def
+        using BigOr'_semantics \<open>T \<in> set Ts\<close> \<open>i \<in> {1..n}\<close> not_sat_Fn_both_false n_greater_0 by blast
       then show False
         using equiv_F_G equiv_def by auto
     next
