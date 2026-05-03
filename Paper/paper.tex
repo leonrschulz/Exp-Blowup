@@ -265,6 +265,11 @@ Two formulas $\phi$ and $\psi$ are \emph{equivalent} if they have the same truth
 \section{DNF to CNF}
 \label{sec_DNF_to_CNF}
 
+\begin{lemma}
+	\label{aux_lemma_cor5_step1}
+	Let $\phi$ be a formula in negation normal form. Then $\isaAp{\cstSizef}{\phi} = \isaAp{\cstSizef}{\isaAp{\cst{dualize}}{\phi}}.$ 
+\end{lemma}
+
 \begin{lemma}[TODO: Find Nice Name]
   Let $n > 0$ be a natural number.
   Let $Cs$ be a list of formulas.
@@ -277,6 +282,7 @@ Two formulas $\phi$ and $\psi$ are \emph{equivalent} if they have the same truth
   We proof this by contradiction utilizing \cref{thm_cnf_to_dnf_blowup}.
   We assume $\isaAp{\cstSizef}{G} < n \cdot 2^n$ and from that derive false in five steps.
   \textbf{(1)} First, we prove that the formula $\isaAp{\cst{dualize}}{G}$ has the same size as $G$, thus $\isaAp{\cstSizef}{(\isaAp{\cst{dualize}}{G})} < n \cdot 2^n$.
+  We show this by using \cref{aux_lemma_cor5_step1}, taking advantage of \cref{def_sizef}, where we ignore $\lnot$ when calculating the size.
   \textbf{(2)} Moreover, we show that $\isaAp{\cst{dualize}}{G}$ is equivalent to $F_n$.
   \textbf{(3)} Also, we prove that there exists a list $Ts$, where every formula contained in $Ts$ is both conjunctive and satisfiable, such that $\isaAp{\cst{dualize}}{G}$ is syntactically equal to it (TODO: replace it by the actual thing).
   \textbf{(4)} From steps 2 and 3, it follows that \cref{thm_cnf_to_dnf_blowup} holds for $F_n$ and $\isaAp{\cst{dualize}}{G}$.
