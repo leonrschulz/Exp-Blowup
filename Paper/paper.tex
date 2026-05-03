@@ -222,6 +222,11 @@ Two formulas $\phi$ and $\psi$ are \emph{equivalent} if they have the same truth
   \label{thm_boring_lemma}
 \end{lemma}
 
+\begin{lemma}
+  \label{aux_lemma_prop4'_step5}
+  Let $\phi$ be a conjunctive Formula. Let $\alpha$ be a valuation that satisfies $\phi$ and let $\beta$ be another valuation. If both valuations map all variables contained in $\phi$ to the same Boolean value, then $\beta$ also satisfies $\phi$.
+\end{lemma}
+
 \begin{lemma}[TODO: Find Nice name (e.g., Weak ...)]
   \label{thm_cnf_to_dnf_blowup}
   Let $n > 0$ be a natural number.
@@ -236,8 +241,9 @@ Two formulas $\phi$ and $\psi$ are \emph{equivalent} if they have the same truth
   We proceed with five steps:
   \textbf{(1)}~First, we show that every conjunctive formula $T \in \isaAp{\cst{set}}{Ts}$ contains for all $i \in \{1,...,n\}$ either the variable $x_{i,0}$ or $x_{i,1}$ positively.
   We prove this step by contradiction, deriving false in the two cases where either both variables $x_{i,0}$ or $x_{i,1}$ are positively contained or both are not positively contained in $T$.
-  In both cases, we proceed by defining a specific valuation that satisfies $G_n$ but not $F_n$
-  (e.g. in the second case, the valuation satisfies T and maps $x_{i,0}$ and $x_{i,1}$ to false).
+  In both cases, we proceed by defining a specific valuation that satisfies $G_n$ but not $F_n$.
+  In the second case, for instance, we modify the valuation that satisfies $T$ by changing the assignment of the variables $x_{i,0}$ and $x_{i,1}$ to false.
+  For this modified valuation we then show, using \cref{aux_lemma_prop4'_step5}, that it still satisfies $T$ and thus $G$. But also it does not satisfy $F_n$, due to the assignment of $x_{i,0}$ and $x_{i,1}$.
   \textbf{(2)}~From this, we derive that every $T \in \isaAp{\cst{set}}{Ts}$ has $\isaAp{\cstSizef}{T} \ge n$.
   \textbf{(3)}~Furthermore, we prove using step 1 that for every Boolean list $\epsilon = [\epsilon_1,...,\epsilon_n]$ there exists a $T \in \isaAp{\cst{set}}{Ts}$ that contains the corresponding variables $x_{1,\epsilon_1},...,x_{n,\epsilon_n}$ positively.
   If this is not the case for a specific list $\epsilon$, we show, using step 1, that every $T$ must contain one of the variables $x_{1,(\epsilon_1-1)},...,x_{n,(\epsilon_n-1)}$. We then define a concrete valuation that maps all variables $x_{i,\epsilon_i}$ to true and $x_{i,(\epsilon_1-i)}$ to false for $i = 1,...,n$. 
