@@ -66,6 +66,9 @@
 \ArticleNo{23}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\usepackage{amssymb} %TODO: clarify if this import is necessary
+\newcommand{\Nat}{\mathbb{N}} 
+
 \usepackage{cleveref} %TODO: clarify why this import is necessary
 
 \theoremstyle{definition}
@@ -232,8 +235,10 @@ Two formulas $\phi$ and $\psi$ are \emph{equivalent} if they have the same truth
   %TODO LRS: search for interesting lemmas to be use here (e.g., Step n: We show stuff using \cref{thm_boring_lemma}.)
   We proceed with five steps:
   \textbf{(1)}~First, we show that every conjunctive formula $T \in \isaAp{\cst{set}}{Ts}$ contains for all $i \in \{1,...,n\}$ either the variable $x_{i,0}$ or $x_{i,1}$ positively.
+  %We prove this step by contradiction. To do so, we derive false for the two cases, that either both variables $x_{i,0}$ or $x_{i,1}$ are positive contained or both are not positive contained in $T$.
   \textbf{(2)}~From this, we derive that every $T \in \isaAp{\cst{set}}{Ts}$ has $\isaAp{\cstSizef}{T} \ge n$.
   \textbf{(3)}~Furthermore, we prove using step 1 that for every Boolean list $\epsilon = [\epsilon_1,...,\epsilon_n]$ there exists a $T \in \isaAp{\cst{set}}{Ts}$ that contains the corresponding variables $x_{1,\epsilon_1},...,x_{n,\epsilon_n}$ positively.
+  If this is not the case for a specific list $\epsilon$, we show, using step 1, that every $T$ must contain one of the variables $x_{1,(\epsilon_1-1)},...,x_{n,(\epsilon_n-1)}$. We then define a concrete valuation that sets all variables $x_{i,\epsilon_i}$ to true and $x_{i,(\epsilon_1-i)}$ to false for $i = 1,...,n$. Using this valuation, we now derive a contradiction, showing that it satisfies $F_n$ but not $G_n$.
   \textbf{(4)}~From this, step 1, and the fact that there are $2^n$ Boolean lists of length $n$, we derive that $\listLength{Ts} \ge 2^n$.
   \textbf{(5)}~Finally, we show that $\isaAp{\cstSizef}{G} \ge n \cdot 2^n$ by combining the results from steps 2 and 4.
 \end{proof}
