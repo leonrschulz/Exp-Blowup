@@ -363,8 +363,16 @@ Two formulas $\phi$ and $\psi$ are \emph{equivalent} if they have the same truth
   The proof is analogous to the proof of \cref{thm_cnf_to_dnf_blowup_math}.
 \end{proof}
 
-\section{Discussion}
+\section{Discussion (LRS)}
 \label{sec_discussion}
+
+% Some intuitive steps of the paper proof required significant formalization effort:
+% A, B, and C.
+% The case C was especially challenging and required us to first proof a general lemma about the cardinality of finite sets:
+% begin{lemma} card_inj_on_le ... \end{lemma} (Already in Isabelle/HOL)
+% Here talk about the instantiation of the lemma and conj_of_eps
+% begin{lemma} card_le_card_if_mem_imp_ex_mem ... \end{lemma}
+% Here find out what is interesting
 
 \section{Conclusion}
 \label{sec_concl}
