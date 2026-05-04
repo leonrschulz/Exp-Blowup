@@ -174,7 +174,6 @@ In particular, $G_n$ has at least $2^n$ many terms.
 \label{sec_preliminaries}
 
 %TODO: introduce BigOr' and BigAnd' with the notation
-%TODO: define the F_n function and consider lemmas not_sat_Fn_both_true and not_sat_conj_pos_false
 
 A \emph{formula} is inductively defined as either an atom, falsehood ($\bot$), the negation of a formula, or the disjunction, conjunction or implication of two formulas.
 A \emph{literal} is a special case of a formula consisting of either a positive or negative atom, or a positive or negative $\bot$.
@@ -201,6 +200,18 @@ Two formulas $\phi$ and $\psi$ are \emph{equivalent} if they have the same truth
   \label{def_sizef}
   The function $\tyAnnot{\cstSizef}{\tyFormula{\yA} \Rightarrow \tyNat}$ counts the number of atoms, $\bot$, disjunctions, conjunctions, and implications in a formula;
   the negations are ignored.
+\end{definitionx}
+
+%TODO: define the F_n function and consider lemmas not_sat_Fn_both_true and not_sat_conj_pos_false
+\begin{definitionx}
+  \label{def_Fn}
+  The function $\tyAnnot{\cst{Fn}}{\tyNat \Rightarrow \tyFormula{\yA}}$ creates a formula containing
+  the conjunction of the exclusive disjunctions of each variable pair $x_{i,false}$ and $x_{i,true}$ with $i \in {1,\ldots,n}}$:
+  \begin{align*}
+    \isaAp{\cst{Fn}}{0} =\; & \neg\bot \\
+    \isaAp{\cst{Fn}}{(n+1)} =\; & ((x_{i,false} \lor x_{i,true}) \land (\neg x_{i,false} \lor \neg x_{i,true})) \land (\isaAp{\cst{Fn}}{n})
+  \end{align*}
+  In the rest of this paper, we write $F_n$ for $\isaAp{\cst{Fn}}{n}$.
 \end{definitionx}
 
 \begin{definitionx}
@@ -277,10 +288,22 @@ Two formulas $\phi$ and $\psi$ are \emph{equivalent} if they have the same truth
 \begin{corollary}[The actuall thing]
   \label{thm_cnf_to_dnf_blowup_math}
   Let $n$ be a natural number.
-  There exists a formula $F_n$ in CNF with $\isaAp{\cstSizef}{F_n} = 8 \cdot n + 1$ such that every equivalent formula $G_n$ in DNF has $\isaAp{\cstSizef}{G_n} \ge n \cdot 2^n$.
+  There exists a formula $\phi$ in CNF with $\isaAp{\cstSizef}{\phi} = 8 \cdot n + 1$ such that every equivalent formula $\psi$ in DNF has $\isaAp{\cstSizef}{\psi} \ge n \cdot 2^n$.
 \end{corollary}
 \begin{proof}
-  TODO: write very rough sketch.
+  We start by a case analysis on $n$.
+  The interesting case is when $n > 0$.
+  We define $\phi = F_n$ (see \cref{def_Fn});
+  it is easy to show that $F_n$ is in conjunctive normal form, and that $\isaAp{\cstSizef}{F_n} = 8 \cdot n + 1$.
+  To prove the last property, we assume that there is an equivalent formula $\psi$ in disjunctive normal form.
+  We first obtain a list $Ts$ of all terms in $\psi$ such that
+  all formulas in $Ts$ are conjunctive and satisfiable,
+  %TODO: think whether we could explain the trick with filter and undnf. Maybe extract to its own lemma?
+  $\isaAp{\cstSizef}{\psi} \ge \isaAp{\cstSizef}{(\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i})}$,
+  and $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$ is equivalent to $\psi$.
+  From this last property, we show that $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$ is equivalent to $F_n$.
+  This allows us to prove $\isaAp{\cstSizef}{(\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i})} \ge n \cdot 2^n$ using \cref{thm_cnf_to_dnf_blowup}.
+  Finally, we can prove that $\isaAp{\cstSizef}{\psi} \ge n \cdot 2^n$ by transitivity.
 \end{proof}
 
 \section{DNF to CNF}
@@ -337,7 +360,7 @@ Two formulas $\phi$ and $\psi$ are \emph{equivalent} if they have the same truth
   There exists a formula $F_n$ in DNF with $\isaAp{\cstSizef}{F_n} = 8 \cdot n + 1$ such that every equivalent formula $G_n$ in CNF has $\isaAp{\cstSizef}{G_n} \ge n \cdot 2^n$.
 \end{corollary}
 \begin{proof}
-  TODO: write very rough sketch.
+  The proof is analogous to the proof of \cref{thm_cnf_to_dnf_blowup_math}.
 \end{proof}
 
 \section{Discussion}

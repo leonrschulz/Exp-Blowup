@@ -443,9 +443,9 @@ fun Fn :: "nat \<Rightarrow> var formula" where
         (Or
           (Atom (Var (Suc n) False))
           (Atom (Var (Suc n) True)))
-      (Or
-        (Not (Atom (Var (Suc n) False)))
-        (Not (Atom (Var (Suc n) True)))))
+        (Or
+          (Not (Atom (Var (Suc n) False)))
+          (Not (Atom (Var (Suc n) True)))))
     (Fn n)"
 
 lemma size_Fn: "sizef (Fn n) = 8*n+1"
