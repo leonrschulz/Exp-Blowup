@@ -520,7 +520,7 @@ lemma size_dualized_Fn: "sizef (dualize (Fn n)) = 8 * n + 1"
 lemma dualized_Fn_in_dnf: "is_dnf (dualize (Fn n))"
   by(induction n; auto)
 
-lemma size_ident_dualize: "is_nnf F \<Longrightarrow> sizef F = sizef (dualize F)"
+lemma size_ident_dualize[simp]: "is_nnf F \<Longrightarrow> sizef (dualize F) = sizef F"
   by (induction F; simp)
 
 lemma equiv_dualize: "is_nnf F \<Longrightarrow> equiv (dualize F) (Not F)"
@@ -607,6 +607,7 @@ qed auto
 lemma dualized_conj_of_disjs_is_disj_of_conjs: 
   "(\<forall> C \<in> set Cs. is_disj C \<and> (\<exists> Val. \<not>(Val \<Turnstile> C))) \<Longrightarrow> 
    \<exists> Ts. (dualize (BigAnd' Cs)) = BigOr' Ts \<and> (\<forall>T\<in>set Ts. is_conj T \<and> (\<exists> Val. Val \<Turnstile> T))"
+  \<comment> \<open>TODO: try to prove the lemma for \<^term>\<open>Ts = map dualize Cs\<close>\<close>
 proof (induction Cs)
   case Nil
   then show ?case
@@ -617,15 +618,13 @@ next
     using Cons.prems by simp
   have is_no_taut_C: "\<exists>\<alpha>. \<not> \<alpha> \<Turnstile> C" 
     using Cons.prems by simp
-  have "\<exists>Ts. dualize (BigAnd' Cs) = BigOr' Ts \<and> (\<forall>T\<in>set Ts. is_conj T \<and> (\<exists>Val. Val \<Turnstile> T))" 
-    by (simp add: Cons.IH Cons.prems)
   then obtain TsCs where 
-    def_TsCs: "dualize (BigAnd' Cs) = BigOr' TsCs \<and> (\<forall>T\<in>set TsCs. is_conj T \<and> (\<exists>Val. Val \<Turnstile> T))" 
-    by auto
+    def_TsCs: "dualize (BigAnd' Cs) = BigOr' TsCs" "\<forall>T\<in>set TsCs. is_conj T \<and> (\<exists>Val. Val \<Turnstile> T)"
+    by atomize_elim (auto simp add: Cons.IH Cons.prems)
   define Ts where 
     "Ts = [dualize C] @ TsCs"
   then have 1: "BigOr' Ts = Or (dualize C) (dualize (BigAnd' Cs))" if "Cs \<noteq> []"
-    by (metis BigAnd'.simps(2,3) BigOr'.simps(1,3) Cons.prems append_Cons append_Nil def_TsCs
+    by (metis BigAnd'.simps(2,3) BigOr'.simps(1,3) Cons.prems append_Cons append_Nil def_TsCs(1)
         dualize.simps(4) dualized_disj_not_taut_impl_sat formula.distinct(15)
         formula_semantics.simps(2) list.exhaust list.set_intros(1,2) that)
   have a2: "is_conj (dualize C)"
@@ -642,23 +641,12 @@ next
     using def_TsCs by auto
   have 3: "\<forall>T\<in>set Ts. (\<exists>Val. Val \<Turnstile> T)" 
     using Ts_def a3 b3 by auto
-  have 4: "\<exists>Ts. Or (dualize C) (dualize (BigAnd' Cs)) = BigOr' Ts \<and>
-    (\<forall>T\<in>set Ts. is_conj T \<and> (\<exists>Val. Val \<Turnstile> T))" if "Cs \<noteq> []"
-    using 1[OF that] 2 3 by metis
   show ?case
   proof (intro exI[of _ Ts] conjI ballI)
     show "dualize (BigAnd' (C # Cs)) = BigOr' Ts"
-    proof (cases "Cs = []")
-      case True
-      then show ?thesis
-        by (metis BigAnd'.simps(2) BigOr'.simps(2) def_TsCs Ts_def dualize.simps(3)
-            list.set_intros(1) formula_semantics.simps(2) BigOr'.simps(3) append.right_neutral
-            neq_Nil_conv BigAnd'.simps(1) formula.distinct(15))
-    next
-      case False
-      then show ?thesis
-        by (metis "1" BigAnd'.simps(3) dualize.simps(4) neq_Nil_conv)
-    qed
+      by (metis (no_types, lifting) "1" BigAnd'.cases BigAnd'.simps(1,2,3) BigOr'.simps(2,3) Ts_def
+          append.left_neutral append_Cons def_TsCs(1,2) dualize.simps(3,4) formula.distinct(15)
+          formula_semantics.simps(2) list.set_intros(1))
   next
     show "\<And>T. T \<in> set Ts \<Longrightarrow> is_conj T"
       by (metis 2)
@@ -715,17 +703,14 @@ lemma mem_atoms_if_cont_pos:
   shows "v \<in> atoms T"
   using assms by (induction T v rule: cont_pos.induct) auto
 
-lemma not_sat_conj_pos_false: 
-  assumes "is_conj F" and "\<exists>v. cont_pos F v \<and> \<not>(Val v)"
-  shows "\<not>(Val \<Turnstile> F)"
+
+lemma
+  assumes "is_conj F"
+  shows
+    not_sat_conj_neg_true: "\<exists>v. cont_neg F v \<and> Val v \<Longrightarrow> \<not>(Val \<Turnstile> F)" and
+    not_sat_conj_pos_false: "\<exists>v. cont_pos F v \<and> \<not>(Val v) \<Longrightarrow> \<not>(Val \<Turnstile> F)"
   using assms
   by (induction F) (auto elim: cont_pos.elims is_lit_plus.elims)
-
-lemma not_sat_conj_neg_true: 
-  assumes "is_conj F" and "\<exists>v. cont_neg F v \<and> Val v"
-  shows "\<not>(Val \<Turnstile> F)"
-  using assms
-  by (induction F) (auto elim: cont_neg.elims is_lit_plus.elims)
 
 lemma sat_conj_val_cont_ident:
   assumes "Val1 \<Turnstile> F" and "\<forall> v \<in> {v. cont F v}. Val1 v = Val2 v" and "is_conj F"
@@ -779,15 +764,17 @@ proof -
       have "\<forall> v \<in> {v. cont_pos T v}. ValsatT v = Val v"
         by (simp add: Val_def both_absent)
       then have "Val \<Turnstile> T"
-        by (metis \<open>T \<in> set Ts\<close> Val_def not_sat_conj_neg_true def_G(2) impl_not_cont_pos
-            mem_Collect_eq Valsat sat_conj_val_cont_ident)
+        using not_sat_conj_neg_true impl_not_cont_pos sat_conj_val_cont_ident
+        by (metis \<open>T \<in> set Ts\<close> Val_def def_G(2) mem_Collect_eq Valsat)
       then have "\<exists> Val. Val \<Turnstile> T \<and> Val (Var i False) = False \<and> Val (Var i True) = False"
         unfolding Val_def by auto
       then have "\<exists> Val. Val \<Turnstile> G \<and> \<not>(Val \<Turnstile> F)"
         unfolding G_def F_def
         using BigOr'_semantics \<open>T \<in> set Ts\<close> \<open>i \<in> {1..n}\<close> not_sat_Fn_both_false n_greater_0 by blast
+      then have "\<not> equiv F G"
+        unfolding equiv_def by auto
       then show False
-        using equiv_F_G equiv_def by auto
+        using equiv_F_G by contradiction
     next
       case both_present
       then have "\<exists> Val. Val \<Turnstile> T"
@@ -797,8 +784,10 @@ proof -
       then have "\<exists> Val. Val \<Turnstile> G \<and> \<not>(Val \<Turnstile> F)"
         unfolding G_def F_def
         using BigOr'_semantics \<open>T \<in> set Ts\<close> \<open>i \<in> {1..n}\<close> not_sat_Fn_both_true n_greater_0 by blast
+      then have "\<not> equiv F G"
+        unfolding equiv_def by auto
       then show False
-        using equiv_F_G equiv_def by auto
+        using equiv_F_G by contradiction
     qed
   qed
 
