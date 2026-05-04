@@ -247,7 +247,7 @@ Two formulas $\phi$ and $\psi$ are \emph{equivalent} if they have the same truth
 \end{lemma}
 
 
-\begin{lemma}[TODO: Find Nice name (e.g., Weak ...)]
+\begin{theorem}[TODO: Find Nice name (e.g., Weak ...)]
   \label{thm_cnf_to_dnf_blowup}
   Let $n > 0$ be a natural number.
   Let $Ts$ be a list of formulas.
@@ -255,7 +255,7 @@ Two formulas $\phi$ and $\psi$ are \emph{equivalent} if they have the same truth
   If all formulas in $Ts$ are conjunctive and satisfiable, and
   if $F_n$ is equivalent to $G$,
   then $\isaAp{\cstSizef}{G} \ge n \cdot 2^n$.
-\end{lemma}
+\end{theorem}
 \begin{proof}
   We proceed with five steps:
   \textbf{(1)}~First, we show that every conjunctive formula $T \in \isaAp{\cst{set}}{Ts}$ contains for all $i \in \{1,\ldots,n\}$ either the variable $x_{i,0}$ or $x_{i,1}$ positively.
@@ -274,11 +274,11 @@ Two formulas $\phi$ and $\psi$ are \emph{equivalent} if they have the same truth
   \textbf{(5)}~Finally, we show that $\isaAp{\cstSizef}{G} \ge n \cdot 2^n$ by combining the results from steps 2 and 4.
 \end{proof}
 
-\begin{theorem}[The actuall thing]
+\begin{corollary}[The actuall thing]
   \label{thm_cnf_to_dnf_blowup_math}
   Let $n$ be a natural number.
   There exists a formula $F_n$ in CNF with $\isaAp{\cstSizef}{F_n} = 8 \cdot n + 1$ such that every equivalent formula $G_n$ in DNF has $\isaAp{\cstSizef}{G_n} \ge n \cdot 2^n$.
-\end{theorem}
+\end{corollary}
 \begin{proof}
   TODO: write very rough sketch.
 \end{proof}
@@ -313,15 +313,14 @@ Two formulas $\phi$ and $\psi$ are \emph{equivalent} if they have the same truth
   The idea is that each element of $Cs$ gets dualized.
 \end{proof}
 
-\begin{lemma}[TODO: Find Nice Name]
+\begin{theorem}[TODO: Find Nice Name]
   Let $n > 0$ be a natural number.
   Let $Cs$ be a list of formulas.
   Let $G = \bigwedge_{i = 0}^{\listLength{Cs}} \listNth{Cs}{i}$.
   If all formulas in $Cs$ are disjunctive and not tautological, and $\isaAp{\cst{dualize}}{F_n}$ is equivalent to $G$,
   then $\isaAp{\cstSizef}{G} \ge n \cdot 2^n$.
-\end{lemma}
+\end{theorem}
 \begin{proof}
-  %TODO LRS: search for interesting lemmas to be use here (e.g., Step n: We show stuff using Lemma xy.)
   We prove this by contradiction using \cref{thm_cnf_to_dnf_blowup}.
   We assume $\isaAp{\cstSizef}{G} < n \cdot 2^n$ and from that derive false in five steps.
   \textbf{(1)}~First, we know from \cref{aux_lemma_cor5_step1} that $\isaAp{\cstSizef}{(\isaAp{\cst{dualize}}{G})} = \isaAp{\cstSizef}{G}$, thus $\isaAp{\cstSizef}{(\isaAp{\cst{dualize}}{G})} < n \cdot 2^n$.
@@ -332,11 +331,11 @@ Two formulas $\phi$ and $\psi$ are \emph{equivalent} if they have the same truth
   \textbf{(5)}~The result of step 1 contradicts the result of step 4, completing the proof.
 \end{proof}
 
-\begin{theorem}[The actuall thing]
+\begin{corollary}[The actuall thing]
   \label{thm_dnf_to_cnf_blowup_math}
   Let $n$ be a natural number.
   There exists a formula $F_n$ in DNF with $\isaAp{\cstSizef}{F_n} = 8 \cdot n + 1$ such that every equivalent formula $G_n$ in CNF has $\isaAp{\cstSizef}{G_n} \ge n \cdot 2^n$.
-\end{theorem}
+\end{corollary}
 \begin{proof}
   TODO: write very rough sketch.
 \end{proof}
