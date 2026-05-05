@@ -206,7 +206,7 @@ Two formulas $\phi$ and $\psi$ are \emph{equivalent} if they have the same truth
 \begin{definitionx}
   \label{def_Fn}
   The function $\tyAnnot{\cst{Fn}}{\tyNat \Rightarrow \tyFormula{\yA}}$ creates a formula containing
-  the conjunction of the exclusive disjunctions of each variable pair $x_{i,false}$ and $x_{i,true}$ with $i \in {1,\ldots,n}}$:
+  the conjunction of the exclusive disjunctions of each variable pair $x_{i,false}$ and $x_{i,true}$ with $i \in \{1,\ldots,n\}$:
   \begin{align*}
     \isaAp{\cst{Fn}}{0} =\; & \neg\bot \\
     \isaAp{\cst{Fn}}{(n+1)} =\; & ((x_{i,false} \lor x_{i,true}) \land (\neg x_{i,false} \lor \neg x_{i,true})) \land (\isaAp{\cst{Fn}}{n})
@@ -373,6 +373,22 @@ Two formulas $\phi$ and $\psi$ are \emph{equivalent} if they have the same truth
 % Here talk about the instantiation of the lemma and conj_of_eps
 % begin{lemma} card_le_card_if_mem_imp_ex_mem ... \end{lemma}
 % Here find out what is interesting
+
+Whereas most proof ideas of the paper proof can be directly translated into the formalization some intuitive mathematical proof steps took a significant formalization effort. 
+This applied mainly to the proof steps 2 and 4 of \cref{thm_cnf_to_dnf_blowup}, where we derived statements of the size of a formula from characteristics of it.
+Here step 4 required us to use a general lemma about the cardinality of finite sets:
+\begin{lemma}
+  \label{card_inj_on_le}
+  Let $A$ and $B$ be sets. Let $f$ be a function. If $f$ is injective on $A$ and the image of A under f is a subset of B and B is finite, then the cardinality of $A$  is less than or equal to the cardinality of $B$.
+\end{lemma}
+We use \cref{card_inj_on_le} to prove that the cardinality of $\isaAp{\cst{set}}{Ts}$ is greater than or equal to $2^n$. Therefore we instantiate it with a function that takes a Boolean list $\epsilon$ and returns some conjunctive formula $T \in \isaAp{\cst{set}}{Ts}$ for that the predicate of step 3 holds. 
+Now we can show the goal by proving that the assumptions of \cref{card_inj_on_le} are fulfilled.
+In step 2 we wrote a lemma that looks quite similar to \cref{card_inj_on_le} but is extending it on a function that takes two arguments:
+\begin{lemma}
+	\label{card_le_card_if_mem_imp_ex_mem}
+	Let $X$ be a finite set of type $a$ and $Y$ be a finite set of type $c$. Let $f$ be a function, that maps pairs of type $a$ and $b$ to a result of type $c$. Let $XY$ be a set as the collection of pairs $(x,y)$ such that $x \in X$ and $\isaAp{f}{(x,y)} \in Y$. If the function f is injective on $XY$ and for all $x \in X$ there exists a $y$ such that $\isaAp{f}{(x,y)} \in Y$ than the cardinality of $X$ must be less than or equal to the cardinality of $Y$.  
+\end{lemma}
+
 
 \section{Conclusion}
 \label{sec_concl}
