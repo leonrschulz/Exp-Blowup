@@ -319,7 +319,7 @@ Two formulas $\phi$ and $\psi$ are \emph{equivalent} if they have the same truth
   We start by a case analysis on $n$.
   The interesting case is when $n > 0$.
   We define $\phi = F_n$ (see \cref{def_Fn});
-  it is easy to show that $F_n$ is in conjunctive normal form, and that $\isaAp{\cstSizef}{F_n} = 8 \cdot n + 1$.
+  it is easy to show that $F_n$ is in conjunctive normal form and that $\isaAp{\cstSizef}{F_n} = 8 \cdot n + 1$.
   To prove the last property, we assume that there is an equivalent formula $\psi$ in disjunctive normal form.
   We first obtain a list $Ts$ of all terms in $\psi$ such that
   all formulas in $Ts$ are conjunctive and satisfiable,
@@ -327,7 +327,7 @@ Two formulas $\phi$ and $\psi$ are \emph{equivalent} if they have the same truth
   $\isaAp{\cstSizef}{\psi} \ge \isaAp{\cstSizef}{(\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i})}$,
   and $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$ is equivalent to $\psi$.
   From this last property, we show that $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$ is equivalent to $F_n$.
-  This allows us to prove $\isaAp{\cstSizef}{(\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i})} \ge n \cdot 2^n$ using \cref{thm_cnf_to_dnf_blowup}.
+  This allows us to prove that $\isaAp{\cstSizef}{(\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i})} \ge n \cdot 2^n$ using \cref{thm_cnf_to_dnf_blowup}.
   Finally, we can prove that $\isaAp{\cstSizef}{\psi} \ge n \cdot 2^n$ by transitivity.
 \end{proof}
 
