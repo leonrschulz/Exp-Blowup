@@ -178,7 +178,7 @@ In particular, $G_n$ has at least $2^n$ many terms.
 A \emph{formula} is inductively defined as either an atom, falsehood ($\bot$), the negation of a formula, or the disjunction, conjunction or implication of two formulas.
 A \emph{literal} is a special case of a formula consisting of either a positive or negative atom, or a positive or negative $\bot$.
 %TODO: introduce notation x_{i,b} for i :: nat and b :: bool
-%TODO: rephrase to use the notation instead of the type var
+%TODO: rephrase to use the notation and the type var
 All atoms are of the type \textsf{var}, representing a combination of a Boolean value and a natural number.
 A formula is \emph{conjunctive} if it is either a literal or its first subformula is a literal and its second a conjunctive formula.
 Analogously a formula is \emph{disjunctive} if it is either a literal or its first subformula is a literal and its second a disjunctive formula.
@@ -374,20 +374,21 @@ Two formulas $\phi$ and $\psi$ are \emph{equivalent} if they have the same truth
 % begin{lemma} card_le_card_if_mem_imp_ex_mem ... \end{lemma}
 % Here find out what is interesting
 
-Whereas most proof ideas of the paper proof can be directly translated into the formalization some intuitive mathematical proof steps took a significant formalization effort. 
-This applied mainly to the proof steps 2 and 4 of \cref{thm_cnf_to_dnf_blowup}, where we derived statements of the size of a formula from characteristics of it.
-Here step 4 required us to use a general lemma about the cardinality of finite sets:
+Whereas most proof ideas of the paper proof can be directly used for the formalization, some intuitive mathematical proof steps required significant formalization effort. 
+This applied mainly to the proof steps 2 and 4 of \cref{thm_cnf_to_dnf_blowup}, where we derived statements about the size of a formula from its properties.
+Here, step 4 required us to use a general lemma about the cardinality of finite sets:
 \begin{lemma}
   \label{card_inj_on_le}
   Let $A$ and $B$ be sets. Let $f$ be a function. If $f$ is injective on $A$ and the image of A under f is a subset of B and B is finite, then the cardinality of $A$  is less than or equal to the cardinality of $B$.
 \end{lemma}
-We use \cref{card_inj_on_le} to prove that the cardinality of $\isaAp{\cst{set}}{Ts}$ is greater than or equal to $2^n$. Therefore we instantiate it with a function that takes a Boolean list $\epsilon$ and returns some conjunctive formula $T \in \isaAp{\cst{set}}{Ts}$ for that the predicate of step 3 holds. 
-Now we can show the goal by proving that the assumptions of \cref{card_inj_on_le} are fulfilled.
-In step 2 we wrote a lemma that looks quite similar to \cref{card_inj_on_le} but is extending it on a function that takes two arguments:
+We use \cref{card_inj_on_le} 	to prove that the cardinality of $\isaAp{\cst{set}}{Ts}$ is greater than or equal to $2^n$. To do so, we instantiate it with a function that takes a Boolean list $\epsilon$ and returns some conjunctive formula $T \in \isaAp{\cst{set}}{Ts}$ for which the predicate of step 3 holds. 
+We then show the goal by proving that the assumptions of \cref{card_inj_on_le} are fulfilled.
+In order to prove step 2, we added a lemma that looks quite similar to \cref{card_inj_on_le} but extends it to a function that takes two arguments:
 \begin{lemma}
 	\label{card_le_card_if_mem_imp_ex_mem}
-	Let $X$ be a finite set of type $a$ and $Y$ be a finite set of type $c$. Let $f$ be a function, that maps pairs of type $a$ and $b$ to a result of type $c$. Let $XY$ be a set as the collection of pairs $(x,y)$ such that $x \in X$ and $\isaAp{f}{(x,y)} \in Y$. If the function f is injective on $XY$ and for all $x \in X$ there exists a $y$ such that $\isaAp{f}{(x,y)} \in Y$ than the cardinality of $X$ must be less than or equal to the cardinality of $Y$.  
+	Let $X$ be a finite set of type $a$ and $Y$ be a finite set of type $c$. Let $f$ be a function that maps pairs of type $a$ and $b$ to a result of type $c$. Let $XY$ be the set of all pairs $(x,y)$ such that $x \in X$ and $\isaApAp{f}{x}{y} \in Y$. If the function f is injective on $XY$ and for all $x \in X$ there exists a $y$ such that $\isaApAp{f}{x}{y} \in Y$, then the cardinality of $X$ must be less than or equal to the cardinality of $Y$.  
 \end{lemma}
+By using \cref{card_le_card_if_mem_imp_ex_mem}, we then derive from step 1 that $T$ contains at least n atoms (and thus later prove $\isaAp{\cstSizef}{T} \ge n$). To do so, we instantiate the function of \cref{card_le_card_if_mem_imp_ex_mem} with the constructor of \textsf{var} and prove its injectivity.
 
 
 \section{Conclusion}
