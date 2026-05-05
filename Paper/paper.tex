@@ -173,13 +173,10 @@ In particular, $G_n$ has at least $2^n$ many terms.
 \section{Preliminaries}
 \label{sec_preliminaries}
 
-%TODO: introduce BigOr' and BigAnd' with the notation
-
 A \emph{formula} is inductively defined as either an atom, falsehood ($\bot$), the negation of a formula, or the disjunction, conjunction or implication of two formulas.
 A \emph{literal} is a special case of a formula consisting of either a positive or negative atom, or a positive or negative $\bot$.
-%TODO: introduce notation x_{i,b} for i :: nat and b :: bool
-%TODO: rephrase to use the notation and the type var
-All atoms are of the type \textsf{var}, representing a combination of a Boolean value and a natural number.
+Basic operations on formulas and related lemmas are expressed for any atom type.
+However, our main theorems instantiate the atom type with variables $x_{i,b}$, where $i$ is a natural number and $b$ is a Boolean value.
 A formula is \emph{conjunctive} if it is either a literal or its first subformula is a literal and its second a conjunctive formula.
 Analogously a formula is \emph{disjunctive} if it is either a literal or its first subformula is a literal and its second a disjunctive formula.
 
@@ -202,14 +199,38 @@ Two formulas $\phi$ and $\psi$ are \emph{equivalent} if they have the same truth
   the negations are ignored.
 \end{definitionx}
 
+\begin{definitionx}
+  \label{def_BigOr_BigAnd}
+  The functions
+  $\tyAnnot{\cst{BigAnd'}}{\tyList{\tyFormula{\yA}} \Rightarrow \tyFormula{\yA}}$ and
+  $\tyAnnot{\cst{BigOr'}}{\tyList{\tyFormula{\yA}} \Rightarrow \tyFormula{\yA}}$ respectively
+  build the conjunction and disjunction of all formulas in a list:
+  \begin{align*}
+    \isaAp{\cst{BigAnd'}}{[]} =\; & \neg\bot &
+    \isaAp{\cst{BigOr'}}{[]} =\; & \bot \\
+    \isaAp{\cst{BigAnd'}}{[\phi]} =\; & \phi &
+    \isaAp{\cst{BigOr'}}{[\phi]} =\; & \phi \\
+    \isaAp{\cst{BigAnd'}}{(\listCons{\phi}{\phi{}s})} =\; & \phi \land \isaAp{\cst{BigAnd'}}{\phi{}s} &
+    \isaAp{\cst{BigOr'}}{(\listCons{\phi}{\phi{}s})} =\; & \phi \lor \isaAp{\cst{BigOr'}}{\phi{}s}
+  \end{align*}
+  In the rest of this paper, we write
+  $\bigwedge_{i = 0}^{\listLength{\phi{}s}} \listNth{\phi{}s}{i}$ for $\isaAp{\cst{BigAnd'}}{\phi{}s}$ and
+  $\bigvee_{i = 0}^{\listLength{\phi{}s}} \listNth{\phi{}s}{i}$ for $\isaAp{\cst{BigOr'}}{\phi{}s}$.
+\end{definitionx}
+
+\begin{remark*}
+  Our formalization always use nonempty list and the base cases of \cref{def_BigOr_BigAnd} could be be left unspecified.
+  However, providing these base cases allows us to prove many lemmas for arbiraty lists without requiring a nonemptyness assumption that would need to be repeatedly discharged.
+\end{remark*}
+
 %TODO: define the F_n function and consider lemmas not_sat_Fn_both_true and not_sat_conj_pos_false
 \begin{definitionx}
   \label{def_Fn}
   The function $\tyAnnot{\cst{Fn}}{\tyNat \Rightarrow \tyFormula{\yA}}$ creates a formula containing
   the conjunction of the exclusive disjunctions of each variable pair $x_{i,false}$ and $x_{i,true}$ with $i \in \{1,\ldots,n\}$:
   \begin{align*}
-    \isaAp{\cst{Fn}}{0} =\; & \neg\bot \\
-    \isaAp{\cst{Fn}}{(n+1)} =\; & ((x_{i,false} \lor x_{i,true}) \land (\neg x_{i,false} \lor \neg x_{i,true})) \land (\isaAp{\cst{Fn}}{n})
+    \isaAp{\cst{Fn}}{0} =\; & \neg\bot &  \\
+    \isaAp{\cst{Fn}}{(n+1)} =\; & ((x_{i,false} \lor x_{i,true}) \land (\neg x_{i,false} \lor \neg x_{i,true})) \land \isaAp{\cst{Fn}}{n}
   \end{align*}
   In the rest of this paper, we write $F_n$ for $\isaAp{\cst{Fn}}{n}$.
 \end{definitionx}
@@ -405,6 +426,8 @@ We use \cref{card_le_card_if_mem_imp_ex_mem} to prove that every $T \in \isaAp{\
 To do so, we instantiate $X$ with $\{1,\ldots,n\}$, $Y$ with the set of atoms of $T$, and the $f$ with the constructor for variables.
 Finding the correct statement for \cref{card_le_card_if_mem_imp_ex_mem} was challenging but, once found, it was easy to discharge the assumptions using step 1.
 
+%TODO: add a paragraph to explain why we defined our own version of BigAnd' and BigOr' instead of reusing BigAnd and BigOr from "Tobias Nipkow's formalization" Propositional_Proof_Systems.
+%Hint: this was necessary to prove the sizef equality of lemma sizef_BigOr'_undnf and analogously for BigAnd'.
 
 \section{Conclusion}
 \label{sec_concl}
