@@ -260,6 +260,12 @@ Two formulas $\phi$ and $\psi$ are \emph{equivalent} if they have the same truth
 \section{CNF to DNF (MDS)}
 \label{sec_CNF_to_DNF}
 
+Our formalization splits the paper proof of \cref{dnfblowup} in a \lcnamecref{thm_cnf_to_dnf_blowup}, which assumes the existence of formulas with specific shapes and properties, and a \lcnamecref{thm_cnf_to_dnf_blowup_math}, which proves that such formulas can always be obtained.
+We start by proving a few basic properties of conjunctive formulas w.r.t.\ valuations.
+We present the most interesting ones here and refer the reader to the formalization for more details.
+
+We first prove a monotonicity property of satisfiability w.r.t. valuations.
+
 \begin{lemma}
   \label{aux_lemma_prop4_step1}
   Let $\phi$ be a conjunctive formula.
@@ -268,6 +274,8 @@ Two formulas $\phi$ and $\psi$ are \emph{equivalent} if they have the same truth
   if $\alpha$ satisfies $\phi$,
   then $\beta$ also satisfies $\phi$.
 \end{lemma}
+
+Next, we prove some sufficient conditions for a valuation to not satisfy a conjunctive formula.
 
 \begin{lemma}
   \label{aux_lemma_prop4_step3}
@@ -280,6 +288,19 @@ Two formulas $\phi$ and $\psi$ are \emph{equivalent} if they have the same truth
   \end{itemize}
   then $\alpha$ does not satisfy $\phi$.
 \end{lemma}
+
+Next, we prove a lower bound of the size of $\bigvee_{i=0}^{\listLength{\phi{}s}} \listNth{\phi{}s}{i}$.
+
+\begin{lemma}
+  \label{thm_exp_size}
+  Let $n > 0$ be a natural number.
+  Let $\phi{}s$ be a list of formulas.
+  If every $\phi \in \isaAp{\cst{set}}{\phi{}s}$ has $\isaAp{\cstSizef}{\phi} \ge m$ and
+  if $\listLength{\phi{}s} \ge 2^n$,
+  then $\isaAp{\cstSizef}{(\bigvee_{i=0}^{\listLength{\phi{}s}} \listNth{\phi{}s}{i})} \ge m \cdot 2^n$.
+\end{lemma}
+
+We can now prove that some specific formulas equivalent to $F_n$ (see \cref{def_Fn}) have a size exponential in $n$.
 
 %TODO: Ask Johannsen
 \begin{theorem}[Exponential Blowup Transforming $F_n$ to DNF]
@@ -294,20 +315,24 @@ Two formulas $\phi$ and $\psi$ are \emph{equivalent} if they have the same truth
 \begin{proof}
   We proceed with five steps:
   \textbf{(1)}~First, we show that every conjunctive formula $T \in \isaAp{\cst{set}}{Ts}$ contains for all $i \in \{1,\ldots,n\}$ either the variable $x_{i,0}$ or $x_{i,1}$ positively.
-  We prove this step by negation, where we have to derive false for two cases: either the variables $x_{i,0}$ and $x_{i,1}$ are both positively contained in $T$ or they are both not positively contained.
-  In both cases, we proceed by defining a specific valuation that satisfies $G$ but not $F_n$.
-  For instance, in the second case, we modify a valuation that satisfies $T$ by changing the assignment of the variables $x_{i,0}$ and $x_{i,1}$ to false.
+  We prove this step by negation, where we have to derive false for two cases:
+  Either the variables $x_{i,0}$ and $x_{i,1}$ are both positively contained in $T$ or they are both not positively contained.
+  In both cases, we proceed by defining a valuation that satisfies $G$ but not $F_n$.
+  For instance, in the second case, we find a valuation that satisfies $T$ and change the assignment of the variables $x_{i,0}$ and $x_{i,1}$ to false.
   We then show using \cref{aux_lemma_prop4_step1,aux_lemma_prop4_step3} that this modified valuation satisfies $T$ (and thus $G$) but does not satisfy $F_n$.
   This means that $F_n$ is not equivalent to $G$, which contradicts the \lcnamecref{thm_cnf_to_dnf_blowup}'s assumption.
   \textbf{(2)}~From step 1, we derive that every $T \in \isaAp{\cst{set}}{Ts}$ has $\isaAp{\cstSizef}{T} \ge n$.
   \textbf{(3)}~Furthermore, we prove that for every Boolean list $\epsilon = [\epsilon_1,\ldots,\epsilon_n]$ there exists a $T \in \isaAp{\cst{set}}{Ts}$ that contains the corresponding variables $x_{1,\epsilon_1},\ldots,x_{n,\epsilon_n}$ positively.
   If this is not the case for a specific list $\epsilon$, we show using step 1 that every $T$ must contain one of the variables $x_{1,\neg\epsilon_1},\ldots,x_{n,\neg\epsilon_n}$ positively.
-  We then define a concrete valuation that maps all variables $x_{i,\epsilon_i}$ to true and $x_{i,\neg\epsilon_i}$ to false for $i \in \{1,\ldots,n\}$.
+  We then define a valuation that maps all variables $x_{i,\epsilon_i}$ to true and $x_{i,\neg\epsilon_i}$ to false for $i \in \{1,\ldots,n\}$.
   We show using \cref{aux_lemma_prop4_step3} that this valuation satisfies $F_n$ but not $G$.
   This means that $F_n$ is not equivalent to $G$, which contradicts the \lcnamecref{thm_cnf_to_dnf_blowup}'s assumption.
   \textbf{(4)}~We then prove that the number of Boolean lists of length $n$ is $2^n \le \setCard{\isaAp{\cst{set}}{Ts}} \le \listLength{Ts}$ using steps 1 and 3.
-  \textbf{(5)}~Finally, we show that $\isaAp{\cstSizef}{G} \ge n \cdot 2^n$ by combining the results from steps 2 and 4.
+  \textbf{(5)}~Finally, we show that $\isaAp{\cstSizef}{G} \ge n \cdot 2^n$ by combining the results from steps 2 and 4 to discharge the assumptions of \cref{thm_exp_size}.
 \end{proof}
+
+\Cref{thm_cnf_to_dnf_blowup} assumes the existence of two equivalent formulas $F_n$ (in conjunctive normal form) and $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$ (in disjunctive normal form) and proved bound on the size of the later.
+We now prove that this exponential blowup holds for any equivalent formula in disjunctive normal form.
 
 %TODO: Ask Johannsen
 \begin{corollary}[Exponential Blowup Transforming CNF to DNF]
@@ -330,6 +355,8 @@ Two formulas $\phi$ and $\psi$ are \emph{equivalent} if they have the same truth
   This allows us to prove that $\isaAp{\cstSizef}{(\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i})} \ge n \cdot 2^n$ using \cref{thm_cnf_to_dnf_blowup}.
   Finally, we can prove that $\isaAp{\cstSizef}{\psi} \ge n \cdot 2^n$ by transitivity.
 \end{proof}
+
+We claim that \cref{thm_cnf_to_dnf_blowup_math} is a formalization of the paper proof of \cref{dnfblowup}.
 
 \section{DNF to CNF (MDS)}
 \label{sec_DNF_to_CNF}
