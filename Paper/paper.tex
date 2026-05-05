@@ -281,7 +281,7 @@ Two formulas $\phi$ and $\psi$ are \emph{equivalent} if they have the same truth
   We then define a concrete valuation that maps all variables $x_{i,\epsilon_i}$ to true and $x_{i,\neg\epsilon_i}$ to false for $i \in \{1,\ldots,n\}$.
   We show using \cref{aux_lemma_prop4_step3} that this valuation satisfies $F_n$ but not $G$.
   This means that $F_n$ is not equivalent to $G$, which contradicts \cref{thm_cnf_to_dnf_blowup}'s assumption.
-  \textbf{(4)}~From step 1, step 3, and the fact that there are $2^n$ Boolean lists of length $n$, we derive that $\listLength{Ts} \ge 2^n$.
+  \textbf{(4)}~We then prove that the number of Boolean lists of length $n$ is $2^n \le \setCard{\isaAp{\cst{set}}{Ts}} \le \listLength{Ts}$ using steps 1 and 3.
   \textbf{(5)}~Finally, we show that $\isaAp{\cstSizef}{G} \ge n \cdot 2^n$ by combining the results from steps 2 and 4.
 \end{proof}
 
@@ -363,32 +363,47 @@ Two formulas $\phi$ and $\psi$ are \emph{equivalent} if they have the same truth
   The proof is analogous to the proof of \cref{thm_cnf_to_dnf_blowup_math}.
 \end{proof}
 
-\section{Discussion (LRS)}
+\section{Discussion}
 \label{sec_discussion}
 
-% Some intuitive steps of the paper proof required significant formalization effort:
-% A, B, and C.
-% The case C was especially challenging and required us to first proof a general lemma about the cardinality of finite sets:
-% begin{lemma} card_inj_on_le ... \end{lemma} (Already in Isabelle/HOL)
-% Here talk about the instantiation of the lemma and conj_of_eps
-% begin{lemma} card_le_card_if_mem_imp_ex_mem ... \end{lemma}
-% Here find out what is interesting
+Whereas most ideas of the paper proof can be directly used for the formalization, some intuitive mathematical proof steps required significant formalization effort.
+This was most pronounced in the proof steps 2 and 4 of \cref{thm_cnf_to_dnf_blowup}, where we derived statements about the size of a formula from its properties.
+To prove step 4, we use a general lemma (already included in Isabelle/HOL) about the cardinality of finite sets:
 
-Whereas most proof ideas of the paper proof can be directly used for the formalization, some intuitive mathematical proof steps required significant formalization effort. 
-This applied mainly to the proof steps 2 and 4 of \cref{thm_cnf_to_dnf_blowup}, where we derived statements about the size of a formula from its properties.
-Here, step 4 required us to use a general lemma about the cardinality of finite sets:
 \begin{lemma}
   \label{card_inj_on_le}
-  Let $A$ and $B$ be sets. Let $f$ be a function. If $f$ is injective on $A$ and the image of A under f is a subset of B and B is finite, then the cardinality of $A$  is less than or equal to the cardinality of $B$.
+  Let $X$ and $Y$ be sets. Let $f$ be a unary function.
+  If $Y$ is finite, and
+  %TODO: ask Johannsen if he has a preference here
+  %if the image of X under f is a subset of Y, and
+  if $\setImage{x}{f}{X} \subseteq Y$, and
+  if $f$ is injective on $X$, and
+  then the cardinality of $X$ is less than or equal to the cardinality of $Y$.
 \end{lemma}
-We use \cref{card_inj_on_le} 	to prove that the cardinality of $\isaAp{\cst{set}}{Ts}$ is greater than or equal to $2^n$. To do so, we instantiate it with a function that takes a Boolean list $\epsilon$ and returns some conjunctive formula $T \in \isaAp{\cst{set}}{Ts}$ for which the predicate of step 3 holds. 
-We then show the goal by proving that the assumptions of \cref{card_inj_on_le} are fulfilled.
-In order to prove step 2, we added a lemma that looks quite similar to \cref{card_inj_on_le} but extends it to a function that takes two arguments:
+
+We use \cref{card_inj_on_le} to prove that the number of Boolean lists of length $n$ is less than or equal to the cardinality of $\isaAp{\cst{set}}{Ts}$.
+We instantiate $X$ with the set of all Boolean lists of length $n$,
+$Y$ with $\isaAp{\cst{set}}{Ts}$, and
+$f$ with a function that takes a Boolean list and returns some conjunctive formula $T \in \isaAp{\cst{set}}{Ts}$ for which the predicate of step 3 holds.
+Finding an appropriate function for $f$ and discharging \cref{card_inj_on_le}'s assumptions was surprisingly challenging:
+The first assumption was the most intricate and its proof uses both steps 1 and 3,
+the second assumption follows from step 3,
+the third assumption easily holds.
+
+To prove step 2, we introduced a new lemma, inspired by \cref{card_inj_on_le}, that uses a binary function that is right total w.r.t.\ the target set:
 \begin{lemma}
 	\label{card_le_card_if_mem_imp_ex_mem}
-	Let $X$ be a finite set of type $a$ and $Y$ be a finite set of type $c$. Let $f$ be a function that maps pairs of type $a$ and $b$ to a result of type $c$. Let $XY$ be the set of all pairs $(x,y)$ such that $x \in X$ and $\isaApAp{f}{x}{y} \in Y$. If the function f is injective on $XY$ and for all $x \in X$ there exists a $y$ such that $\isaApAp{f}{x}{y} \in Y$, then the cardinality of $X$ must be less than or equal to the cardinality of $Y$.  
+	Let $X$ be a set of elements of type $\yA$ and $Y$ be a set of elements of type $\yC$.
+	Let $\tyAnnot{f}{\yA \Rightarrow \yB \Rightarrow \yC}$ be a binary function.
+	If $X$ and $Y$ are finite sets, and
+	if for all $x \in X$ there exists a $y$ such that $\isaApAp{f}{x}{y} \in Y$, and
+	if the function $f$ is injective on those pairs of $x$ and $y$,
+	then the cardinality of $X$ is less than or equal to the cardinality of $Y$.
 \end{lemma}
-By using \cref{card_le_card_if_mem_imp_ex_mem}, we then derive from step 1 that $T$ contains at least n atoms (and thus later prove $\isaAp{\cstSizef}{T} \ge n$). To do so, we instantiate the function of \cref{card_le_card_if_mem_imp_ex_mem} with the constructor of \textsf{var} and prove its injectivity.
+
+We use \cref{card_le_card_if_mem_imp_ex_mem} to prove that every $T \in \isaAp{\cst{set}}{Ts}$ contains at least $n$ atoms and thus that $\isaAp{\cstSizef}{T} \ge n$.
+To do so, we instantiate $X$ with $\{1,\ldots,n\}$, $Y$ with the set of atoms of $T$, and the $f$ with the constructor for variables.
+Finding the correct statement for \cref{card_le_card_if_mem_imp_ex_mem} was challenging but, once found, it was easy to discharge the assumptions using step 1.
 
 
 \section{Conclusion}
