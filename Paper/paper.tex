@@ -298,13 +298,13 @@ Two formulas $\phi$ and $\psi$ are \emph{equivalent} if they have the same truth
   In both cases, we proceed by defining a specific valuation that satisfies $G$ but not $F_n$.
   For instance, in the second case, we modify a valuation that satisfies $T$ by changing the assignment of the variables $x_{i,0}$ and $x_{i,1}$ to false.
   We then show using \cref{aux_lemma_prop4_step1,aux_lemma_prop4_step3} that this modified valuation satisfies $T$ (and thus $G$) but does not satisfy $F_n$.
-  This means that $F_n$ is not equivalent to $G$, which contradicts \cref{thm_cnf_to_dnf_blowup}'s assumption.
+  This means that $F_n$ is not equivalent to $G$, which contradicts the \lcnamecref{thm_cnf_to_dnf_blowup}'s assumption.
   \textbf{(2)}~From step 1, we derive that every $T \in \isaAp{\cst{set}}{Ts}$ has $\isaAp{\cstSizef}{T} \ge n$.
   \textbf{(3)}~Furthermore, we prove that for every Boolean list $\epsilon = [\epsilon_1,\ldots,\epsilon_n]$ there exists a $T \in \isaAp{\cst{set}}{Ts}$ that contains the corresponding variables $x_{1,\epsilon_1},\ldots,x_{n,\epsilon_n}$ positively.
   If this is not the case for a specific list $\epsilon$, we show using step 1 that every $T$ must contain one of the variables $x_{1,\neg\epsilon_1},\ldots,x_{n,\neg\epsilon_n}$ positively.
   We then define a concrete valuation that maps all variables $x_{i,\epsilon_i}$ to true and $x_{i,\neg\epsilon_i}$ to false for $i \in \{1,\ldots,n\}$.
   We show using \cref{aux_lemma_prop4_step3} that this valuation satisfies $F_n$ but not $G$.
-  This means that $F_n$ is not equivalent to $G$, which contradicts \cref{thm_cnf_to_dnf_blowup}'s assumption.
+  This means that $F_n$ is not equivalent to $G$, which contradicts the \lcnamecref{thm_cnf_to_dnf_blowup}'s assumption.
   \textbf{(4)}~We then prove that the number of Boolean lists of length $n$ is $2^n \le \setCard{\isaAp{\cst{set}}{Ts}} \le \listLength{Ts}$ using steps 1 and 3.
   \textbf{(5)}~Finally, we show that $\isaAp{\cstSizef}{G} \ge n \cdot 2^n$ by combining the results from steps 2 and 4.
 \end{proof}
