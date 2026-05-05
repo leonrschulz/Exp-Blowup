@@ -196,10 +196,24 @@ Two formulas $\phi$ and $\psi$ are \emph{equivalent} if they have the same truth
 \end{definitionx}
 
 \begin{definitionx}
+  \label{def_size}
+  The function $\tyAnnot{\cstSize}{\tyFormula{\yA} \Rightarrow \tyNat}$ counts the number of atoms, $\bot$, negations, disjunctions, conjunctions, and implications in a formula.
+  In the rest of this paper, we write $|\phi|$ for $\isaAp{\cstSize}{\phi}$.
+\end{definitionx}
+
+\begin{definitionx}
   \label{def_sizef}
   The function $\tyAnnot{\cstSizef}{\tyFormula{\yA} \Rightarrow \tyNat}$ counts the number of atoms, $\bot$, disjunctions, conjunctions, and implications in a formula;
   the negations are ignored.
 \end{definitionx}
+
+Because \cref{def_sizef} ignores negations, it always evaluates to a smaller number than \cref{def_size}.
+\begin{lemma}
+  \label{thm_sizef_le_size}
+  Let $\phi$ be a formula.
+  $\isaAp{\cstSizef}{\phi}} \le \left|\phi\right|$.
+\end{lemma}
+%TODO: explain why we use sizef and not size.
 
 \begin{definitionx}
   \label{def_BigOr_BigAnd}
@@ -338,7 +352,7 @@ We now prove that this exponential blowup holds for any equivalent formula in di
 \begin{corollary}[Exponential Blowup Transforming CNF to DNF]
   \label{thm_cnf_to_dnf_blowup_math}
   Let $n$ be a natural number.
-  There exists a formula $\phi$ in conjunctive normal form with $\isaAp{\cstSizef}{\phi} = 8 \cdot n + 1$ such that every equivalent formula $\psi$ in disjunctive normal form has $\isaAp{\cstSizef}{\psi} \ge n \cdot 2^n$.
+  There exists a formula $\phi$ in conjunctive normal form with $\isaAp{\cstSizef}{\phi} = 8 \cdot n + 1$ such that every equivalent formula $\psi$ in disjunctive normal form has size $\left|\psi\right| \ge n \cdot 2^n$.
 \end{corollary}
 \begin{proof}
   We start by a case analysis on $n$.
@@ -353,7 +367,7 @@ We now prove that this exponential blowup holds for any equivalent formula in di
   and $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$ is equivalent to $\psi$.
   From this last property, we show that $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$ is equivalent to $F_n$.
   This allows us to prove that $\isaAp{\cstSizef}{(\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i})} \ge n \cdot 2^n$ using \cref{thm_cnf_to_dnf_blowup}.
-  Finally, we can prove that $\isaAp{\cstSizef}{\psi} \ge n \cdot 2^n$ by transitivity.
+  We can prove that $\isaAp{\cstSizef}{\psi} \ge n \cdot 2^n$ by transitivity and, finally, that $\left|\psi\right| \ge n \cdot 2^n$ using \cref{thm_sizef_le_size}.
 \end{proof}
 
 We claim that \cref{thm_cnf_to_dnf_blowup_math} is a formalization of the paper proof of \cref{dnfblowup}.
@@ -411,7 +425,7 @@ We claim that \cref{thm_cnf_to_dnf_blowup_math} is a formalization of the paper 
 \begin{corollary}[Exponential Blowup Transforming DNF to CNF]
   \label{thm_dnf_to_cnf_blowup_math}
   Let $n$ be a natural number.
-  There exists a formula $F_n$ in disjunctive normal form with $\isaAp{\cstSizef}{F_n} = 8 \cdot n + 1$ such that every equivalent formula $G_n$ in conjunctive normal form has $\isaAp{\cstSizef}{G_n} \ge n \cdot 2^n$.
+  There exists a formula $F_n$ in disjunctive normal form with $\isaAp{\cstSizef}{F_n} = 8 \cdot n + 1$ such that every equivalent formula $G_n$ in conjunctive normal form has size $\left|G_n\right| \ge n \cdot 2^n$.
 \end{corollary}
 \begin{proof}
   The proof is analogous to the proof of \cref{thm_cnf_to_dnf_blowup_math}.

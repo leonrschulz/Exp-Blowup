@@ -218,6 +218,9 @@ fun sizef :: "'a formula \<Rightarrow> nat" where
 lemma Suc_0_le_sizef[simp]: "Suc 0 \<le> sizef F"
   by (induction F) simp_all
 
+lemma sizef_le_size: "sizef \<phi> \<le> size \<phi>"
+  by (induction \<phi>) simp_all
+
 lemma card_atoms_le_sizef: "card (atoms F) \<le> sizef F"
 proof (induction F)
   case (And F1 F2)
@@ -959,7 +962,7 @@ lemma proposition4':
   shows "\<exists>(F\<^sub>n :: var formula).
     is_cnf F\<^sub>n \<and>
     sizef F\<^sub>n = 8 * n + 1 \<and>
-    (\<forall>(G\<^sub>n :: var formula). equiv F\<^sub>n G\<^sub>n \<longrightarrow> is_dnf G\<^sub>n \<longrightarrow> sizef G\<^sub>n \<ge> n * 2 ^ n)"
+    (\<forall>(G\<^sub>n :: var formula). equiv F\<^sub>n G\<^sub>n \<longrightarrow> is_dnf G\<^sub>n \<longrightarrow> size G\<^sub>n \<ge> n * 2 ^ n)"
 proof (cases n)
   case 0
   then show ?thesis
@@ -995,8 +998,8 @@ next
     ultimately have "n * 2 ^ n \<le> sizef (BigOr' Ts)"
       using proposition4[OF \<open>0 < n\<close>, of Ts] by metis
 
-    then show "n * 2 ^ n \<le> sizef G\<^sub>n"
-      using sizef by presburger
+    then show "n * 2 ^ n \<le> size G\<^sub>n"
+      using sizef sizef_le_size[of G\<^sub>n] by presburger
   qed
 qed
 
@@ -1093,7 +1096,7 @@ lemma corollary5':
   shows "\<exists>(F\<^sub>n :: var formula).
     is_dnf F\<^sub>n \<and>
     sizef F\<^sub>n = 8 * n + 1 \<and>
-    (\<forall>(G\<^sub>n :: var formula). equiv F\<^sub>n G\<^sub>n \<longrightarrow> is_cnf G\<^sub>n \<longrightarrow> sizef G\<^sub>n \<ge> n * 2 ^ n)"
+    (\<forall>(G\<^sub>n :: var formula). equiv F\<^sub>n G\<^sub>n \<longrightarrow> is_cnf G\<^sub>n \<longrightarrow> size G\<^sub>n \<ge> n * 2 ^ n)"
 proof (cases n)
   case 0
   then show ?thesis
@@ -1130,8 +1133,8 @@ next
     ultimately have "n * 2 ^ n \<le> sizef (BigAnd' Cs)"
       using corollary5[OF \<open>0 < n\<close>, of Cs] by metis
 
-    then show "n * 2 ^ n \<le> sizef G\<^sub>n"
-      using sizef by presburger
+    then show "n * 2 ^ n \<le> size G\<^sub>n"
+      using sizef sizef_le_size[of G\<^sub>n] by presburger
   qed
 qed
 
