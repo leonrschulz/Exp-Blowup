@@ -257,7 +257,7 @@ Two formulas $\phi$ and $\psi$ are \emph{equivalent} if they have the same truth
 \end{lemma}
 
 
-\section{CNF to DNF}
+\section{CNF to DNF (MDS)}
 \label{sec_CNF_to_DNF}
 
 \begin{lemma}
@@ -331,7 +331,7 @@ Two formulas $\phi$ and $\psi$ are \emph{equivalent} if they have the same truth
   Finally, we can prove that $\isaAp{\cstSizef}{\psi} \ge n \cdot 2^n$ by transitivity.
 \end{proof}
 
-\section{DNF to CNF}
+\section{DNF to CNF (MDS)}
 \label{sec_DNF_to_CNF}
 
 \begin{lemma}
@@ -432,7 +432,7 @@ We use \cref{card_le_card_if_mem_imp_ex_mem} to prove that every $T \in \isaAp{\
 To do so, we instantiate $X$ with $\{1,\ldots,n\}$, $Y$ with the set of atoms of $T$, and the $f$ with the constructor for variables.
 Finding the correct statement for \cref{card_le_card_if_mem_imp_ex_mem} was challenging but, once found, it was easy to discharge the assumptions using step 1.
 
-%TODO: add a paragraph to explain why we defined our own version of BigAnd' and BigOr' instead of reusing BigAnd and BigOr from "Tobias Nipkow's formalization" Propositional_Proof_Systems.
+%TODO (LRS): add a paragraph to explain why we defined our own version of BigAnd' and BigOr' instead of reusing BigAnd and BigOr from "Tobias Nipkow's formalization" Propositional_Proof_Systems.
 %Hint: this was necessary to prove the sizef equality of lemma sizef_BigOr'_undnf and analogously for BigAnd'.
 
 \section{Conclusion}
