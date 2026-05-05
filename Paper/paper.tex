@@ -220,7 +220,8 @@ Because \cref{def_sizef} ignores negations, it always evaluates to a smaller num
   The functions
   $\tyAnnot{\cst{BigAnd'}}{\tyList{\tyFormula{\yA}} \Rightarrow \tyFormula{\yA}}$ and
   $\tyAnnot{\cst{BigOr'}}{\tyList{\tyFormula{\yA}} \Rightarrow \tyFormula{\yA}}$ respectively
-  build the conjunction and disjunction of all formulas in a list:
+  build the conjunction and disjunction of all formulas in a list:%
+  \footnote{The infix operatior $\listCons{x}{xs}$ adds an element $x$ at the front of a list $xs$.}
   \begin{align*}
     \isaAp{\cst{BigAnd'}}{[]} =\; & \neg\bot &
     \isaAp{\cst{BigOr'}}{[]} =\; & \bot \\
