@@ -98,42 +98,35 @@ This paper is based on Schulz's bachelor thesis supervised by Johannsen with the
 \section{Introduction}
 \label{sec_intro}
 
-The metatheory of propositional logic has been the subject of extensive formalization effor for many years.
+The metatheory of propositional logic has been studied for many decades and the subject of extensive formalization effort for many years.
 However, to the best of our knowledge, very few quantitative results have been formalized.
 One well-known quantitative folklore result is that transforming a formula in disjunctive or conjunctive normal form can lead to an exponential blowup of the formula size.
 
-In this paper, we first briefly cover the mathematical background (\cref{sec_background}) and then report on our Isabelle/HOL formalization of this exponential blowup.
-Our formalization requires a few preliminary definitions and lemmas (\cref{sec_preliminaries}).
+In this paper, we first briefly cover the necessary mathematical background (\cref{sec_background}) and then report on our Isabelle/HOL formalization of this exponential blowup.
+We start by presenting a few preliminary definitions and lemmas (\cref{sec_preliminaries}).
 
 We then prove the exponential blowup when converting a formula from conjunctive to disjunctive normal form (\cref{sec_CNF_to_DNF}).
 We do this in two steps:
 First, we prove the low-level \cref{thm_cnf_to_dnf_blowup} that assumes the existence of two equivalent formulas fulfilling some assumptions and that exhibits the exponential lower bound on the formula size.
-Second, we use this \lcnamecref{thm_cnf_to_dnf_blowup} to prove in the desired \cref{thm_cnf_to_dnf_blowup_math} that such equivalent formulas fulfilling these assumptions always exist.
+Second, we use this \lcnamecref{thm_cnf_to_dnf_blowup} to prove in the desired \cref{thm_cnf_to_dnf_blowup_math} that such formulas always exist.
 
 We analogously prove the same exponential blowup when converting a formula from disjunctive to conjunctive normal form (\cref{sec_DNF_to_CNF}).
 We do this again with two steps:
-First, the low-level \Cref{thm_dnf_to_cnf_blowup} assumes the existence of two equivalent formulas fulfilling some assumptions and exhibits the exponential lower bound on the formula size;
+First, the low-level \Cref{thm_dnf_to_cnf_blowup} assumes again the existence of two equivalent formulas fulfilling some assumptions and exhibits the exponential lower bound on the formula size;
 the proof uses \cref{thm_cnf_to_dnf_blowup}.
-Second, we use \cref{thm_dnf_to_cnf_blowup} to prove in the desired \cref{thm_dnf_to_cnf_blowup_math} that such equivalent formulas fulfilling these assumptions always exist.
+Second, we use \cref{thm_dnf_to_cnf_blowup} to prove in the desired \cref{thm_dnf_to_cnf_blowup_math} that such formulas always exist.
 
-Finally, we discus (\cref{sec_discussion}) the challenges we encountered when proving statements about the size of formulas.
+Finally, we discus (\cref{sec_discussion}) some of the challenges we encountered when proving statements about the size of formulas.
 
-Our Isabelle/HOL formalization consists of ???? nonempty lines%
-\footnote{Counted using \texttt{grep -Ev '^[[:space:]]*$' | wc -l}.}%
-and is available online \cite{xxx}.
-It was developped with Isabelle2025.
-We
-The formalization will soon be submitted to the \emph{Archive of Formal Proofs}.
 Our work is part of the IsaFoL (Isabelle Formalization of Logic) effort \cite{xxx}.
-
-- State that we only provide the most interesting lemmas and proof sketches and point the interested reader to the formalization for more details.
-
-- describe formalization
-  - This formalization build on the formalization by Nipkow et al. (cite paper and AFP)
-  - Cite Isabelle from Nipkow and Paulson (and maybe concrete semantics)
-  - Cite Sledgehamer (Paulson and Blanchette)
-  - Cite Isabelle/Isar (Makarius)
-  - Cite something about IsaFoL
+Our formalization consists of ???? nonempty lines%
+\footnote{Counted using \inlineshell{grep -Ev '\textasciicircum{}[[:blank:]]*\$'}.}
+and is available online \cite{xxx};
+we will soon submit it to the \emph{Archive of Formal Proofs}.
+It was developped with Isabelle2025 \cite{xxx,xxx} and with extensive usage of Sledgehammer \cite{xxx,xxx} and the structured Isar language \cite{makarius_xxx}.
+We reused some background theories from Michaelis and Nipkow's formalization of proof systems for classical propositional logic \cite{michalis_nipkow_TYPES2017,Propositional_Proof_Systems-AFP}.
+In this paper, we only provide the most interesting lemmas and some proof sketches;
+we refer interested reader to the formalization for more details.
 
 \section{Background}
 \label{sec_background}
