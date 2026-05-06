@@ -275,10 +275,16 @@ next
     by presburger
 qed simp_all
 
-lemma aux_exp_size: "length Ts = n \<Longrightarrow> \<forall> T \<in> set Ts. sizef T \<ge> m \<Longrightarrow> sizef (BigOr' Ts) \<ge> n * m"
+lemma card_atoms_le_size: "card (atoms F) \<le> size F"
+  by (metis card_atoms_le_sizef le_trans sizef_le_size)
+
+lemma aux_exp_sizef: "length Ts = n \<Longrightarrow> \<forall> T \<in> set Ts. sizef T \<ge> m \<Longrightarrow> sizef (BigOr' Ts) \<ge> n * m"
   by (induction Ts arbitrary: m n rule: BigOr'.induct; fastforce)
 
-lemma exp_size: "n > 0 \<Longrightarrow> length Ts \<ge> 2^n \<Longrightarrow> \<forall>T \<in> set Ts. sizef T \<ge> m \<Longrightarrow>
+lemma aux_exp_size: "length Ts = n \<Longrightarrow> \<forall> T \<in> set Ts. size T \<ge> m \<Longrightarrow> size (BigOr' Ts) \<ge> n * m"
+  by (induction Ts arbitrary: m n rule: BigOr'.induct; fastforce)
+
+lemma exp_sizef: "n > 0 \<Longrightarrow> length Ts \<ge> 2^n \<Longrightarrow> \<forall>T \<in> set Ts. sizef T \<ge> m \<Longrightarrow>
   sizef (BigOr' Ts) \<ge> 2^n * m"
 proof (induction Ts arbitrary: n m rule: BigOr'.induct)
   case 1
@@ -325,6 +331,59 @@ next
       by (metis "3.prems"(3) Ts_def)
 
     ultimately show ?thesis
+      using aux_exp_sizef by fastforce
+  qed
+  then show ?case
+    by (simp add: Ts_def)
+qed
+
+lemma exp_size: "n > 0 \<Longrightarrow> length Ts \<ge> 2^n \<Longrightarrow> \<forall>T \<in> set Ts. size T \<ge> m \<Longrightarrow>
+  size (BigOr' Ts) \<ge> 2^n * m"
+proof (induction Ts arbitrary: n m rule: BigOr'.induct)
+  case 1
+  then show ?case
+    by simp
+next
+  case (2 F)
+  then have False
+    by (metis list.size(3) One_nat_def length_Cons leD one_less_power less_2_cases_iff)
+  then show ?case ..
+next
+  case (3 T T' Ts')
+  define Ts where
+    "Ts = T' # Ts'"
+  have "2 ^ n \<le> length Ts \<or> 2 ^ n = Suc (length Ts)"
+    unfolding Ts_def using "3.prems" by auto
+  then have "2 ^ n * m \<le> Suc (size T + size (BigOr' Ts))"
+  proof (elim disjE)
+    assume asm1: "2 ^ n \<le> length Ts"
+
+    have "2 ^ n * m \<le> size (BigOr' (T' # Ts'))"
+    proof (rule "3.IH")
+      show "0 < n"
+        by (metis "3.prems"(1))
+    next
+      show "2 ^ n \<le> length (T' # Ts')"
+        using Ts_def asm1 by blast
+    next
+      show "(\<forall>T\<in>set (T' # Ts'). m \<le> size T)"
+        by (simp add: "3.prems"(3) Ts_def)
+    qed
+
+    also have "\<dots> \<le> Suc (size T + size (BigOr' Ts))"
+      by (simp add: Ts_def)
+
+    finally show ?thesis .
+  next
+    assume "2 ^ n = Suc (length Ts)"
+
+    then have "2 ^ n = length (T # Ts)"
+      by simp
+
+    moreover have "\<forall> T \<in> set (T # Ts). size T \<ge> m"
+      by (metis "3.prems"(3) Ts_def)
+
+    ultimately show ?thesis
       using aux_exp_size by fastforce
   qed
   then show ?case
@@ -334,13 +393,25 @@ qed
 lemma sizef_BigOr': "xs \<noteq> [] \<Longrightarrow> sizef (BigOr' xs) + 1 = sum_list (map sizef xs) + length xs"
   by (induction xs rule: BigOr'.induct) simp_all
 
+lemma size_BigOr': "xs \<noteq> [] \<Longrightarrow> size (BigOr' xs) + 1 = sum_list (map size xs) + length xs"
+  by (induction xs rule: BigOr'.induct) simp_all
+
 lemma sizef_BigAnd': "xs \<noteq> [] \<Longrightarrow> sizef (BigAnd' xs) + 1 = sum_list (map sizef xs) + length xs"
+  by (induction xs rule: BigAnd'.induct) simp_all
+
+lemma size_BigAnd': "xs \<noteq> [] \<Longrightarrow> size (BigAnd' xs) + 1 = sum_list (map size xs) + length xs"
   by (induction xs rule: BigAnd'.induct) simp_all
 
 lemma sizef_conv_sum_list_undnf: "sizef \<phi> = sum_list (map sizef (undnf \<phi>)) + count_Or \<phi>"
   by (induction \<phi>) simp_all
 
+lemma size_conv_sum_list_undnf: "size \<phi> = sum_list (map size (undnf \<phi>)) + count_Or \<phi>"
+  by (induction \<phi>) simp_all
+
 lemma sizef_conv_sum_list_uncnf: "sizef \<phi> = sum_list (map sizef (uncnf \<phi>)) + count_And \<phi>"
+  by (induction \<phi>) simp_all
+
+lemma size_conv_sum_list_uncnf: "size \<phi> = sum_list (map size (uncnf \<phi>)) + count_And \<phi>"
   by (induction \<phi>) simp_all
 
 lemma sizef_BigOr'_undnf:
@@ -360,6 +431,23 @@ proof -
     by presburger
 qed
 
+lemma size_BigOr'_undnf:
+  fixes \<phi> :: "'a formula"
+  shows "size (BigOr' (undnf \<phi>)) = size \<phi>"
+proof -
+  have "size \<phi> + 1 = sum_list (map size (undnf \<phi>)) + count_Or \<phi> + 1"
+    using size_conv_sum_list_undnf[of \<phi>] by presburger
+
+  also have "\<dots> = sum_list (map size (undnf \<phi>)) + length (undnf \<phi>)"
+    using length_undnf[of \<phi>] by presburger
+
+  also have "\<dots> = size (BigOr' (undnf \<phi>)) + 1"
+    using size_BigOr'[of "undnf \<phi>", simplified] by presburger
+
+  finally show ?thesis
+    by presburger
+qed
+
 lemma sizef_BigAnd'_uncnf:
   fixes \<phi> :: "'a formula"
   shows "sizef (BigAnd' (uncnf \<phi>)) = sizef \<phi>"
@@ -372,6 +460,23 @@ proof -
 
   also have "\<dots> = sizef (BigAnd' (uncnf \<phi>)) + 1"
     using sizef_BigAnd'[of "uncnf \<phi>", simplified] by presburger
+
+  finally show ?thesis
+    by presburger
+qed
+
+lemma size_BigAnd'_uncnf:
+  fixes \<phi> :: "'a formula"
+  shows "size (BigAnd' (uncnf \<phi>)) = size \<phi>"
+proof -
+  have "size \<phi> + 1 = sum_list (map size (uncnf \<phi>)) + count_And \<phi> + 1"
+    using size_conv_sum_list_uncnf[of \<phi>] by presburger
+
+  also have "\<dots> = sum_list (map size (uncnf \<phi>)) + length (uncnf \<phi>)"
+    using length_uncnf[of \<phi>] by presburger
+
+  also have "\<dots> = size (BigAnd' (uncnf \<phi>)) + 1"
+    using size_BigAnd'[of "uncnf \<phi>", simplified] by presburger
 
   finally show ?thesis
     by presburger
@@ -416,6 +521,56 @@ next
       by simp
     also have "\<dots> \<le> sizef (BigOr' (F # v # va))"
       using 3 by simp
+    finally show ?thesis .
+  qed
+
+  finally show ?case .
+qed
+
+lemma size_BigOr'_filter_le_if:
+  assumes "\<exists>x \<in> set xs. P x"
+  shows "size (BigOr' (filter P xs)) \<le> size (BigOr' xs)"
+  using assms
+proof (induction xs rule: BigOr'.induct)
+  case 1
+  then show ?case
+    by simp
+next
+  case (2 F)
+  then show ?case
+    by simp
+next
+  case (3 F v va)
+
+  then have IH: "size (BigOr' (filter P (v # va))) \<le> size (BigOr' (v # va))"
+    by (metis BigOr'.simps(1) One_nat_def empty_filter_conv formula.size(8) formula.size_neq
+        leI less_one)
+
+  have "size (BigOr' (filter P (F # v # va))) \<le> size (BigOr' (F # filter P (v # va)))"
+  proof (cases "P F")
+    case True
+    then show ?thesis
+      by simp
+  next
+    case False
+    then show ?thesis
+      by (metis (no_types, opaque_lifting) "3.prems" BigOr'.simps(3) add.commute
+          add.right_neutral empty_filter_conv filter.simps(2) formula.size(11) less_add_Suc1
+          neq_Nil_conv nle_le plus_1_eq_Suc verit_comp_simplify1(3))
+  qed
+
+  also have "\<dots> \<le> size (BigOr' (F # v # va))"
+  proof (cases "filter P (v # va)")
+    case Nil
+    then show ?thesis
+      by simp
+  next
+    case (Cons G Gs)
+    then have "size (BigOr' (F # filter P (v # va))) =
+      size F + size (BigOr' (filter P (v # va))) + 1"
+      by simp
+    also have "\<dots> \<le> size (BigOr' (F # v # va))"
+      using IH by auto
     finally show ?thesis .
   qed
 
@@ -935,7 +1090,7 @@ proof -
   
   ultimately show ?thesis
     unfolding G_def
-    using exp_size[OF n_greater_0]
+    using exp_sizef[OF n_greater_0]
     by (metis mult.commute)
 qed
 
@@ -974,6 +1129,45 @@ proof -
   qed
 qed
 
+lemma ex_equiv_disj_list_if_is_dnf':
+  fixes \<phi> :: "'a formula"
+  assumes dnf: "is_dnf \<phi>" and sat: "\<exists>\<alpha>. \<alpha> \<Turnstile> \<phi>"
+  shows "\<exists>(Ts :: 'a formula list). equiv \<phi> (BigOr' Ts) \<and>
+    size (BigOr' Ts) \<le> size \<phi> \<and>
+    (\<forall>T \<in> set Ts. is_conj T) \<and>
+    (\<forall>T \<in> set Ts. \<exists>\<alpha>. \<alpha> \<Turnstile> T)"
+proof -
+  have bex_sat: "\<exists>T \<in> set (undnf \<phi>). \<exists>\<alpha>. \<alpha> \<Turnstile> T"
+    using sat
+    by (metis equiv_def BigOr'_semantics equiv_BigOr'_undnf_if_dnf)
+
+  define Ts :: "'a formula list" where
+    "Ts = filter (\<lambda>T. \<exists>\<alpha>. \<alpha> \<Turnstile> T) (undnf \<phi>)"
+
+  show ?thesis
+  proof (intro exI[of _ Ts] conjI ballI)
+    have "equiv \<phi> (BigOr' (undnf \<phi>))"
+      using equiv_BigOr'_undnf_if_dnf[symmetric] .
+    then show "equiv \<phi> (BigOr' Ts)"
+      unfolding Ts_def
+      by (smt (verit) BigOr'_semantics equiv_def mem_Collect_eq set_filter)
+  next
+    have "size (BigOr' (undnf \<phi>)) = size \<phi>"
+      using size_BigOr'_undnf .
+    then show "size (BigOr' Ts) \<le> size \<phi>"
+      unfolding Ts_def
+      using size_BigOr'_filter_le_if[OF bex_sat]
+      by presburger
+  next
+    show "\<And>T. T \<in> set Ts \<Longrightarrow> is_conj T"
+      using ball_undnf_is_conj[OF dnf]
+      by (simp add: Ts_def)
+  next
+    show "\<And>T. T \<in> set Ts \<Longrightarrow> \<exists>\<alpha>. \<alpha> \<Turnstile> T"
+      by (simp add: Ts_def)
+  qed
+qed
+
 lemma proposition4':
   fixes n :: nat
   shows "\<exists>(F\<^sub>n :: var formula).
@@ -1000,14 +1194,17 @@ next
   next
     fix G\<^sub>n :: "var formula"
     assume "equiv (Fn n) G\<^sub>n"
-    assume "is_dnf G\<^sub>n"
+    then have sat_G\<^sub>n: "\<exists>\<alpha>. \<alpha> \<Turnstile> G\<^sub>n"
+      unfolding equiv_def
+      using Fn_sat[of n] by metis
 
+    assume "is_dnf G\<^sub>n"
     then obtain Ts :: "var formula list" where
       "\<forall>T \<in> set Ts. is_conj T" and
       "\<forall>T \<in> set Ts. \<exists>\<alpha>. \<alpha> \<Turnstile> T" and
       "equiv G\<^sub>n (BigOr' Ts)" and
-      sizef: "sizef (BigOr' Ts) \<le> sizef G\<^sub>n"
-      using ex_equiv_disj_list_if_is_dnf[of G\<^sub>n] by metis
+      sizef: "size (BigOr' Ts) \<le> size G\<^sub>n"
+      using ex_equiv_disj_list_if_is_dnf'[OF _ sat_G\<^sub>n] by metis
 
     moreover have "equiv (Fn n) (BigOr' Ts)"
       using equiv_transitive[OF \<open>equiv (Fn n) G\<^sub>n\<close> \<open>equiv G\<^sub>n (BigOr' Ts)\<close>] .
@@ -1016,7 +1213,7 @@ next
       using proposition4[OF \<open>0 < n\<close>, of Ts] by metis
 
     then show "n * 2 ^ n \<le> size G\<^sub>n"
-      using sizef sizef_le_size[of G\<^sub>n] by presburger
+      using sizef sizef_le_size[of "BigOr' Ts"] by presburger
   qed
 qed
 
