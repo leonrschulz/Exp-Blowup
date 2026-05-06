@@ -283,12 +283,12 @@ Because \cref{def_sizef} ignores negations, it always evaluates to a smaller num
 
 \begin{lemma}
   Let $\phi$ be a formula in disjunctive normal form.
-  $\isaAp{\cstSizef}{(\bigvee_{i = 0}^{\listLength{\isaAp{\cst{undnf}}{\phi}}} (\listNth{\isaAp{\cst{undnf}}{\phi}}{i}))} = \isaAp{\cstSizef}{\phi}$.
+  $\isaAp{\cstSizef}{(\bigvee_{i = 0}^{\listLength{\isaAp{\cst{undnf}}{\phi}}} \listNth{(\isaAp{\cst{undnf}}{\phi})}{i})} = \isaAp{\cstSizef}{\phi}$.
 \end{lemma}
 
 \begin{lemma}
   Let $\phi$ be a formula in conjunctive normal form.
-  $\isaAp{\cstSizef}{(\bigwedge_{i = 0}^{\listLength{\isaAp{\cst{uncnf}}{\phi}}} (\listNth{\isaAp{\cst{uncnf}}{\phi}}{i}))} = \isaAp{\cstSizef}{\phi}$.
+  $\isaAp{\cstSizef}{(\bigwedge_{i = 0}^{\listLength{\isaAp{\cst{uncnf}}{\phi}}} \listNth{(\isaAp{\cst{uncnf}}{\phi})}{i})} = \isaAp{\cstSizef}{\phi}$.
 \end{lemma}
 
 
