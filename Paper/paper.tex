@@ -147,15 +147,16 @@ $\neg x$. The literals $x$ and $\neg x$ are \emph{complements}
 of each other.
 %The complement of a lieral $a$ is denoted by $\bar{a}$.
 
-A formula $F$ is in \emph{negation normal form} (NNF), if $F$ contains
+A formula $F$ is in \emph{negation normal form}, if $F$ contains
 no implications, and negations in $F$ only occur immediately in front
 of variables, i.e., $F$ is built from literals by conjunction and
 disjunction only.
 
-For a formula $F$ in NNF we define the dual formula $\bar F$ in NNF
-by replacing every literal by its complement, and interchanging the
-symbols $\land$ and $\lor$.
-For every formula $F$ in NNF, $\bar{F}$ is equivalent to $\neg F$.
+For a formula $F$ in negation normal form we define the dual formula
+$\bar F$ in negation normal form by replacing every literal by its
+complement, and interchanging the symbols $\land$ and $\lor$.  For
+every formula $F$ in negation normal form, $\bar{F}$ is equivalent to
+$\neg F$.
 
 \begin{definition}
   We define the following classes of formulas:
@@ -170,23 +171,27 @@ For every formula $F$ in NNF, $\bar{F}$ is equivalent to $\neg F$.
 \end{itemize}
 \end{definition}
 
-Note that every formula in DNF or CNF is also in NNF. For a formula
-$F$ in CNF, the dual formula $\bar F$ is in DNF, and vice cersa.
+Note that every formula in disjunctive normal form or conjunctive
+normal form is also in negation normal form. For a formula $F$ in
+conjunctive normal form, the dual formula $\bar F$ is in disjunctive
+normal form, and vice cersa.
 
-Every formula can be transformed into an equivalent formula in DNF,
-and in DNF, but the cost of this transformation is an exponential
-increase in size in the worst case
+It is well known that every formula of propositional logic can be
+transformed into an equivalent formula in disjunctive normal form, and
+in conjunctive normal form, but the cost of these transformations is an
+exponential increase in size in the worst case, see, e.g., the textbook of
+Kleine B\"uning and Lettmann \cite{KleineBueningLettmann_Aussagenlogik}.
 
 \begin{theorem} \label{dnfblowup}
   For all sufficiently large $n\in\Nat$, there are formulas $F_n$ in
-  CNF with $|F_n| = O(n)$, such that every equivalent formula $G_n$ in
-  DNF is of size $|G_n| \geq n2^n$.
+  conjunctive normal form with $|F_n| = O(n)$, such that every equivalent formula $G_n$ in
+  disjunctive normal form is of size $|G_n| \geq n2^n$.
 \end{theorem}
 \begin{proof}
 The formulas $F_n$ are defined as
 $F_n = \bigwedge_{i=1}^n ( x_{i,0} \lor x_{i,1} ) \land (\neg x_{i,0} \lor \neg x_{i,1})$.
 
-If $G_n = \bigvee_{j\leq m} T_j$ is a formula in CNF equivalent to $F_n$, then the following two claims hold, which together prove the statement.
+If $G_n = \bigvee_{j\leq m} T_j$ is a formula in conjunctive normal form equivalent to $F_n$, then the following two claims hold, which together prove the statement.
 
 Claim 1. Each of the terms $T_j$ contains exactly one of the literals $x_{i,0}$ and $x_{i,1}$, for every $i\leq n$. In particular, every term $T_j$ is of size at least $n$.
 
@@ -199,14 +204,14 @@ In particular, $G_n$ has at least $2^n$ many terms.
 
 \begin{theorem} \label{cnfblowup}
   For all sufficiently large $n\in\Nat$, there are formulas $F'_n$ in
-  DNF with $|F'_n| = O(n)$, such that every equivalent formula $G_n$
-  in CNF is of size $|G_n| \geq n2^n$.
+  disjunctive normal form with $|F'_n| = O(n)$, such that every equivalent formula $G_n$
+  in conjunctive normal form is of size $|G_n| \geq n2^n$.
 \end{theorem}
-
+  
 \begin{proof}
   Let $F'_n := {\bar F}_n$ for the formulas $F_n$ of Theorem~\ref{dnfblowup}.
-  If there were formulas  $G_n \equiv F'_n$ in CNF with $G_n < n2^n$,
-  then ${\bar G}_n \equiv F_n$ would be a formula in DNF with
+  If there were formulas  $G_n \equiv F'_n$ in conjunctive normal form with $G_n < n2^n$,
+  then ${\bar G}_n \equiv F_n$ would be a formula in disjunctive normal form with
   $|{\bar G}_n| = |G_n| < n2^n$, contradicting Theorem~\ref{dnfblowup}.
 \end{proof}
 
