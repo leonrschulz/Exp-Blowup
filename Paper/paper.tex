@@ -231,30 +231,12 @@ A formula $\phi$ is
 \emph{tautological} if it is satisfied by every valuation (i.e., $\forallOne{\alpha}{\alpha \models \phi}$).
 Two formulas $\phi$ and $\psi$ are \emph{equivalent} if they have the same truth value for every valuation (i.e., $\forallOne{\alpha}{\alpha \models \phi \iff \alpha \models \psi}$).
 
-\begin{definitionx}
-  \label{def_set}
-  The function $\tyAnnot{\cst{set}}{\tyList{\yA} \Rightarrow \tySet{\yA}}$ converts a list into a set.
-\end{definitionx}
+%\begin{definitionx}
+%  \label{def_set}
+%  The function $\tyAnnot{\cst{set}}{\tyList{\yA} \Rightarrow \tySet{\yA}}$ converts a list into a set.
+%\end{definitionx}
 
-\begin{definitionx}
-  \label{def_size}
-  The function $\tyAnnot{\cstSize}{\tyFormula{\yA} \Rightarrow \tyNat}$ counts the number of atoms, $\bot$, negations, disjunctions, conjunctions, and implications in a formula.
-  In the rest of this paper, we write $|\phi|$ for $\isaAp{\cstSize}{\phi}$.
-\end{definitionx}
-
-\begin{definitionx}
-  \label{def_sizef}
-  The function $\tyAnnot{\cstSizef}{\tyFormula{\yA} \Rightarrow \tyNat}$ counts the number of atoms, $\bot$, disjunctions, conjunctions, and implications in a formula;
-  the negations are ignored.
-\end{definitionx}
-
-Because \cref{def_sizef} ignores negations, it always evaluates to a smaller number than \cref{def_size}.
-\begin{lemma}
-  \label{thm_sizef_le_size}
-  Let $\phi$ be a formula.
-  $\isaAp{\cstSizef}{\phi} \le \left|\phi\right|$.
-\end{lemma}
-%TODO: explain why we use sizef and not size.
+We now define some operations to build the conjunction and disjunction of a list of formulas.
 
 \begin{definitionx}
   \label{def_BigOr_BigAnd}
@@ -281,6 +263,8 @@ Because \cref{def_sizef} ignores negations, it always evaluates to a smaller num
   However, providing these base cases allows us to prove many lemmas for arbiraty lists without requiring a nonemptyness assumption that would need to be repeatedly discharged.
 \end{remark*}
 
+We also define a very specific family of formulas.
+
 \begin{definitionx}
   \label{def_Fn}
   The function $\tyAnnot{\cst{Fn}}{\tyNat \Rightarrow \tyFormula{\yA}}$ creates a formula containing
@@ -292,14 +276,37 @@ Because \cref{def_sizef} ignores negations, it always evaluates to a smaller num
   In the rest of this paper, we write $F_n$ for $\isaAp{\cst{Fn}}{n}$.
 \end{definitionx}
 
-\Cref{def_Fn} is chosen such that a formula $F_n$ can only be satisfied by valuations that assign different truth values to the variables $x_{i,false}$ and $x_{i,true}$.
+\Cref{def_Fn} is chosen such that a formula $F_n$ is in conjunctive normal form and can only be satisfied by valuations that assign different truth values to the variables $x_{i,false}$ and $x_{i,true}$.
 
 \begin{lemma}
   \label{thm_is_cnf_Fn}
   Let $n$ be a natural number.
-  The formula $F_n$ is in conjunctive normal form and
-  the formula $\isaAp{\cst{dualize}}{F_n}$ is in disjunctive normal form.
+  The formula $F_n$ is in conjunctive normal form.
 \end{lemma}
+
+Finally, we provide two different definitions for the size of a formula.
+
+\begin{definitionx}
+  \label{def_size}
+  The function $\tyAnnot{\cstSize}{\tyFormula{\yA} \Rightarrow \tyNat}$ counts the number of atoms, $\bot$, negations, disjunctions, conjunctions, and implications in a formula.
+  In the rest of this paper, we write $|\phi|$ for $\isaAp{\cstSize}{\phi}$.
+\end{definitionx}
+
+\begin{definitionx}
+  \label{def_sizef}
+  The function $\tyAnnot{\cstSizef}{\tyFormula{\yA} \Rightarrow \tyNat}$ counts the number of atoms, $\bot$, disjunctions, conjunctions, and implications in a formula;
+  the negations are ignored.
+\end{definitionx}
+
+Because $\cst{sizef}$ ignores negations, it always evaluates to a smaller number than $\left|\cdot\right|$.
+
+\begin{lemma}
+  \label{thm_sizef_le_size}
+  Let $\phi$ be a formula.
+  $\isaAp{\cstSizef}{\phi} \le \left|\phi\right|$.
+\end{lemma}
+
+We can observe the difference between the two definitions by looking at the sizes of the $F_n$ formula and the conjunction and disjunction of lists of formulas.
 
 \begin{lemma}
   \label{thm_sizef_Fn}
@@ -311,14 +318,18 @@ Because \cref{def_sizef} ignores negations, it always evaluates to a smaller num
 \begin{lemma}
 	\label{thm_sizef_BigAnd_uncnf}
 	Let $\phi$ be a formula in conjunctive normal form.
-	$\isaAp{\cstSizef}{(\bigwedge_{i = 0}^{\listLength{\isaAp{\cst{uncnf}}{\phi}}} \listNth{(\isaAp{\cst{uncnf}}{\phi})}{i})} = \isaAp{\cstSizef}{\phi}$.
+	$\isaAp{\cstSizef}{(\bigwedge_{i = 0}^{\listLength{\isaAp{\cst{uncnf}}{\phi}}} \listNth{(\isaAp{\cst{uncnf}}{\phi})}{i})} = \isaAp{\cstSizef}{\phi}$ and
+	$\left|\bigwedge_{i = 0}^{\listLength{\isaAp{\cst{uncnf}}{\phi}}} \listNth{(\isaAp{\cst{uncnf}}{\phi})}{i}\right| = \left|\phi\right|$.
 \end{lemma}
 
 \begin{lemma}
   \label{thm_sizef_BigOr_undnf}
   Let $\phi$ be a formula in disjunctive normal form.
-  $\isaAp{\cstSizef}{(\bigvee_{i = 0}^{\listLength{\isaAp{\cst{undnf}}{\phi}}} \listNth{(\isaAp{\cst{undnf}}{\phi})}{i})} = \isaAp{\cstSizef}{\phi}$.
+  $\isaAp{\cstSizef}{(\bigvee_{i = 0}^{\listLength{\isaAp{\cst{undnf}}{\phi}}} \listNth{(\isaAp{\cst{undnf}}{\phi})}{i})} = \isaAp{\cstSizef}{\phi}$ and
+  $\left|\bigvee_{i = 0}^{\listLength{\isaAp{\cst{undnf}}{\phi}}} \listNth{(\isaAp{\cst{undnf}}{\phi})}{i}\right| = \left|\phi\right|$.
 \end{lemma}
+
+Most of the statements about the size of formulas are expressed in terms of $\cstSizef$ but, luckily, \cref{thm_sizef_le_size} will allow us to remove $\cstSizef$ entirely from the statements of \cref{thm_cnf_to_dnf_blowup_math,thm_dnf_to_cnf_blowup_math}.
 
 
 \section{CNF to DNF (MDS)}
@@ -448,7 +459,7 @@ The semantics of the dual of a formula is the exact opposite of that of the orig
 Because the $\cstSizef$ function ignores negations, the $\cst{dualize}$ function preserves the size of the original formula.
 
 \begin{lemma}
-	\label{aux_lemma_cor5_step1}
+	\label{thm_sizef_dualize}
   Let $\phi$ be a formula.
   $\isaAp{\cstSizef}{(\isaAp{\cst{dualize}}{\phi})} = \isaAp{\cstSizef}{\phi}$.
 \end{lemma}
@@ -488,7 +499,7 @@ We can now prove that some specific formulas equivalent to the dual of $F_n$ (se
 \begin{proof}
   We prove this by contradiction using \cref{thm_cnf_to_dnf_blowup}.
   We assume $\isaAp{\cstSizef}{G} < n \cdot 2^n$ and from that derive false in five steps.
-  \textbf{(1)}~First, we know from \cref{aux_lemma_cor5_step1} that $\isaAp{\cstSizef}{(\isaAp{\cst{dualize}}{G})} = \isaAp{\cstSizef}{G}$, thus $\isaAp{\cstSizef}{(\isaAp{\cst{dualize}}{G})} < n \cdot 2^n$.
+  \textbf{(1)}~First, we know from \cref{thm_sizef_dualize} that $\isaAp{\cstSizef}{(\isaAp{\cst{dualize}}{G})} = \isaAp{\cstSizef}{G}$, thus $\isaAp{\cstSizef}{(\isaAp{\cst{dualize}}{G})} < n \cdot 2^n$.
   \textbf{(2)}~Moreover, we show that $\isaAp{\cst{dualize}}{G}$ is equivalent to $F_n$ using, among others, \cref{thm_equiv_dualize}.
   \textbf{(3)}~Also, we prove using \cref{thm_dualized_conj_of_disjs_is_disj_of_conjs} that there exists a list $Ts$, where every formula contained in $Ts$ is both conjunctive and satisfiable, such that $\isaAp{\cst{dualize}}{G}$ is syntactically equal to $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$.
   \textbf{(4)}~From steps 2 and 3, it follows that \cref{thm_cnf_to_dnf_blowup} holds for $F_n$ and $\isaAp{\cst{dualize}}{G}$.
@@ -558,6 +569,12 @@ Our functions avoid appending $\lnot\bot$ and $\bot$ to the produced formula whe
 This allowed us to prove the size equality in \cref{thm_sizef_BigAnd_uncnf} and \cref{thm_sizef_BigOr_undnf} instead of having the left-hand side of the lemmas be slightly smaller than the right-hand side.
 Using the original functions would have been possible, but it would have resulted in \cref{thm_cnf_to_dnf_blowup_math,thm_dnf_to_cnf_blowup_math} stating that the size $\left|\psi\right| + 2 \ge n \cdot 2^n$ instead of $\left|\psi\right| \ge n \cdot 2^n$.
 To keep the statements as close as possible to their mathematical counterparts, we therefore chose to introduce the functions \textsf{BigAnd'} and \textsf{BigOr'}.
+
+Finally we introduced the function $\cstSizef$ to be able to prove the equality of \cref{thm_sizef_dualize}.
+Without $\cstSizef$, we could only prove the inequality $\left|\isaAp{\cst{dualize}}{\phi}\right| \le 2 \cdot \left|\phi\right|$ because $\cst{dualize}$ adds and removes negations depending on the formula.
+It would be possible to restate and prove the statement of \cref{thm_cnf_to_dnf_blowup} in terms of $\left|\cdot\right|$.
+However, if we tried to restate and prove the statement of \cref{thm_dnf_to_cnf_blowup} in terms of $\left|\cdot\right|$, we would prove $\left|\isaAp{\cst{dualize}}{G}\right| < 2 \cdot n \cdot 2^n$ in step 1 and $\left|\isaAp{\cst{dualize}}{G}\right| \ge n \cdot 2^n$ in step 4, and we would not be able to derive a contradiction in step 5.
+
 
 \section{Conclusion}
 \label{sec_concl}
