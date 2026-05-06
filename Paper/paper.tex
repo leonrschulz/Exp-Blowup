@@ -175,7 +175,7 @@ In particular, $G_n$ has at least $2^n$ many terms.
 \section{Preliminaries}
 \label{sec_preliminaries}
 
-A \emph{formula} is inductively defined as either an atom, falsehood ($\bot$), the negation of a formula, or the disjunction, conjunction or implication of two formulas.
+A \emph{formula} is inductively defined as either an atom, falsehood ($\bot$), the negation ($\neg$) of a formula, or the disjunction ($\lor$), conjunction ($\land$) or implication ($\rightarrow$) of two formulas.
 A \emph{literal} is a special case of a formula consisting of either a positive or negative atom, or a positive or negative $\bot$.
 Basic operations on formulas and related lemmas are expressed for any atom type.
 However, our main theorems instantiate the atom type with variables $x_{i,b}$, where $i$ is a natural number and $b$ is a Boolean value.
@@ -255,32 +255,34 @@ Because \cref{def_sizef} ignores negations, it always evaluates to a smaller num
 
 \begin{definitionx}
   \label{def_dualize}
-  %TODO: tune spacing around type parameters here.
   %TODO: be consistent with abbreviations: Either always abbreviated or never
-  The function $\tyAnnot{\cst{dualize}}{\tyFormula{\yA} \Rightarrow \tyFormula{\yA}}$ converts a formula in negation normal form to its dualized form by replacing each literal with its complementary:
+  The function $\tyAnnot{\cst{dualize}}{\tyFormula{\yA} \Rightarrow \tyFormula{\yA}}$ converts a formula to its dualized form by replacing each literal with its complementary:
   an atom $A$ becomes $\neg A$,
-  $\bot$ becomes $\neg\bot$,
+  falsehood $\bot$ becomes $\neg\bot$,
   a negation $\neg \phi$ becomes $\phi$,
-  $\phi \lor \psi$ becomes $\isaAp{\cst{dualize}}{\phi} \land \isaAp{\cst{dualize}}{\psi}$, and
-  $\phi \land \psi$ becomes $\isaAp{\cst{dualize}}{\phi} \lor \isaAp{\cst{dualize}}{\psi}$.
+  a disjunction $\phi \lor \psi$ becomes $\isaAp{\cst{dualize}}{\phi} \land \isaAp{\cst{dualize}}{\psi}$,
+  a conjunction $\phi \land \psi$ becomes $\isaAp{\cst{dualize}}{\phi} \lor \isaAp{\cst{dualize}}{\psi}$, and
+  an implication $\phi \rightarrow \psi$ becomes $\phi \land \isaAp{\cst{dualize}}{\psi}$.
 \end{definitionx}
 
 \begin{lemma}
   \label{thm_equiv_dualize}
   Let $\phi$ be a formula.
-  If $\phi$ is in negation normal form, then $\isaAp{\cst{dualize}}{\phi}$ is equivalent to $\neg\phi$.
+  The formula $\isaAp{\cst{dualize}}{\phi}$ is equivalent to $\neg\phi$.
 \end{lemma}
 
 \begin{lemma}
   \label{thm_is_cnf_Fn}
   Let $n$ be a natural number.
-  The formula $F_n$ is in conjunctive normal form.
+  The formula $F_n$ is in conjunctive normal form and
+  the formula $\isaAp{\cst{dualize}}{F_n}$ is in disjunctive normal form.
 \end{lemma}
 
 \begin{lemma}
   \label{thm_sizef_Fn}
   Let $n$ be a natural number.
-  $\isaAp{\cstSizef}{F_n} = 8 \cdot n + 1$.
+  $\isaAp{\cstSizef}{F_n} = 8 \cdot n + 1$ and
+  $\left|F_n\right| = 10 \cdot n + 2$.
 \end{lemma}
 
 \begin{lemma}
@@ -382,13 +384,13 @@ We now prove that this exponential blowup holds for any equivalent formula in di
 \begin{corollary}[Exponential Blowup Transforming CNF to DNF]
   \label{thm_cnf_to_dnf_blowup_math}
   Let $n$ be a natural number.
-  There exists a formula $\phi$ in conjunctive normal form with $\isaAp{\cstSizef}{\phi} = 8 \cdot n + 1$ such that every equivalent formula $\psi$ in disjunctive normal form has size $\left|\psi\right| \ge n \cdot 2^n$.
+  There exists a formula $\phi$ in conjunctive normal form with size $\left|\phi\right| = 10 \cdot n + 2$ such that every equivalent formula $\psi$ in disjunctive normal form has size $\left|\psi\right| \ge n \cdot 2^n$.
 \end{corollary}
 \begin{proof}
   We start by a case analysis on $n$.
   The interesting case is when $n > 0$.
   We define $\phi = F_n$ (see \cref{def_Fn});
-  it is easy to show that $F_n$ is in conjunctive normal form (using \cref{thm_is_cnf_Fn}) and that $\isaAp{\cstSizef}{F_n} = 8 \cdot n + 1$ (using \cref{thm_sizef_Fn}).
+  it is easy to show that $F_n$ is in conjunctive normal form (using \cref{thm_is_cnf_Fn}) and that $\left|\phi\right| = 10 \cdot n + 2$ (using \cref{thm_sizef_Fn}).
   To prove the last property, we assume that there is an equivalent formula $\psi$ in disjunctive normal form.
   We first obtain a list $Ts$ (by filtering $\isaAp{\cst{undnf}}{\psi}$) of all terms in $\psi$ such that
   all formulas in $Ts$ are conjunctive and satisfiable,
@@ -455,7 +457,7 @@ We claim that \cref{thm_cnf_to_dnf_blowup_math} is a formalization of the paper 
 \begin{corollary}[Exponential Blowup Transforming DNF to CNF]
   \label{thm_dnf_to_cnf_blowup_math}
   Let $n$ be a natural number.
-  There exists a formula $\phi$ in disjunctive normal form with $\isaAp{\cstSizef}{\phi} = 8 \cdot n + 1$ such that every equivalent formula $G_n$ in conjunctive normal form has size $\left|G_n\right| \ge n \cdot 2^n$.
+  There exists a formula $\phi$ in disjunctive normal form with size $\left|\phi\right| = 10 \cdot n + 1$ such that every equivalent formula $\psi$ in conjunctive normal form has size $\left|\psi\right| \ge n \cdot 2^n$.
 \end{corollary}
 \begin{proof}
   The proof is analogous to the proof of \cref{thm_cnf_to_dnf_blowup_math}.
