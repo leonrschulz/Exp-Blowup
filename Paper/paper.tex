@@ -282,6 +282,7 @@ Because \cref{def_sizef} ignores negations, it always evaluates to a smaller num
 \end{lemma}
 
 \begin{lemma}
+  \label{thm_sizef_BigOr_undnf}
   Let $\phi$ be a formula in disjunctive normal form.
   $\isaAp{\cstSizef}{(\bigvee_{i = 0}^{\listLength{\isaAp{\cst{undnf}}{\phi}}} \listNth{(\isaAp{\cst{undnf}}{\phi})}{i})} = \isaAp{\cstSizef}{\phi}$.
 \end{lemma}
@@ -381,12 +382,12 @@ We now prove that this exponential blowup holds for any equivalent formula in di
   We define $\phi = F_n$ (see \cref{def_Fn});
   it is easy to show that $F_n$ is in conjunctive normal form and that $\isaAp{\cstSizef}{F_n} = 8 \cdot n + 1$.
   To prove the last property, we assume that there is an equivalent formula $\psi$ in disjunctive normal form.
-  We first obtain a list $Ts$ of all terms in $\psi$ such that
+  We first obtain a list $Ts$ (by filtering $\isaAp{\cst{undnf}}{\psi}$) of all terms in $\psi$ such that
   all formulas in $Ts$ are conjunctive and satisfiable,
   %TODO: think whether we could explain the trick with filter and undnf. Maybe extract to its own lemma?
-  $\isaAp{\cstSizef}{\psi} \ge \isaAp{\cstSizef}{(\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i})}$,
+  $\isaAp{\cstSizef}{\psi} \ge \isaAp{\cstSizef}{(\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i})}$ (using \cref{thm_sizef_BigOr_undnf}),
   and $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$ is equivalent to $\psi$.
-  From this last property, we show that $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$ is equivalent to $F_n$.
+  From this last equivalence, we show that $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$ is equivalent to $F_n$.
   This allows us to prove that $\isaAp{\cstSizef}{(\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i})} \ge n \cdot 2^n$ using \cref{thm_cnf_to_dnf_blowup}.
   We can prove that $\isaAp{\cstSizef}{\psi} \ge n \cdot 2^n$ by transitivity and, finally, that $\left|\psi\right| \ge n \cdot 2^n$ using \cref{thm_sizef_le_size}.
 \end{proof}
