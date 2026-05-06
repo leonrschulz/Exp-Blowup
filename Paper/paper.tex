@@ -415,7 +415,7 @@ We claim that \cref{thm_cnf_to_dnf_blowup_math} is a formalization of the paper 
   We prove this by contradiction using \cref{thm_cnf_to_dnf_blowup}.
   We assume $\isaAp{\cstSizef}{G} < n \cdot 2^n$ and from that derive false in five steps.
   \textbf{(1)}~First, we know from \cref{aux_lemma_cor5_step1} that $\isaAp{\cstSizef}{(\isaAp{\cst{dualize}}{G})} = \isaAp{\cstSizef}{G}$, thus $\isaAp{\cstSizef}{(\isaAp{\cst{dualize}}{G})} < n \cdot 2^n$.
-  \textbf{(2)}~Moreover, we show that $\isaAp{\cst{dualize}}{G}$ is equivalent to $F_n$.
+  \textbf{(2)}~Moreover, we show that $\isaAp{\cst{dualize}}{G}$ is equivalent to $F_n$ using, among others, \cref{thm_equiv_dualize}.
   \textbf{(3)}~Also, we prove using \cref{thm_dualized_conj_of_disjs_is_disj_of_conjs} that there exists a list $Ts$, where every formula contained in $Ts$ is both conjunctive and satisfiable, such that $\isaAp{\cst{dualize}}{G}$ is syntactically equal to $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$.
   \textbf{(4)}~From steps 2 and 3, it follows that \cref{thm_cnf_to_dnf_blowup} holds for $F_n$ and $\isaAp{\cst{dualize}}{G}$.
   According to \cref{thm_cnf_to_dnf_blowup}, it therefore must be the case that $\isaAp{\cstSizef}{(\isaAp{\cst{dualize}}{G})} \ge n \cdot 2^n$.

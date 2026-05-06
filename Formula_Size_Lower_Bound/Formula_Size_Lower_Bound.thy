@@ -1034,10 +1034,9 @@ proof -
       using G_in_nnf by (simp add: size_ident_dualize)
     have "equiv (dualize G) (Fn n)"
     proof -
-      have "equiv G Fprime" 
-        using equiv_Fprime_G equiv_def by blast
-      then have "equiv G (dualize (Fn n))" 
-        by (simp add: def_Fprime)
+      have "equiv G (dualize (Fn n))"
+        using equiv_Fprime_G[symmetric]
+        unfolding Fprime_def .
       also have "equiv \<dots> (Not (Fn n))"
         using equiv_dualize[OF Fn_in_nnf] .
       finally have "equiv G (Not (Fn n))" .
