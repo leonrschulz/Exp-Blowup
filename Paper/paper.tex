@@ -316,17 +316,16 @@ We can observe the difference between the two definitions by looking at the size
 \end{lemma}
 
 \begin{lemma}
-	\label{thm_sizef_BigAnd_uncnf}
-	Let $\phi$ be a formula in conjunctive normal form.
-	$\isaAp{\cstSizef}{(\bigwedge_{i = 0}^{\listLength{\isaAp{\cst{uncnf}}{\phi}}} \listNth{(\isaAp{\cst{uncnf}}{\phi})}{i})} = \isaAp{\cstSizef}{\phi}$ and
-	$\left|\bigwedge_{i = 0}^{\listLength{\isaAp{\cst{uncnf}}{\phi}}} \listNth{(\isaAp{\cst{uncnf}}{\phi})}{i}\right| = \left|\phi\right|$.
-\end{lemma}
-
-\begin{lemma}
-  \label{thm_sizef_BigOr_undnf}
-  Let $\phi$ be a formula in disjunctive normal form.
-  $\isaAp{\cstSizef}{(\bigvee_{i = 0}^{\listLength{\isaAp{\cst{undnf}}{\phi}}} \listNth{(\isaAp{\cst{undnf}}{\phi})}{i})} = \isaAp{\cstSizef}{\phi}$ and
-  $\left|\bigvee_{i = 0}^{\listLength{\isaAp{\cst{undnf}}{\phi}}} \listNth{(\isaAp{\cst{undnf}}{\phi})}{i}\right| = \left|\phi\right|$.
+  \label{thm_sizef_BigOr_undnf_BigAnd_uncnf}
+	Let $\phi$ be a formula in conjunctive normal form and $\psi$ be a formula in disjunctive normal form.
+  The following equalities hold:
+  \begin{align*}
+    \isaAp{\cstSizef}{\left(\bigwedge\nolimits_{i = 0}\nolimits^{\listLength{\isaAp{\cst{uncnf}}{\phi}}} \listNth{(\isaAp{\cst{uncnf}}{\phi})}{i}\right)} =\:& \isaAp{\cstSizef}{\phi} &
+    \left|\bigwedge\nolimits_{i = 0}\nolimits^{\listLength{\isaAp{\cst{uncnf}}{\phi}}} \listNth{(\isaAp{\cst{uncnf}}{\phi})}{i}\right| =\:& \left|\phi\right|
+    \\
+    \isaAp{\cstSizef}{\left(\bigvee\nolimits_{i = 0}\nolimits^{\listLength{\isaAp{\cst{undnf}}{\psi}}} \listNth{(\isaAp{\cst{undnf}}{\psi})}{i}\right)} =\:& \isaAp{\cstSizef}{\psi} &
+    \left|\bigvee\nolimits_{i = 0}\nolimits^{\listLength{\isaAp{\cst{undnf}}{\psi}}} \listNth{(\isaAp{\cst{undnf}}{\psi})}{i}\right| =\:& \left|\psi\right|
+  \end{align*}
 \end{lemma}
 
 Most of the statements about the size of formulas are expressed in terms of $\cstSizef$ but, luckily, \cref{thm_sizef_le_size} will allow us to remove $\cstSizef$ entirely from the statements of \cref{thm_cnf_to_dnf_blowup_math,thm_dnf_to_cnf_blowup_math}.
@@ -421,7 +420,7 @@ We now prove that such equivalent formulas do exist and that the exponential blo
   We first obtain a list $Ts$ (by filtering $\isaAp{\cst{undnf}}{\psi}$) of all satisfiable terms in $\psi$ such that
   all formulas in $Ts$ are conjunctive and satisfiable,
   %TODO: think whether we could explain the trick with filter and undnf. Maybe extract to its own lemma?
-  $\isaAp{\cstSizef}{\psi} \ge \isaAp{\cstSizef}{(\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i})}$ (using \cref{thm_sizef_BigOr_undnf}),
+  $\isaAp{\cstSizef}{\psi} \ge \isaAp{\cstSizef}{(\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i})}$ (using \cref{thm_sizef_BigOr_undnf_BigAnd_uncnf}),
   and $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$ is equivalent to $\psi$.
   From this last equivalence, we show that $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$ is equivalent to $F_n$.
   This allows us to prove that $\isaAp{\cstSizef}{(\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i})} \ge n \cdot 2^n$ using \cref{thm_cnf_to_dnf_blowup}.
@@ -566,7 +565,7 @@ Finding the correct statement for \cref{card_le_card_if_mem_imp_ex_mem} was chal
 
 Moreover, we chose modify the functions \textsf{BigAnd} and \textsf{BigOr} from Michaelis and Nipkow \cite{Propositional_Proof_Systems-AFP} and to define our own versions in \cref{def_BigOr_BigAnd}, where the base cases are handled differently.
 Our functions avoid appending $\lnot\bot$ and $\bot$ to the produced formula when the provided list is nonempty.
-This allowed us to prove the size equality in \cref{thm_sizef_BigAnd_uncnf} and \cref{thm_sizef_BigOr_undnf} instead of having the left-hand side of the lemmas be slightly smaller than the right-hand side.
+This allowed us to prove the size equalities in \cref{thm_sizef_BigOr_undnf_BigAnd_uncnf} instead of having the left-hand side of the lemmas be slightly smaller than the right-hand side.
 Using the original functions would have been possible, but it would have resulted in \cref{thm_cnf_to_dnf_blowup_math,thm_dnf_to_cnf_blowup_math} stating that the size $\left|\psi\right| + 2 \ge n \cdot 2^n$ instead of $\left|\psi\right| \ge n \cdot 2^n$.
 To keep the statements as close as possible to their mathematical counterparts, we therefore chose to introduce the functions \textsf{BigAnd'} and \textsf{BigOr'}.
 
