@@ -128,11 +128,12 @@ For every formula $F$ in NNF, $\bar{F}$ is equivalent to $\neg F$.
 \end{itemize}
 \end{definition}
 
-Note that every formula in DNF or CNF is also in NNF.
+Note that every formula in DNF or CNF is also in NNF. For a formula
+$F$ in CNF, the dual formula $\bar F$ is in DNF, and vice cersa.
 
 Every formula can be transformed into an equivalent formula in DNF,
 and in DNF, but the cost of this transformation is an exponential
-increase in size in the worst case.
+increase in size in the worst case
 
 \begin{theorem} \label{dnfblowup}
   For all sufficiently large $n\in\Nat$, there are formulas $F_n$ in
@@ -140,8 +141,8 @@ increase in size in the worst case.
   DNF is of size $|G_n| \geq n2^n$.
 \end{theorem}
 \begin{proof}
-The formulas $F_n$ are defined as $F_n = \bigwedge_{i=1}^n ( x_{i,0} \lor x_{i,1} ) \land (\neg
-x_{i,0} \lor \neg x_{i,1})$.
+The formulas $F_n$ are defined as
+$F_n = \bigwedge_{i=1}^n ( x_{i,0} \lor x_{i,1} ) \land (\neg x_{i,0} \lor \neg x_{i,1})$.
 
 If $G_n = \bigvee_{j\leq m} T_j$ is a formula in CNF equivalent to $F_n$, then the following two claims hold, which together prove the statement.
 
