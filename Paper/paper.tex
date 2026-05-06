@@ -392,7 +392,7 @@ We now prove that this exponential blowup holds for any equivalent formula in di
   We define $\phi = F_n$ (see \cref{def_Fn});
   it is easy to show that $F_n$ is in conjunctive normal form (using \cref{thm_is_cnf_Fn}) and that $\left|\phi\right| = 10 \cdot n + 2$ (using \cref{thm_sizef_Fn}).
   To prove the last property, we assume that there is an equivalent formula $\psi$ in disjunctive normal form.
-  We first obtain a list $Ts$ (by filtering $\isaAp{\cst{undnf}}{\psi}$) of all terms in $\psi$ such that
+  We first obtain a list $Ts$ (by filtering $\isaAp{\cst{undnf}}{\psi}$) of all satisfiable terms in $\psi$ such that
   all formulas in $Ts$ are conjunctive and satisfiable,
   %TODO: think whether we could explain the trick with filter and undnf. Maybe extract to its own lemma?
   $\isaAp{\cstSizef}{\psi} \ge \isaAp{\cstSizef}{(\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i})}$ (using \cref{thm_sizef_BigOr_undnf}),
