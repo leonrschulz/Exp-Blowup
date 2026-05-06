@@ -294,24 +294,6 @@ Because \cref{def_sizef} ignores negations, it always evaluates to a smaller num
 
 \Cref{def_Fn} is chosen such that a formula $F_n$ can only be satisfied by valuations that assign different truth values to the variables $x_{i,false}$ and $x_{i,true}$.
 
-\begin{definitionx}
-  \label{def_dualize}
-  %TODO: be consistent with abbreviations: Either always abbreviated or never
-  The function $\tyAnnot{\cst{dualize}}{\tyFormula{\yA} \Rightarrow \tyFormula{\yA}}$ converts a formula to its dualized form by replacing each literal with its complementary:
-  an atom $A$ becomes $\neg A$,
-  falsehood $\bot$ becomes $\neg\bot$,
-  a negation $\neg \phi$ becomes $\phi$,
-  a disjunction $\phi \lor \psi$ becomes $\isaAp{\cst{dualize}}{\phi} \land \isaAp{\cst{dualize}}{\psi}$,
-  a conjunction $\phi \land \psi$ becomes $\isaAp{\cst{dualize}}{\phi} \lor \isaAp{\cst{dualize}}{\psi}$, and
-  an implication $\phi \rightarrow \psi$ becomes $\phi \land \isaAp{\cst{dualize}}{\psi}$.
-\end{definitionx}
-
-\begin{lemma}
-  \label{thm_equiv_dualize}
-  Let $\phi$ be a formula.
-  The formula $\isaAp{\cst{dualize}}{\phi}$ is equivalent to $\neg\phi$.
-\end{lemma}
-
 \begin{lemma}
   \label{thm_is_cnf_Fn}
   Let $n$ be a natural number.
@@ -324,11 +306,6 @@ Because \cref{def_sizef} ignores negations, it always evaluates to a smaller num
   Let $n$ be a natural number.
   $\isaAp{\cstSizef}{F_n} = 8 \cdot n + 1$ and
   $\left|F_n\right| = 10 \cdot n + 2$.
-\end{lemma}
-
-\begin{lemma}
-  Let $\phi$ be a formula in negative normal form.
-  $\isaAp{\cstSizef}{(\isaAp{\cst{dualize}}{\phi})} = \isaAp{\cstSizef}{\phi}$.
 \end{lemma}
 
 \begin{lemma}
@@ -347,9 +324,8 @@ Because \cref{def_sizef} ignores negations, it always evaluates to a smaller num
 \section{CNF to DNF (MDS)}
 \label{sec_CNF_to_DNF}
 
-Our formalization splits the paper proof of \cref{dnfblowup} in a \lcnamecref{thm_cnf_to_dnf_blowup}, which assumes the existence of formulas with specific shapes and properties, and a \lcnamecref{thm_cnf_to_dnf_blowup_math}, which proves that such formulas can always be obtained.
+Our formalization splits the paper proof of \cref{dnfblowup} in a low-level \lcnamecref{thm_cnf_to_dnf_blowup}, which assumes the existence of formulas with specific shapes and properties, and a \lcnamecref{thm_cnf_to_dnf_blowup_math}, which proves that such formulas can always be obtained.
 We start by proving a few basic properties of conjunctive formulas w.r.t.\ valuations.
-We present the most interesting ones here and refer the reader to the formalization for more details.
 
 We first prove a monotonicity property of satisfiability w.r.t. valuations.
 
@@ -443,17 +419,41 @@ We now prove that such equivalent formulas do exist and that the exponential blo
 
 We claim that \cref{thm_cnf_to_dnf_blowup_math} is a formalization of the paper proof of \cref{dnfblowup}.
 
+
 \section{DNF to CNF (MDS)}
 \label{sec_DNF_to_CNF}
 
+Our formalization splits the paper proof of \cref{cnfblowup} again in a low-level \lcnamecref{thm_dnf_to_cnf_blowup}, which assumes the existence of formulas with specific shapes and properties, and a \lcnamecref{thm_dnf_to_cnf_blowup_math}, which proves that such formulas can always be obtained.
+We start by defining a function to produce the dual of a formula and proving a few basic properties.
+
+\begin{definitionx}
+  \label{def_dualize}
+  The function $\tyAnnot{\cst{dualize}}{\tyFormula{\yA} \Rightarrow \tyFormula{\yA}}$ converts a formula to its dualized form by replacing each literal with its complementary:
+  an atom $A$ becomes $\neg A$,
+  falsehood $\bot$ becomes $\neg\bot$,
+  a negation $\neg \phi$ becomes $\phi$,
+  a disjunction $\phi \lor \psi$ becomes $\isaAp{\cst{dualize}}{\phi} \land \isaAp{\cst{dualize}}{\psi}$,
+  a conjunction $\phi \land \psi$ becomes $\isaAp{\cst{dualize}}{\phi} \lor \isaAp{\cst{dualize}}{\psi}$, and
+  an implication $\phi \rightarrow \psi$ becomes $\phi \land \isaAp{\cst{dualize}}{\psi}$.
+\end{definitionx}
+
+The semantics of the dual of a formula is the exact opposite of that of the original formula.
+
 \begin{lemma}
-	\label{aux_lemma_cor5_step1}
-	Let $\phi$ be a formula.
-	If $\phi$ is in negation normal form,
-	then $\isaAp{\cstSizef}{(\isaAp{\cst{dualize}}{\phi})} = \isaAp{\cstSizef}{\phi}$ holds.
+  \label{thm_equiv_dualize}
+  Let $\phi$ be a formula.
+  The formula $\isaAp{\cst{dualize}}{\phi}$ is equivalent to $\neg\phi$.
 \end{lemma}
 
-\Cref{aux_lemma_cor5_step1} only holds because \cref{def_sizef} ignores negations.
+Because the $\cstSizef$ function ignores negations, the $\cst{dualize}$ function preserves the size of the original formula.
+
+\begin{lemma}
+	\label{aux_lemma_cor5_step1}
+  Let $\phi$ be a formula.
+  $\isaAp{\cstSizef}{(\isaAp{\cst{dualize}}{\phi})} = \isaAp{\cstSizef}{\phi}$.
+\end{lemma}
+
+Next, we prove some sufficient condition for a dualized formula to be satisfiable.
 
 \begin{lemma}
   \label{thm_dualized_disj_not_taut_impl_sat}
@@ -461,6 +461,8 @@ We claim that \cref{thm_cnf_to_dnf_blowup_math} is a formalization of the paper 
 	If $\phi$ is disjunctive and not tautological,
 	then $\isaAp{\cst{dualize}}{\phi}$ is satisfiable.
 \end{lemma}
+
+Next, we prove that the dual of some specific formulas in disjunctive normal form are in conjunctive normal form.
 
 \begin{lemma}
   \label{thm_dualized_conj_of_disjs_is_disj_of_conjs}
@@ -472,6 +474,8 @@ We claim that \cref{thm_cnf_to_dnf_blowup_math} is a formalization of the paper 
   We prove this by structural induction over the list $Cs$ using \cref{thm_dualized_disj_not_taut_impl_sat}.
   The idea is that each element of $Cs$ gets dualized.
 \end{proof}
+
+We can now prove that some specific formulas equivalent to the dual of $F_n$ (see \cref{def_Fn}) have a size exponential in $n$.
 
 \begin{proposition}
   \label{thm_dnf_to_cnf_blowup}
@@ -492,6 +496,9 @@ We claim that \cref{thm_cnf_to_dnf_blowup_math} is a formalization of the paper 
   \textbf{(5)}~The result of step 1 contradicts the result of step 4, completing the proof.
 \end{proof}
 
+\Cref{thm_dnf_to_cnf_blowup} assumes the existence of two equivalent formulas $\isaAp{\cst{dualize}}{F_n}$ (in disjunctive normal form) and $\bigwedge_{i = 0}^{\listLength{Cs}} \listNth{Cs}{i}$ (in conjunctive normal form) and proves a lower bound on the size of the later.
+We now prove that such equivalent formulas do exist and that the exponential blowup holds for all of them.
+
 \begin{theorem}[Exponential Blowup from DNF to CNF]
   \label{thm_dnf_to_cnf_blowup_math}
   Let $n$ be a natural number.
@@ -500,6 +507,8 @@ We claim that \cref{thm_cnf_to_dnf_blowup_math} is a formalization of the paper 
 \begin{proof}
   The proof is analogous to the proof of \cref{thm_cnf_to_dnf_blowup_math}.
 \end{proof}
+
+We claim that \cref{thm_dnf_to_cnf_blowup_math} is a formalization of the paper proof of \cref{cnfblowup}.
 
 \section{Discussion}
 \label{sec_discussion}
