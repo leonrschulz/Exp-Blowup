@@ -175,7 +175,7 @@ In particular, $G_n$ has at least $2^n$ many terms.
 \section{Preliminaries}
 \label{sec_preliminaries}
 
-A \emph{formula} is inductively defined as either an atom, falsehood ($\bot$), the negation of a formula, or the disjunction, conjunction or implication of two formulas.
+A \emph{formula} is inductively defined as either an atom, falsehood ($\bot$), the negation ($\neg$) of a formula, or the disjunction ($\lor$), conjunction ($\land$) or implication ($\rightarrow$) of two formulas.
 A \emph{literal} is a special case of a formula consisting of either a positive or negative atom, or a positive or negative $\bot$.
 Basic operations on formulas and related lemmas are expressed for any atom type.
 However, our main theorems instantiate the atom type with variables $x_{i,b}$, where $i$ is a natural number and $b$ is a Boolean value.
@@ -255,20 +255,20 @@ Because \cref{def_sizef} ignores negations, it always evaluates to a smaller num
 
 \begin{definitionx}
   \label{def_dualize}
-  %TODO: tune spacing around type parameters here.
   %TODO: be consistent with abbreviations: Either always abbreviated or never
-  The function $\tyAnnot{\cst{dualize}}{\tyFormula{\yA} \Rightarrow \tyFormula{\yA}}$ converts a formula in negation normal form to its dualized form by replacing each literal with its complementary:
+  The function $\tyAnnot{\cst{dualize}}{\tyFormula{\yA} \Rightarrow \tyFormula{\yA}}$ converts a formula to its dualized form by replacing each literal with its complementary:
   an atom $A$ becomes $\neg A$,
-  $\bot$ becomes $\neg\bot$,
+  falsehood $\bot$ becomes $\neg\bot$,
   a negation $\neg \phi$ becomes $\phi$,
-  $\phi \lor \psi$ becomes $\isaAp{\cst{dualize}}{\phi} \land \isaAp{\cst{dualize}}{\psi}$, and
-  $\phi \land \psi$ becomes $\isaAp{\cst{dualize}}{\phi} \lor \isaAp{\cst{dualize}}{\psi}$.
+  a disjunction $\phi \lor \psi$ becomes $\isaAp{\cst{dualize}}{\phi} \land \isaAp{\cst{dualize}}{\psi}$,
+  a conjunction $\phi \land \psi$ becomes $\isaAp{\cst{dualize}}{\phi} \lor \isaAp{\cst{dualize}}{\psi}$, and
+  an implication $\phi \rightarrow \psi$ becomes $\phi \land \isaAp{\cst{dualize}}{\psi}$.
 \end{definitionx}
 
 \begin{lemma}
-  \label{thm_equiv_dualize}
+  \label{thm_equiv_dualize_is_dnf_dualize}
   Let $\phi$ be a formula.
-  If $\phi$ is in negation normal form, then $\isaAp{\cst{dualize}}{\phi}$ is equivalent to $\neg\phi$.
+  The formula $\isaAp{\cst{dualize}}{\phi}$ is in disjunctive normal form and equivalent to $\neg\phi$.
 \end{lemma}
 
 \begin{lemma}
@@ -444,7 +444,7 @@ We claim that \cref{thm_cnf_to_dnf_blowup_math} is a formalization of the paper 
   We prove this by contradiction using \cref{thm_cnf_to_dnf_blowup}.
   We assume $\isaAp{\cstSizef}{G} < n \cdot 2^n$ and from that derive false in five steps.
   \textbf{(1)}~First, we know from \cref{aux_lemma_cor5_step1} that $\isaAp{\cstSizef}{(\isaAp{\cst{dualize}}{G})} = \isaAp{\cstSizef}{G}$, thus $\isaAp{\cstSizef}{(\isaAp{\cst{dualize}}{G})} < n \cdot 2^n$.
-  \textbf{(2)}~Moreover, we show that $\isaAp{\cst{dualize}}{G}$ is equivalent to $F_n$ using, among others, \cref{thm_equiv_dualize}.
+  \textbf{(2)}~Moreover, we show that $\isaAp{\cst{dualize}}{G}$ is equivalent to $F_n$ using, among others, \cref{thm_equiv_dualize_is_dnf_dualize}.
   \textbf{(3)}~Also, we prove using \cref{thm_dualized_conj_of_disjs_is_disj_of_conjs} that there exists a list $Ts$, where every formula contained in $Ts$ is both conjunctive and satisfiable, such that $\isaAp{\cst{dualize}}{G}$ is syntactically equal to $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$.
   \textbf{(4)}~From steps 2 and 3, it follows that \cref{thm_cnf_to_dnf_blowup} holds for $F_n$ and $\isaAp{\cst{dualize}}{G}$.
   According to \cref{thm_cnf_to_dnf_blowup}, it therefore must be the case that $\isaAp{\cstSizef}{(\isaAp{\cst{dualize}}{G})} \ge n \cdot 2^n$.

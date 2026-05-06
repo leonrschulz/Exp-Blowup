@@ -527,24 +527,25 @@ fun dualize :: "'a formula \<Rightarrow> 'a formula" where
   "dualize (Atom v) = Not (Atom v)" |
   "dualize (Not v) = v" |
   "dualize (And F G) = Or (dualize F) (dualize G)" |
-  "dualize (Or F G) = And (dualize F) (dualize G)"
+  "dualize (Or F G) = And (dualize F) (dualize G)" |
+  "dualize (Imp F G) = And F (dualize G)"
 
 lemma sizef_dualized_Fn: "sizef (dualize (Fn n)) = 8 * n + 1"
-  by (induction n) auto
+  by (induction n) simp_all
 
 lemma size_dualized_Fn: "size (dualize (Fn n)) = 10 * n + 1"
-  by (induction n) auto
+  by (induction n) simp_all
 
 lemma dualized_Fn_in_dnf: "is_dnf (dualize (Fn n))"
-  by(induction n; auto)
+  by (induction n) simp_all
 
-lemma sizef_dualize: "is_nnf F \<Longrightarrow> sizef (dualize F) = sizef F"
-  by (induction F; simp)
+lemma sizef_dualize: "sizef (dualize F) = sizef F"
+  by (induction F) simp_all
 
-lemma size_dualize_le: "is_nnf F \<Longrightarrow> size (dualize F) \<le> 2 * size F"
-  by (induction F; simp)
+lemma size_dualize_le: "size (dualize F) \<le> 2 * size F"
+  by (induction F) simp_all
 
-lemma equiv_dualize: "is_nnf F \<Longrightarrow> equiv (dualize F) (Not F)"
+lemma equiv_dualize: "equiv (dualize F) (Not F)"
   by (induction F) (simp_all add: equiv_def)
 
 lemma dualized_cnf_in_dnf: "is_cnf F \<Longrightarrow> is_dnf (dualize F)"
@@ -1050,7 +1051,7 @@ proof -
     then have "sizef G < n*2^n"
       by presburger
     then have "sizef (dualize G) < n*2^n"
-      using sizef_dualize[OF G_in_nnf] by presburger
+      using sizef_dualize[of G] by presburger
 
     obtain Ts where
       "dualize G = BigOr' Ts" "\<forall>T\<in>set Ts. is_conj T \<and> (\<exists> Val. Val \<Turnstile> T)"
@@ -1059,13 +1060,13 @@ proof -
     moreover have "equiv (Fn n) (dualize G)"
     proof -
       have "equiv (dualize G) (Not G)"
-        using equiv_dualize[OF G_in_nnf] .
+        using equiv_dualize .
       also have "equiv \<dots> (Not (dualize (Fn n)))"
         unfolding equiv_Not_left_Not_right
         using equiv_Fprime_G[symmetric, unfolded Fprime_def] .
       also have "equiv \<dots> (Not (Not (Fn n)))"
         unfolding equiv_Not_left_Not_right
-        using equiv_dualize[OF is_nnf_Fn] .
+        using equiv_dualize .
       also have "equiv \<dots> (Fn n)"
         unfolding equiv_Not_Not_left
         using equiv_reflexive .
