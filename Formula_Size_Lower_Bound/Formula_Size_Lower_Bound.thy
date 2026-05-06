@@ -1037,7 +1037,7 @@ proof -
   have size_Fprime: "sizef Fprime = 8*n+1" 
     using def_Fprime by (simp add: sizef_dualized_Fn)
   have Fprime_in_dnf: "is_dnf Fprime" 
-    by (simp add: def_Fprime is_dnf_dualize)
+    by (simp add: def_Fprime is_dnf_dualize_Fn)
   have G_in_cnf: "is_cnf G" 
     using def_G is_cnf_BigAnd' by auto
   have G_in_nnf: "is_nnf G" 
@@ -1123,7 +1123,7 @@ lemma corollary5':
 proof (cases n)
   case 0
   then show ?thesis
-    using is_dnf_dualize size_dualized_Fn
+    using is_dnf_dualize_Fn size_dualized_Fn
     by fastforce
 next
   case (Suc n')
@@ -1134,7 +1134,7 @@ next
   show ?thesis
   proof (intro exI conjI allI impI)
     show "is_dnf (dualize (Fn n))"
-      using is_dnf_dualize .
+      using is_dnf_dualize_Fn .
   next
     show "size (dualize (Fn n)) = 10 * n + 1"
       using size_dualized_Fn .
