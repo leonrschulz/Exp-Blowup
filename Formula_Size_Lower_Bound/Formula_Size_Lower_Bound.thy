@@ -77,6 +77,15 @@ lemma equiv_symmetric[sym]: "\<And>\<phi> \<psi>. equiv \<phi> \<psi> \<Longrigh
 lemma equiv_transitive[trans]: "\<And>\<xi> \<phi> \<psi>. equiv \<xi> \<phi> \<Longrightarrow> equiv \<phi> \<psi> \<Longrightarrow> equiv \<xi> \<psi>"
   unfolding equiv_def by simp
 
+lemma equiv_Not_left_Not_right[simp]: "\<And>\<phi> \<psi>. equiv (Not \<phi>) (Not \<psi>) \<longleftrightarrow> equiv \<phi> \<psi>"
+  unfolding equiv_def by simp_all
+
+lemma equiv_Not_Not_left[simp]: "\<And>\<phi> \<psi>. equiv (Not (Not \<phi>)) \<psi> \<longleftrightarrow> equiv \<phi> \<psi>"
+  unfolding equiv_def by simp_all
+
+lemma equiv_Not_Not_right[simp]: "\<And>\<phi> \<psi>. equiv \<phi> (Not (Not \<psi>)) \<longleftrightarrow> equiv \<phi> \<psi>"
+  unfolding equiv_def by simp_all
+
 
 subsection \<open>Conjunctive Normal Form\<close>
 
@@ -217,6 +226,9 @@ fun sizef :: "'a formula \<Rightarrow> nat" where
 
 lemma Suc_0_le_sizef[simp]: "Suc 0 \<le> sizef F"
   by (induction F) simp_all
+
+lemma sizef_le_size: "sizef \<phi> \<le> size \<phi>"
+  by (induction \<phi>) simp_all
 
 lemma card_atoms_le_sizef: "card (atoms F) \<le> sizef F"
 proof (induction F)
@@ -448,14 +460,17 @@ fun Fn :: "nat \<Rightarrow> var formula" where
           (Not (Atom (Var (Suc n) True)))))
     (Fn n)"
 
-lemma size_Fn: "sizef (Fn n) = 8*n+1"
+lemma sizef_Fn: "sizef (Fn n) = 8 * n + 1"
+  by (induction n) auto
+
+lemma size_Fn: "size (Fn n) = 10 * n + 2"
+  by (induction n) auto
+
+lemma is_cnf_Fn: "is_cnf (Fn n)"
   by (induction n; auto)
 
-lemma Fn_in_cnf: "is_cnf (Fn n)"
-  by (induction n; auto)
-
-lemma Fn_in_nnf: "is_nnf (Fn n)"
-  using Fn_in_cnf[THEN cnf_in_nnf] .
+lemma is_nnf_Fn: "is_nnf (Fn n)"
+  using is_cnf_Fn[THEN cnf_in_nnf] .
 
 lemma Fn_sat: "\<exists>Val. Val \<Turnstile> Fn n"
 proof -
@@ -504,26 +519,31 @@ qed
 
 
 subsection \<open>Dualize Function\<close>
-                                         
-text \<open>Should only be applied to a formula for which @{const is_nnf} holds.\<close>
 
-fun dualize :: "'a formula \<Rightarrow> 'a formula" where
+primrec dualize :: "'a formula \<Rightarrow> 'a formula" where
   "dualize Bot = Not Bot" |
   "dualize (Atom v) = Not (Atom v)" |
   "dualize (Not v) = v" |
   "dualize (And F G) = Or (dualize F) (dualize G)" |
-  "dualize (Or F G) = And (dualize F) (dualize G)"
+  "dualize (Or F G) = And (dualize F) (dualize G)" |
+  "dualize (Imp F G) = And F (dualize G)"
 
-lemma size_dualized_Fn: "sizef (dualize (Fn n)) = 8 * n + 1" 
-  by(induction n; auto)
+lemma sizef_dualized_Fn: "sizef (dualize (Fn n)) = 8 * n + 1"
+  by (induction n) simp_all
 
-lemma dualized_Fn_in_dnf: "is_dnf (dualize (Fn n))"
-  by(induction n; auto)
+lemma size_dualized_Fn: "size (dualize (Fn n)) = 10 * n + 1"
+  by (induction n) simp_all
 
-lemma size_ident_dualize[simp]: "is_nnf F \<Longrightarrow> sizef (dualize F) = sizef F"
-  by (induction F; simp)
+lemma is_dnf_dualize_Fn: "is_dnf (dualize (Fn n))"
+  by (induction n) simp_all
 
-lemma equiv_dualize: "is_nnf F \<Longrightarrow> equiv (dualize F) (Not F)"
+lemma sizef_dualize: "sizef (dualize F) = sizef F"
+  by (induction F) simp_all
+
+lemma size_dualize_le: "size (dualize F) \<le> 2 * size F"
+  by (induction F) simp_all
+
+lemma equiv_dualize: "equiv (dualize F) (Not F)"
   by (induction F) (simp_all add: equiv_def)
 
 lemma dualized_cnf_in_dnf: "is_cnf F \<Longrightarrow> is_dnf (dualize F)"
@@ -733,9 +753,9 @@ proof -
   note def_F = F_def
   note def_G = G_def G_spec
   have size_F: "sizef F = 8*n+1" 
-    using def_F by (simp add: size_Fn)
+    using def_F by (simp add: sizef_Fn)
   have in_cnf_F: "is_cnf F" 
-    using def_F by (simp add: Fn_in_cnf)
+    using def_F by (simp add: is_cnf_Fn)
   have in_dnf_G: "is_dnf G" 
     using def_G is_dnf_BigOr' by auto
 
@@ -958,12 +978,12 @@ lemma proposition4':
   fixes n :: nat
   shows "\<exists>(F\<^sub>n :: var formula).
     is_cnf F\<^sub>n \<and>
-    sizef F\<^sub>n = 8 * n + 1 \<and>
-    (\<forall>(G\<^sub>n :: var formula). equiv F\<^sub>n G\<^sub>n \<longrightarrow> is_dnf G\<^sub>n \<longrightarrow> sizef G\<^sub>n \<ge> n * 2 ^ n)"
+    size F\<^sub>n = 10 * n + 2 \<and>
+    (\<forall>(G\<^sub>n :: var formula). equiv F\<^sub>n G\<^sub>n \<longrightarrow> is_dnf G\<^sub>n \<longrightarrow> size G\<^sub>n \<ge> n * 2 ^ n)"
 proof (cases n)
   case 0
   then show ?thesis
-    using Fn_in_cnf size_Fn by fastforce
+    using is_cnf_Fn size_Fn by fastforce
 next
   case (Suc n')
 
@@ -973,9 +993,9 @@ next
   show ?thesis
   proof (intro exI conjI allI impI)
     show "is_cnf (Fn n)"
-      using Fn_in_cnf .
+      using is_cnf_Fn .
   next
-    show "sizef (Fn n) = 8 * n + 1"
+    show "size (Fn n) = 10 * n + 2"
       using size_Fn .
   next
     fix G\<^sub>n :: "var formula"
@@ -995,8 +1015,8 @@ next
     ultimately have "n * 2 ^ n \<le> sizef (BigOr' Ts)"
       using proposition4[OF \<open>0 < n\<close>, of Ts] by metis
 
-    then show "n * 2 ^ n \<le> sizef G\<^sub>n"
-      using sizef by presburger
+    then show "n * 2 ^ n \<le> size G\<^sub>n"
+      using sizef sizef_le_size[of G\<^sub>n] by presburger
   qed
 qed
 
@@ -1015,41 +1035,47 @@ proof -
   note def_Fprime = Fprime_def
   note def_G = G_def G_spec
   have size_Fprime: "sizef Fprime = 8*n+1" 
-    using def_Fprime by (simp add: size_dualized_Fn)
+    using def_Fprime by (simp add: sizef_dualized_Fn)
   have Fprime_in_dnf: "is_dnf Fprime" 
-    by (simp add: def_Fprime dualized_Fn_in_dnf)
+    by (simp add: def_Fprime is_dnf_dualize)
   have G_in_cnf: "is_cnf G" 
     using def_G is_cnf_BigAnd' by auto
   have G_in_nnf: "is_nnf G" 
     using G_in_cnf cnf_in_nnf by auto
+
   show ?thesis
   proof (rule ccontr)
     assume "\<not> n*2^n \<le> sizef G"
-    then have "sizef G < n*2^n" 
-      by simp
-    then have dualized_G_exp_size: "sizef (dualize G) < n*2^n" 
-      using G_in_nnf by (simp add: size_ident_dualize)
-    have "equiv (dualize G) (Fn n)"
+    then have "sizef G < n*2^n"
+      by presburger
+    then have "sizef (dualize G) < n*2^n"
+      using sizef_dualize[of G] by presburger
+
+    obtain Ts where
+      "dualize G = BigOr' Ts" "\<forall>T\<in>set Ts. is_conj T \<and> (\<exists> Val. Val \<Turnstile> T)"
+      using def_G dualized_conj_of_disjs_is_disj_of_conjs by metis
+
+    moreover have "equiv (Fn n) (dualize G)"
     proof -
-      have "equiv G Fprime" 
-        using equiv_Fprime_G equiv_def by blast
-      then have "equiv G (dualize (Fn n))" 
-        by (simp add: def_Fprime)
-      also have "equiv \<dots> (Not (Fn n))"
-        using equiv_dualize[OF Fn_in_nnf] .
-      finally have "equiv G (Not (Fn n))" .
-      then have "equiv (Not G) (Fn n)" 
-        by (simp add: equiv_def)
-      then show ?thesis 
-        using G_in_nnf equiv_dualize equiv_def by meson
+      have "equiv (dualize G) (Not G)"
+        using equiv_dualize .
+      also have "equiv \<dots> (Not (dualize (Fn n)))"
+        unfolding equiv_Not_left_Not_right
+        using equiv_Fprime_G[symmetric, unfolded Fprime_def] .
+      also have "equiv \<dots> (Not (Not (Fn n)))"
+        unfolding equiv_Not_left_Not_right
+        using equiv_dualize .
+      also have "equiv \<dots> (Fn n)"
+        unfolding equiv_Not_Not_left
+        using equiv_reflexive .
+      finally show ?thesis
+        by (rule equiv_symmetric)
     qed
-    have dualized_G_disj_of_conj: "\<exists>Ts.
-      (dualize G) = BigOr' Ts \<and> (\<forall>T\<in>set Ts. is_conj T \<and> (\<exists> Val. Val \<Turnstile> T))"
-      using def_G dualized_conj_of_disjs_is_disj_of_conjs by auto
-    show False
-      using proposition4
-      using dualized_G_exp_size \<open>equiv (dualize G) (Fn n)\<close>[symmetric] dualized_G_disj_of_conj
-      by (metis le_antisym n_greater_0 nat_less_le)
+
+    ultimately have "n * 2 ^ n \<le> sizef (dualize G)"
+      using proposition4[of n Ts] by force
+    then show False
+      using \<open>sizef (dualize G) < n*2^n\<close> by presburger
   qed
 qed
 
@@ -1092,12 +1118,12 @@ lemma corollary5':
   fixes n :: nat
   shows "\<exists>(F\<^sub>n :: var formula).
     is_dnf F\<^sub>n \<and>
-    sizef F\<^sub>n = 8 * n + 1 \<and>
-    (\<forall>(G\<^sub>n :: var formula). equiv F\<^sub>n G\<^sub>n \<longrightarrow> is_cnf G\<^sub>n \<longrightarrow> sizef G\<^sub>n \<ge> n * 2 ^ n)"
+    size F\<^sub>n = 10 * n + 1 \<and>
+    (\<forall>(G\<^sub>n :: var formula). equiv F\<^sub>n G\<^sub>n \<longrightarrow> is_cnf G\<^sub>n \<longrightarrow> size G\<^sub>n \<ge> n * 2 ^ n)"
 proof (cases n)
   case 0
   then show ?thesis
-    using dualized_Fn_in_dnf size_dualized_Fn
+    using is_dnf_dualize size_dualized_Fn
     by fastforce
 next
   case (Suc n')
@@ -1108,9 +1134,9 @@ next
   show ?thesis
   proof (intro exI conjI allI impI)
     show "is_dnf (dualize (Fn n))"
-      using dualized_Fn_in_dnf .
+      using is_dnf_dualize .
   next
-    show "sizef (dualize (Fn n)) = 8 * n + 1"
+    show "size (dualize (Fn n)) = 10 * n + 1"
       using size_dualized_Fn .
   next
     fix G\<^sub>n :: "var formula"
@@ -1130,8 +1156,8 @@ next
     ultimately have "n * 2 ^ n \<le> sizef (BigAnd' Cs)"
       using corollary5[OF \<open>0 < n\<close>, of Cs] by metis
 
-    then show "n * 2 ^ n \<le> sizef G\<^sub>n"
-      using sizef by presburger
+    then show "n * 2 ^ n \<le> size G\<^sub>n"
+      using sizef sizef_le_size[of G\<^sub>n] by presburger
   qed
 qed
 

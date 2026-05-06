@@ -176,7 +176,7 @@ In particular, $G_n$ has at least $2^n$ many terms.
 \section{Preliminaries}
 \label{sec_preliminaries}
 
-A \emph{formula} is inductively defined as either an atom, falsehood ($\bot$), the negation of a formula, or the disjunction, conjunction or implication of two formulas.
+A \emph{formula} is inductively defined as either an atom, falsehood ($\bot$), the negation ($\neg$) of a formula, or the disjunction ($\lor$), conjunction ($\land$) or implication ($\rightarrow$) of two formulas.
 A \emph{literal} is a special case of a formula consisting of either a positive or negative atom, or a positive or negative $\bot$.
 Basic operations on formulas and related lemmas are expressed for any atom type.
 However, our main theorems instantiate the atom type with variables $x_{i,b}$, where $i$ is a natural number and $b$ is a Boolean value.
@@ -197,17 +197,32 @@ Two formulas $\phi$ and $\psi$ are \emph{equivalent} if they have the same truth
 \end{definitionx}
 
 \begin{definitionx}
+  \label{def_size}
+  The function $\tyAnnot{\cstSize}{\tyFormula{\yA} \Rightarrow \tyNat}$ counts the number of atoms, $\bot$, negations, disjunctions, conjunctions, and implications in a formula.
+  In the rest of this paper, we write $|\phi|$ for $\isaAp{\cstSize}{\phi}$.
+\end{definitionx}
+
+\begin{definitionx}
   \label{def_sizef}
   The function $\tyAnnot{\cstSizef}{\tyFormula{\yA} \Rightarrow \tyNat}$ counts the number of atoms, $\bot$, disjunctions, conjunctions, and implications in a formula;
   the negations are ignored.
 \end{definitionx}
+
+Because \cref{def_sizef} ignores negations, it always evaluates to a smaller number than \cref{def_size}.
+\begin{lemma}
+  \label{thm_sizef_le_size}
+  Let $\phi$ be a formula.
+  $\isaAp{\cstSizef}{\phi} \le \left|\phi\right|$.
+\end{lemma}
+%TODO: explain why we use sizef and not size.
 
 \begin{definitionx}
   \label{def_BigOr_BigAnd}
   The functions
   $\tyAnnot{\cst{BigAnd'}}{\tyList{\tyFormula{\yA}} \Rightarrow \tyFormula{\yA}}$ and
   $\tyAnnot{\cst{BigOr'}}{\tyList{\tyFormula{\yA}} \Rightarrow \tyFormula{\yA}}$ respectively
-  build the conjunction and disjunction of all formulas in a list:
+  build the conjunction and disjunction of all formulas in a list:%
+  \footnote{The infix operatior $\listCons{x}{xs}$ adds an element $x$ at the front of a list $xs$.}
   \begin{align*}
     \isaAp{\cst{BigAnd'}}{[]} =\; & \neg\bot &
     \isaAp{\cst{BigOr'}}{[]} =\; & \bot \\
@@ -241,25 +256,62 @@ Two formulas $\phi$ and $\psi$ are \emph{equivalent} if they have the same truth
 
 \begin{definitionx}
   \label{def_dualize}
-  %TODO: tune spacing around type parameters here.
   %TODO: be consistent with abbreviations: Either always abbreviated or never
-  The function $\tyAnnot{\cst{dualize}}{\tyFormula{\yA} \Rightarrow \tyFormula{\yA}}$ converts a formula in negation normal form to its dualized form by replacing each literal with its complementary:
+  The function $\tyAnnot{\cst{dualize}}{\tyFormula{\yA} \Rightarrow \tyFormula{\yA}}$ converts a formula to its dualized form by replacing each literal with its complementary:
   an atom $A$ becomes $\neg A$,
-  $\bot$ becomes $\neg\bot$,
+  falsehood $\bot$ becomes $\neg\bot$,
   a negation $\neg \phi$ becomes $\phi$,
-  $\phi \lor \psi$ becomes $\isaAp{\cst{dualize}}{\phi} \land \isaAp{\cst{dualize}}{\psi}$, and
-  $\phi \land \psi$ becomes $\isaAp{\cst{dualize}}{\phi} \lor \isaAp{\cst{dualize}}{\psi}$.
+  a disjunction $\phi \lor \psi$ becomes $\isaAp{\cst{dualize}}{\phi} \land \isaAp{\cst{dualize}}{\psi}$,
+  a conjunction $\phi \land \psi$ becomes $\isaAp{\cst{dualize}}{\phi} \lor \isaAp{\cst{dualize}}{\psi}$, and
+  an implication $\phi \rightarrow \psi$ becomes $\phi \land \isaAp{\cst{dualize}}{\psi}$.
 \end{definitionx}
 
 \begin{lemma}
   \label{thm_equiv_dualize}
   Let $\phi$ be a formula.
-  If $\phi$ is in negation normal form, then $\isaAp{\cst{dualize}}{\phi}$ is equivalent to $\neg\phi$.
+  The formula $\isaAp{\cst{dualize}}{\phi}$ is equivalent to $\neg\phi$.
+\end{lemma}
+
+\begin{lemma}
+  \label{thm_is_cnf_Fn}
+  Let $n$ be a natural number.
+  The formula $F_n$ is in conjunctive normal form and
+  the formula $\isaAp{\cst{dualize}}{F_n}$ is in disjunctive normal form.
+\end{lemma}
+
+\begin{lemma}
+  \label{thm_sizef_Fn}
+  Let $n$ be a natural number.
+  $\isaAp{\cstSizef}{F_n} = 8 \cdot n + 1$ and
+  $\left|F_n\right| = 10 \cdot n + 2$.
+\end{lemma}
+
+\begin{lemma}
+  Let $\phi$ be a formula in negative normal form.
+  $\isaAp{\cstSizef}{(\isaAp{\cst{dualize}}{\phi})} = \isaAp{\cstSizef}{\phi}$.
+\end{lemma}
+
+\begin{lemma}
+	\label{thm_sizef_BigAnd_uncnf}
+	Let $\phi$ be a formula in conjunctive normal form.
+	$\isaAp{\cstSizef}{(\bigwedge_{i = 0}^{\listLength{\isaAp{\cst{uncnf}}{\phi}}} \listNth{(\isaAp{\cst{uncnf}}{\phi})}{i})} = \isaAp{\cstSizef}{\phi}$.
+\end{lemma}
+
+\begin{lemma}
+  \label{thm_sizef_BigOr_undnf}
+  Let $\phi$ be a formula in disjunctive normal form.
+  $\isaAp{\cstSizef}{(\bigvee_{i = 0}^{\listLength{\isaAp{\cst{undnf}}{\phi}}} \listNth{(\isaAp{\cst{undnf}}{\phi})}{i})} = \isaAp{\cstSizef}{\phi}$.
 \end{lemma}
 
 
 \section{CNF to DNF (MDS)}
 \label{sec_CNF_to_DNF}
+
+Our formalization splits the paper proof of \cref{dnfblowup} in a \lcnamecref{thm_cnf_to_dnf_blowup}, which assumes the existence of formulas with specific shapes and properties, and a \lcnamecref{thm_cnf_to_dnf_blowup_math}, which proves that such formulas can always be obtained.
+We start by proving a few basic properties of conjunctive formulas w.r.t.\ valuations.
+We present the most interesting ones here and refer the reader to the formalization for more details.
+
+We first prove a monotonicity property of satisfiability w.r.t. valuations.
 
 \begin{lemma}
   \label{aux_lemma_prop4_step1}
@@ -269,6 +321,8 @@ Two formulas $\phi$ and $\psi$ are \emph{equivalent} if they have the same truth
   if $\alpha$ satisfies $\phi$,
   then $\beta$ also satisfies $\phi$.
 \end{lemma}
+
+Next, we prove some sufficient conditions for a valuation to not satisfy a conjunctive formula.
 
 \begin{lemma}
   \label{aux_lemma_prop4_step3}
@@ -281,6 +335,19 @@ Two formulas $\phi$ and $\psi$ are \emph{equivalent} if they have the same truth
   \end{itemize}
   then $\alpha$ does not satisfy $\phi$.
 \end{lemma}
+
+Next, we prove a lower bound of the size of $\bigvee_{i=0}^{\listLength{\phi{}s}} \listNth{\phi{}s}{i}$.
+
+\begin{lemma}
+  \label{thm_exp_size}
+  Let $n > 0$ be a natural number.
+  Let $\phi{}s$ be a list of formulas.
+  If every $\phi \in \isaAp{\cst{set}}{\phi{}s}$ has $\isaAp{\cstSizef}{\phi} \ge m$ and
+  if $\listLength{\phi{}s} \ge 2^n$,
+  then $\isaAp{\cstSizef}{(\bigvee_{i=0}^{\listLength{\phi{}s}} \listNth{\phi{}s}{i})} \ge m \cdot 2^n$.
+\end{lemma}
+
+We can now prove that some specific formulas equivalent to $F_n$ (see \cref{def_Fn}) have a size exponential in $n$.
 
 %TODO: Ask Johannsen
 \begin{theorem}[Exponential Blowup Transforming $F_n$ to DNF]
@@ -295,42 +362,48 @@ Two formulas $\phi$ and $\psi$ are \emph{equivalent} if they have the same truth
 \begin{proof}
   We proceed with five steps:
   \textbf{(1)}~First, we show that every conjunctive formula $T \in \isaAp{\cst{set}}{Ts}$ contains for all $i \in \{1,\ldots,n\}$ either the variable $x_{i,0}$ or $x_{i,1}$ positively.
-  We prove this step by negation, where we have to derive false for two cases: either the variables $x_{i,0}$ and $x_{i,1}$ are both positively contained in $T$ or they are both not positively contained.
-  In both cases, we proceed by defining a specific valuation that satisfies $G$ but not $F_n$.
-  For instance, in the second case, we modify a valuation that satisfies $T$ by changing the assignment of the variables $x_{i,0}$ and $x_{i,1}$ to false.
+  We prove this step by negation, where we have to derive false for two cases:
+  Either the variables $x_{i,0}$ and $x_{i,1}$ are both positively contained in $T$ or they are both not positively contained.
+  In both cases, we proceed by defining a valuation that satisfies $G$ but not $F_n$.
+  For instance, in the second case, we find a valuation that satisfies $T$ and change the assignment of the variables $x_{i,0}$ and $x_{i,1}$ to false.
   We then show using \cref{aux_lemma_prop4_step1,aux_lemma_prop4_step3} that this modified valuation satisfies $T$ (and thus $G$) but does not satisfy $F_n$.
-  This means that $F_n$ is not equivalent to $G$, which contradicts \cref{thm_cnf_to_dnf_blowup}'s assumption.
+  This means that $F_n$ is not equivalent to $G$, which contradicts the \lcnamecref{thm_cnf_to_dnf_blowup}'s assumption.
   \textbf{(2)}~From step 1, we derive that every $T \in \isaAp{\cst{set}}{Ts}$ has $\isaAp{\cstSizef}{T} \ge n$.
   \textbf{(3)}~Furthermore, we prove that for every Boolean list $\epsilon = [\epsilon_1,\ldots,\epsilon_n]$ there exists a $T \in \isaAp{\cst{set}}{Ts}$ that contains the corresponding variables $x_{1,\epsilon_1},\ldots,x_{n,\epsilon_n}$ positively.
   If this is not the case for a specific list $\epsilon$, we show using step 1 that every $T$ must contain one of the variables $x_{1,\neg\epsilon_1},\ldots,x_{n,\neg\epsilon_n}$ positively.
-  We then define a concrete valuation that maps all variables $x_{i,\epsilon_i}$ to true and $x_{i,\neg\epsilon_i}$ to false for $i \in \{1,\ldots,n\}$.
+  We then define a valuation that maps all variables $x_{i,\epsilon_i}$ to true and $x_{i,\neg\epsilon_i}$ to false for $i \in \{1,\ldots,n\}$.
   We show using \cref{aux_lemma_prop4_step3} that this valuation satisfies $F_n$ but not $G$.
-  This means that $F_n$ is not equivalent to $G$, which contradicts \cref{thm_cnf_to_dnf_blowup}'s assumption.
+  This means that $F_n$ is not equivalent to $G$, which contradicts the \lcnamecref{thm_cnf_to_dnf_blowup}'s assumption.
   \textbf{(4)}~We then prove that the number of Boolean lists of length $n$ is $2^n \le \setCard{\isaAp{\cst{set}}{Ts}} \le \listLength{Ts}$ using steps 1 and 3.
-  \textbf{(5)}~Finally, we show that $\isaAp{\cstSizef}{G} \ge n \cdot 2^n$ by combining the results from steps 2 and 4.
+  \textbf{(5)}~Finally, we show that $\isaAp{\cstSizef}{G} \ge n \cdot 2^n$ by combining the results from steps 2 and 4 to discharge the assumptions of \cref{thm_exp_size}.
 \end{proof}
+
+\Cref{thm_cnf_to_dnf_blowup} assumes the existence of two equivalent formulas $F_n$ (in conjunctive normal form) and $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$ (in disjunctive normal form) and proved bound on the size of the later.
+We now prove that this exponential blowup holds for any equivalent formula in disjunctive normal form.
 
 %TODO: Ask Johannsen
 \begin{corollary}[Exponential Blowup Transforming CNF to DNF]
   \label{thm_cnf_to_dnf_blowup_math}
   Let $n$ be a natural number.
-  There exists a formula $\phi$ in CNF with $\isaAp{\cstSizef}{\phi} = 8 \cdot n + 1$ such that every equivalent formula $\psi$ in DNF has $\isaAp{\cstSizef}{\psi} \ge n \cdot 2^n$.
+  There exists a formula $\phi$ in conjunctive normal form with size $\left|\phi\right| = 10 \cdot n + 2$ such that every equivalent formula $\psi$ in disjunctive normal form has size $\left|\psi\right| \ge n \cdot 2^n$.
 \end{corollary}
 \begin{proof}
   We start by a case analysis on $n$.
   The interesting case is when $n > 0$.
   We define $\phi = F_n$ (see \cref{def_Fn});
-  it is easy to show that $F_n$ is in conjunctive normal form, and that $\isaAp{\cstSizef}{F_n} = 8 \cdot n + 1$.
+  it is easy to show that $F_n$ is in conjunctive normal form (using \cref{thm_is_cnf_Fn}) and that $\left|\phi\right| = 10 \cdot n + 2$ (using \cref{thm_sizef_Fn}).
   To prove the last property, we assume that there is an equivalent formula $\psi$ in disjunctive normal form.
-  We first obtain a list $Ts$ of all terms in $\psi$ such that
+  We first obtain a list $Ts$ (by filtering $\isaAp{\cst{undnf}}{\psi}$) of all terms in $\psi$ such that
   all formulas in $Ts$ are conjunctive and satisfiable,
   %TODO: think whether we could explain the trick with filter and undnf. Maybe extract to its own lemma?
-  $\isaAp{\cstSizef}{\psi} \ge \isaAp{\cstSizef}{(\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i})}$,
+  $\isaAp{\cstSizef}{\psi} \ge \isaAp{\cstSizef}{(\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i})}$ (using \cref{thm_sizef_BigOr_undnf}),
   and $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$ is equivalent to $\psi$.
-  From this last property, we show that $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$ is equivalent to $F_n$.
-  This allows us to prove $\isaAp{\cstSizef}{(\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i})} \ge n \cdot 2^n$ using \cref{thm_cnf_to_dnf_blowup}.
-  Finally, we can prove that $\isaAp{\cstSizef}{\psi} \ge n \cdot 2^n$ by transitivity.
+  From this last equivalence, we show that $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$ is equivalent to $F_n$.
+  This allows us to prove that $\isaAp{\cstSizef}{(\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i})} \ge n \cdot 2^n$ using \cref{thm_cnf_to_dnf_blowup}.
+  We can prove that $\isaAp{\cstSizef}{\psi} \ge n \cdot 2^n$ by transitivity and, finally, that $\left|\psi\right| \ge n \cdot 2^n$ using \cref{thm_sizef_le_size}.
 \end{proof}
+
+We claim that \cref{thm_cnf_to_dnf_blowup_math} is a formalization of the paper proof of \cref{dnfblowup}.
 
 \section{DNF to CNF (MDS)}
 \label{sec_DNF_to_CNF}
@@ -374,7 +447,7 @@ Two formulas $\phi$ and $\psi$ are \emph{equivalent} if they have the same truth
   We prove this by contradiction using \cref{thm_cnf_to_dnf_blowup}.
   We assume $\isaAp{\cstSizef}{G} < n \cdot 2^n$ and from that derive false in five steps.
   \textbf{(1)}~First, we know from \cref{aux_lemma_cor5_step1} that $\isaAp{\cstSizef}{(\isaAp{\cst{dualize}}{G})} = \isaAp{\cstSizef}{G}$, thus $\isaAp{\cstSizef}{(\isaAp{\cst{dualize}}{G})} < n \cdot 2^n$.
-  \textbf{(2)}~Moreover, we show that $\isaAp{\cst{dualize}}{G}$ is equivalent to $F_n$.
+  \textbf{(2)}~Moreover, we show that $\isaAp{\cst{dualize}}{G}$ is equivalent to $F_n$ using, among others, \cref{thm_equiv_dualize}.
   \textbf{(3)}~Also, we prove using \cref{thm_dualized_conj_of_disjs_is_disj_of_conjs} that there exists a list $Ts$, where every formula contained in $Ts$ is both conjunctive and satisfiable, such that $\isaAp{\cst{dualize}}{G}$ is syntactically equal to $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$.
   \textbf{(4)}~From steps 2 and 3, it follows that \cref{thm_cnf_to_dnf_blowup} holds for $F_n$ and $\isaAp{\cst{dualize}}{G}$.
   According to \cref{thm_cnf_to_dnf_blowup}, it therefore must be the case that $\isaAp{\cstSizef}{(\isaAp{\cst{dualize}}{G})} \ge n \cdot 2^n$.
@@ -385,7 +458,7 @@ Two formulas $\phi$ and $\psi$ are \emph{equivalent} if they have the same truth
 \begin{corollary}[Exponential Blowup Transforming DNF to CNF]
   \label{thm_dnf_to_cnf_blowup_math}
   Let $n$ be a natural number.
-  There exists a formula $F_n$ in DNF with $\isaAp{\cstSizef}{F_n} = 8 \cdot n + 1$ such that every equivalent formula $G_n$ in CNF has $\isaAp{\cstSizef}{G_n} \ge n \cdot 2^n$.
+  There exists a formula $\phi$ in disjunctive normal form with size $\left|\phi\right| = 10 \cdot n + 1$ such that every equivalent formula $\psi$ in conjunctive normal form has size $\left|\psi\right| \ge n \cdot 2^n$.
 \end{corollary}
 \begin{proof}
   The proof is analogous to the proof of \cref{thm_cnf_to_dnf_blowup_math}.
@@ -425,16 +498,18 @@ To prove step 2, we introduced a new lemma, inspired by \cref{card_inj_on_le}, t
 	Let $\tyAnnot{f}{\yA \Rightarrow \yB \Rightarrow \yC}$ be a binary function.
 	If $X$ and $Y$ are finite sets, and
 	if for all $x \in X$ there exists a $y$ such that $\isaApAp{f}{x}{y} \in Y$, and
-	if the function $f$ is injective on those pairs of $x$ and $y$,
+	if the function $f$ is injective on all those pairs of $x$ and $y$,
 	then the cardinality of $X$ is less than or equal to the cardinality of $Y$.
 \end{lemma}
 
 We use \cref{card_le_card_if_mem_imp_ex_mem} to prove that every $T \in \isaAp{\cst{set}}{Ts}$ contains at least $n$ atoms and thus that $\isaAp{\cstSizef}{T} \ge n$.
 To do so, we instantiate $X$ with $\{1,\ldots,n\}$, $Y$ with the set of atoms of $T$, and the $f$ with the constructor for variables.
-Finding the correct statement for \cref{card_le_card_if_mem_imp_ex_mem} was challenging but, once found, it was easy to discharge the assumptions using step 1.
+Finding the correct statement for \cref{card_le_card_if_mem_imp_ex_mem} was challenging but, once found, it was easy to discharge the assumptions using step 1.\\
 
 %TODO (LRS): add a paragraph to explain why we defined our own version of BigAnd' and BigOr' instead of reusing BigAnd and BigOr from "Tobias Nipkow's formalization" Propositional_Proof_Systems.
 %Hint: this was necessary to prove the sizef equality of lemma sizef_BigOr'_undnf and analogously for BigAnd'.
+
+Moreover, it was necessary to modify the functions \textsf{BigAnd} and \textsf{BigOr} from \cite{Propositional_Proof_Systems-AFP} and to define our own versions in \cref{def_BigOr_BigAnd}, where the base cases are handled differently. Our functions therefore avoid appending $\lnot\bot$ and $\bot$ to the produced formula. This way we were able to prove the size equality in \cref{thm_sizef_BigAnd_uncnf} and \cref{thm_sizef_BigOr_undnf} instead of having the left-hand side of the lemmas be slightly smaller than the right-hand side. Using the original functions would be possible but it would result in \cref{thm_cnf_to_dnf_blowup_math} and \cref{thm_dnf_to_cnf_blowup_math} stating that the formula size is greater than or equal to $n \cdot 2^n - 2$ instead of $n \cdot 2^n$. To keep the corollaries as close as possible to their mathematical counterparts we therefore chose to introduce the functions \textsf{BigAnd'} and \textsf{BigOr'}.
 
 \section{Conclusion}
 \label{sec_concl}
