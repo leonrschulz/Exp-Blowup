@@ -519,10 +519,8 @@ qed
 
 
 subsection \<open>Dualize Function\<close>
-                                         
-text \<open>Should only be applied to a formula for which @{const is_nnf} holds.\<close>
 
-fun dualize :: "'a formula \<Rightarrow> 'a formula" where
+primrec dualize :: "'a formula \<Rightarrow> 'a formula" where
   "dualize Bot = Not Bot" |
   "dualize (Atom v) = Not (Atom v)" |
   "dualize (Not v) = v" |
@@ -536,7 +534,7 @@ lemma sizef_dualized_Fn: "sizef (dualize (Fn n)) = 8 * n + 1"
 lemma size_dualized_Fn: "size (dualize (Fn n)) = 10 * n + 1"
   by (induction n) simp_all
 
-lemma dualized_Fn_in_dnf: "is_dnf (dualize (Fn n))"
+lemma is_dnf_dualize_Fn: "is_dnf (dualize (Fn n))"
   by (induction n) simp_all
 
 lemma sizef_dualize: "sizef (dualize F) = sizef F"
@@ -1039,7 +1037,7 @@ proof -
   have size_Fprime: "sizef Fprime = 8*n+1" 
     using def_Fprime by (simp add: sizef_dualized_Fn)
   have Fprime_in_dnf: "is_dnf Fprime" 
-    by (simp add: def_Fprime dualized_Fn_in_dnf)
+    by (simp add: def_Fprime is_dnf_dualize)
   have G_in_cnf: "is_cnf G" 
     using def_G is_cnf_BigAnd' by auto
   have G_in_nnf: "is_nnf G" 
@@ -1125,7 +1123,7 @@ lemma corollary5':
 proof (cases n)
   case 0
   then show ?thesis
-    using dualized_Fn_in_dnf size_dualized_Fn
+    using is_dnf_dualize size_dualized_Fn
     by fastforce
 next
   case (Suc n')
@@ -1136,7 +1134,7 @@ next
   show ?thesis
   proof (intro exI conjI allI impI)
     show "is_dnf (dualize (Fn n))"
-      using dualized_Fn_in_dnf .
+      using is_dnf_dualize .
   next
     show "size (dualize (Fn n)) = 10 * n + 1"
       using size_dualized_Fn .
