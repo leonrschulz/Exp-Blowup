@@ -553,7 +553,7 @@ Finding the correct statement for \cref{card_le_card_if_mem_imp_ex_mem} was chal
 %TODO (LRS): add a paragraph to explain why we defined our own version of BigAnd' and BigOr' instead of reusing BigAnd and BigOr from "Tobias Nipkow's formalization" Propositional_Proof_Systems.
 %Hint: this was necessary to prove the sizef equality of lemma sizef_BigOr'_undnf and analogously for BigAnd'.
 
-Moreover, it was necessary to modify the functions \textsf{BigAnd} and \textsf{BigOr} from Michaelis and Nipkow \cite{Propositional_Proof_Systems-AFP} and to define our own versions in \cref{def_BigOr_BigAnd}, where the base cases are handled differently.
+Moreover, we chose modify the functions \textsf{BigAnd} and \textsf{BigOr} from Michaelis and Nipkow \cite{Propositional_Proof_Systems-AFP} and to define our own versions in \cref{def_BigOr_BigAnd}, where the base cases are handled differently.
 Our functions avoid appending $\lnot\bot$ and $\bot$ to the produced formula when the provided list is nonempty.
 This allowed us to prove the size equality in \cref{thm_sizef_BigAnd_uncnf} and \cref{thm_sizef_BigOr_undnf} instead of having the left-hand side of the lemmas be slightly smaller than the right-hand side.
 Using the original functions would be possible but it would result in \cref{thm_cnf_to_dnf_blowup_math,thm_dnf_to_cnf_blowup_math} stating that the formula size is greater than or equal to $n \cdot 2^n - 2$ instead of $n \cdot 2^n$.
