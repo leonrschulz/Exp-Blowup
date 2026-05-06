@@ -211,7 +211,7 @@ Because \cref{def_sizef} ignores negations, it always evaluates to a smaller num
 \begin{lemma}
   \label{thm_sizef_le_size}
   Let $\phi$ be a formula.
-  $\isaAp{\cstSizef}{\phi}} \le \left|\phi\right|$.
+  $\isaAp{\cstSizef}{\phi} \le \left|\phi\right|$.
 \end{lemma}
 %TODO: explain why we use sizef and not size.
 
@@ -269,6 +269,26 @@ Because \cref{def_sizef} ignores negations, it always evaluates to a smaller num
   \label{thm_equiv_dualize}
   Let $\phi$ be a formula.
   If $\phi$ is in negation normal form, then $\isaAp{\cst{dualize}}{\phi}$ is equivalent to $\neg\phi$.
+\end{lemma}
+
+\begin{lemma}
+  Let $n$ be a natural number.
+  $\isaAp{\cstSizef}{F_n} = 8 \cdot n + 1$.
+\end{lemma}
+
+\begin{lemma}
+  Let $\phi$ be a formula in negative normal form.
+  $\isaAp{\cstSizef}{(\isaAp{\cst{dualize}}{\phi})} = \isaAp{\cstSizef}{\phi}$.
+\end{lemma}
+
+\begin{lemma}
+  Let $\phi$ be a formula in disjunctive normal form.
+  $\isaAp{\cstSizef}{(\bigvee_{i = 0}^{\listLength{\isaAp{\cst{undnf}}{\phi}}} (\listNth{\isaAp{\cst{undnf}}{\phi}}{i}))} = \isaAp{\cstSizef}{\phi}$.
+\end{lemma}
+
+\begin{lemma}
+  Let $\phi$ be a formula in conjunctive normal form.
+  $\isaAp{\cstSizef}{(\bigwedge_{i = 0}^{\listLength{\isaAp{\cst{uncnf}}{\phi}}} (\listNth{\isaAp{\cst{uncnf}}{\phi}}{i}))} = \isaAp{\cstSizef}{\phi}$.
 \end{lemma}
 
 
