@@ -460,8 +460,11 @@ fun Fn :: "nat \<Rightarrow> var formula" where
           (Not (Atom (Var (Suc n) True)))))
     (Fn n)"
 
-lemma sizef_Fn: "sizef (Fn n) = 8*n+1"
-  by (induction n; auto)
+lemma sizef_Fn: "sizef (Fn n) = 8 * n + 1"
+  by (induction n) auto
+
+lemma size_Fn: "size (Fn n) = 10 * n + 2"
+  by (induction n) auto
 
 lemma is_cnf_Fn: "is_cnf (Fn n)"
   by (induction n; auto)
@@ -526,8 +529,11 @@ fun dualize :: "'a formula \<Rightarrow> 'a formula" where
   "dualize (And F G) = Or (dualize F) (dualize G)" |
   "dualize (Or F G) = And (dualize F) (dualize G)"
 
-lemma size_dualized_Fn: "sizef (dualize (Fn n)) = 8 * n + 1" 
-  by(induction n; auto)
+lemma sizef_dualized_Fn: "sizef (dualize (Fn n)) = 8 * n + 1"
+  by (induction n) auto
+
+lemma size_dualized_Fn: "size (dualize (Fn n)) = 10 * n + 1"
+  by (induction n) auto
 
 lemma dualized_Fn_in_dnf: "is_dnf (dualize (Fn n))"
   by(induction n; auto)
@@ -973,12 +979,12 @@ lemma proposition4':
   fixes n :: nat
   shows "\<exists>(F\<^sub>n :: var formula).
     is_cnf F\<^sub>n \<and>
-    sizef F\<^sub>n = 8 * n + 1 \<and>
+    size F\<^sub>n = 10 * n + 2 \<and>
     (\<forall>(G\<^sub>n :: var formula). equiv F\<^sub>n G\<^sub>n \<longrightarrow> is_dnf G\<^sub>n \<longrightarrow> size G\<^sub>n \<ge> n * 2 ^ n)"
 proof (cases n)
   case 0
   then show ?thesis
-    using is_cnf_Fn sizef_Fn by fastforce
+    using is_cnf_Fn size_Fn by fastforce
 next
   case (Suc n')
 
@@ -990,8 +996,8 @@ next
     show "is_cnf (Fn n)"
       using is_cnf_Fn .
   next
-    show "sizef (Fn n) = 8 * n + 1"
-      using sizef_Fn .
+    show "size (Fn n) = 10 * n + 2"
+      using size_Fn .
   next
     fix G\<^sub>n :: "var formula"
     assume "equiv (Fn n) G\<^sub>n"
@@ -1030,7 +1036,7 @@ proof -
   note def_Fprime = Fprime_def
   note def_G = G_def G_spec
   have size_Fprime: "sizef Fprime = 8*n+1" 
-    using def_Fprime by (simp add: size_dualized_Fn)
+    using def_Fprime by (simp add: sizef_dualized_Fn)
   have Fprime_in_dnf: "is_dnf Fprime" 
     by (simp add: def_Fprime dualized_Fn_in_dnf)
   have G_in_cnf: "is_cnf G" 
@@ -1113,7 +1119,7 @@ lemma corollary5':
   fixes n :: nat
   shows "\<exists>(F\<^sub>n :: var formula).
     is_dnf F\<^sub>n \<and>
-    sizef F\<^sub>n = 8 * n + 1 \<and>
+    size F\<^sub>n = 10 * n + 1 \<and>
     (\<forall>(G\<^sub>n :: var formula). equiv F\<^sub>n G\<^sub>n \<longrightarrow> is_cnf G\<^sub>n \<longrightarrow> size G\<^sub>n \<ge> n * 2 ^ n)"
 proof (cases n)
   case 0
@@ -1131,7 +1137,7 @@ next
     show "is_dnf (dualize (Fn n))"
       using dualized_Fn_in_dnf .
   next
-    show "sizef (dualize (Fn n)) = 8 * n + 1"
+    show "size (dualize (Fn n)) = 10 * n + 1"
       using size_dualized_Fn .
   next
     fix G\<^sub>n :: "var formula"
