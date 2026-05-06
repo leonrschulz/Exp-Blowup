@@ -46,7 +46,10 @@
 
 %\funding{(Optional) general funding statement \dots}%optional, to capture a funding statement, which applies to all authors. Please enter author specific funding statements as fifth argument of the \author macro.
 
-\acknowledgements{}%optional
+\acknowledgements{
+This paper is based on Schulz's bachelor thesis supervised by Johannsen with the help of Desharnais-Schäfer.
+%TODO (LRS): try to upload bsc thesis to https://epub.ub.uni-muenchen.de/help/studienabschlussarbeiten.html
+}%optional
 
 %\nolinenumbers %uncomment to disable line numbering
 
@@ -88,10 +91,49 @@
 \maketitle
 
 \begin{abstract}
+  A well-known folklore result about propositional logic is that transforming a formula in disjunctive or conjunctive normal form can lead to an exponential blowup of the formula size.
+  We formalize this result in the form of two theorems in Isabelle/HOL and discuss the challenges we encountered.
 \end{abstract}
 
 \section{Introduction}
 \label{sec_intro}
+
+The metatheory of propositional logic has been the subject of extensive formalization effor for many years.
+However, to the best of our knowledge, very few quantitative results have been formalized.
+One well-known quantitative folklore result is that transforming a formula in disjunctive or conjunctive normal form can lead to an exponential blowup of the formula size.
+
+In this paper, we first briefly cover the mathematical background (\cref{sec_background}) and then report on our Isabelle/HOL formalization of this exponential blowup.
+Our formalization requires a few preliminary definitions and lemmas (\cref{sec_preliminaries}).
+
+We then prove the exponential blowup when converting a formula from conjunctive to disjunctive normal form (\cref{sec_CNF_to_DNF}).
+We do this in two steps:
+First, we prove the low-level \cref{thm_cnf_to_dnf_blowup} that assumes the existence of two equivalent formulas fulfilling some assumptions and that exhibits the exponential lower bound on the formula size.
+Second, we use this \lcnamecref{thm_cnf_to_dnf_blowup} to prove in the desired \cref{thm_cnf_to_dnf_blowup_math} that such equivalent formulas fulfilling these assumptions always exist.
+
+We analogously prove the same exponential blowup when converting a formula from disjunctive to conjunctive normal form (\cref{sec_DNF_to_CNF}).
+We do this again with two steps:
+First, the low-level \Cref{thm_dnf_to_cnf_blowup} assumes the existence of two equivalent formulas fulfilling some assumptions and exhibits the exponential lower bound on the formula size;
+the proof uses \cref{thm_cnf_to_dnf_blowup}.
+Second, we use \cref{thm_dnf_to_cnf_blowup} to prove in the desired \cref{thm_dnf_to_cnf_blowup_math} that such equivalent formulas fulfilling these assumptions always exist.
+
+Finally, we discus (\cref{sec_discussion}) the challenges we encountered when proving statements about the size of formulas.
+
+Our Isabelle/HOL formalization consists of ???? nonempty lines%
+\footnote{Counted using \texttt{grep -Ev '^[[:space:]]*$' | wc -l}.}%
+and is available online \cite{xxx}.
+It was developped with Isabelle2025.
+We
+The formalization will soon be submitted to the \emph{Archive of Formal Proofs}.
+Our work is part of the IsaFoL (Isabelle Formalization of Logic) effort \cite{xxx}.
+
+- State that we only provide the most interesting lemmas and proof sketches and point the interested reader to the formalization for more details.
+
+- describe formalization
+  - This formalization build on the formalization by Nipkow et al. (cite paper and AFP)
+  - Cite Isabelle from Nipkow and Paulson (and maybe concrete semantics)
+  - Cite Sledgehamer (Paulson and Blanchette)
+  - Cite Isabelle/Isar (Makarius)
+  - Cite something about IsaFoL
 
 \section{Background}
 \label{sec_background}
@@ -155,11 +197,11 @@ $x_{1,\epsilon_1}, \ldots , x_{n,\epsilon_n}$.
 In particular, $G_n$ has at least $2^n$ many terms.
 \end{proof}
 
-\begin{corollary} \label{cnfblowup}
+\begin{theorem} \label{cnfblowup}
   For all sufficiently large $n\in\Nat$, there are formulas $F'_n$ in
   DNF with $|F'_n| = O(n)$, such that every equivalent formula $G_n$
   in CNF is of size $|G_n| \geq n2^n$.
-\end{corollary}
+\end{theorem}
 
 \begin{proof}
   Let $F'_n := {\bar F}_n$ for the formulas $F_n$ of Theorem~\ref{dnfblowup}.
@@ -349,8 +391,7 @@ Next, we prove a lower bound of the size of $\bigvee_{i=0}^{\listLength{\phi{}s}
 
 We can now prove that some specific formulas equivalent to $F_n$ (see \cref{def_Fn}) have a size exponential in $n$.
 
-%TODO: Ask Johannsen
-\begin{theorem}[Exponential Blowup Transforming $F_n$ to DNF]
+\begin{proposition}
   \label{thm_cnf_to_dnf_blowup}
   Let $n > 0$ be a natural number.
   Let $Ts$ be a list of formulas.
@@ -358,7 +399,7 @@ We can now prove that some specific formulas equivalent to $F_n$ (see \cref{def_
   If all formulas in $Ts$ are conjunctive and satisfiable, and
   if $F_n$ is equivalent to $G$,
   then $\isaAp{\cstSizef}{G} \ge n \cdot 2^n$.
-\end{theorem}
+\end{proposition}
 \begin{proof}
   We proceed with five steps:
   \textbf{(1)}~First, we show that every conjunctive formula $T \in \isaAp{\cst{set}}{Ts}$ contains for all $i \in \{1,\ldots,n\}$ either the variable $x_{i,0}$ or $x_{i,1}$ positively.
@@ -378,15 +419,14 @@ We can now prove that some specific formulas equivalent to $F_n$ (see \cref{def_
   \textbf{(5)}~Finally, we show that $\isaAp{\cstSizef}{G} \ge n \cdot 2^n$ by combining the results from steps 2 and 4 to discharge the assumptions of \cref{thm_exp_size}.
 \end{proof}
 
-\Cref{thm_cnf_to_dnf_blowup} assumes the existence of two equivalent formulas $F_n$ (in conjunctive normal form) and $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$ (in disjunctive normal form) and proved bound on the size of the later.
-We now prove that this exponential blowup holds for any equivalent formula in disjunctive normal form.
+\Cref{thm_cnf_to_dnf_blowup} assumes the existence of two equivalent formulas $F_n$ (in conjunctive normal form) and $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$ (in disjunctive normal form) and proves a lower bound on the size of the later.
+We now prove that such equivalent formulas do exist and that the exponential blowup holds for all of them.
 
-%TODO: Ask Johannsen
-\begin{corollary}[Exponential Blowup Transforming CNF to DNF]
+\begin{theorem}[Exponential Blowup from CNF to DNF]
   \label{thm_cnf_to_dnf_blowup_math}
   Let $n$ be a natural number.
   There exists a formula $\phi$ in conjunctive normal form with size $\left|\phi\right| = 10 \cdot n + 2$ such that every equivalent formula $\psi$ in disjunctive normal form has size $\left|\psi\right| \ge n \cdot 2^n$.
-\end{corollary}
+\end{theorem}
 \begin{proof}
   We start by a case analysis on $n$.
   The interesting case is when $n > 0$.
@@ -435,14 +475,14 @@ We claim that \cref{thm_cnf_to_dnf_blowup_math} is a formalization of the paper 
   The idea is that each element of $Cs$ gets dualized.
 \end{proof}
 
-%TODO: ask Johannsen
-\begin{theorem}[Exponential Blowup Transforming $\isaAp{\cst{dualize}}{F_n}$ to CNF]
+\begin{proposition}
+  \label{thm_dnf_to_cnf_blowup}
   Let $n > 0$ be a natural number.
   Let $Cs$ be a list of formulas.
   Let $G = \bigwedge_{i = 0}^{\listLength{Cs}} \listNth{Cs}{i}$.
   If all formulas in $Cs$ are disjunctive and not tautological, and $\isaAp{\cst{dualize}}{F_n}$ is equivalent to $G$,
   then $\isaAp{\cstSizef}{G} \ge n \cdot 2^n$.
-\end{theorem}
+\end{proposition}
 \begin{proof}
   We prove this by contradiction using \cref{thm_cnf_to_dnf_blowup}.
   We assume $\isaAp{\cstSizef}{G} < n \cdot 2^n$ and from that derive false in five steps.
@@ -454,12 +494,11 @@ We claim that \cref{thm_cnf_to_dnf_blowup_math} is a formalization of the paper 
   \textbf{(5)}~The result of step 1 contradicts the result of step 4, completing the proof.
 \end{proof}
 
-%TODO: ask Johannsen
-\begin{corollary}[Exponential Blowup Transforming DNF to CNF]
+\begin{theorem}[Exponential Blowup from DNF to CNF]
   \label{thm_dnf_to_cnf_blowup_math}
   Let $n$ be a natural number.
   There exists a formula $\phi$ in disjunctive normal form with size $\left|\phi\right| = 10 \cdot n + 1$ such that every equivalent formula $\psi$ in conjunctive normal form has size $\left|\psi\right| \ge n \cdot 2^n$.
-\end{corollary}
+\end{theorem}
 \begin{proof}
   The proof is analogous to the proof of \cref{thm_cnf_to_dnf_blowup_math}.
 \end{proof}
@@ -475,8 +514,6 @@ To prove step 4, we use a general lemma (already included in Isabelle/HOL) about
   \label{card_inj_on_le}
   Let $X$ and $Y$ be sets. Let $f$ be a unary function.
   If $Y$ is finite, and
-  %TODO: ask Johannsen if he has a preference here
-  %if the image of X under f is a subset of Y, and
   if $\setImage{x}{f}{X} \subseteq Y$, and
   if $f$ is injective on $X$, and
   then the cardinality of $X$ is less than or equal to the cardinality of $Y$.
