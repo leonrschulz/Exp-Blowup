@@ -460,14 +460,14 @@ fun Fn :: "nat \<Rightarrow> var formula" where
           (Not (Atom (Var (Suc n) True)))))
     (Fn n)"
 
-lemma size_Fn: "sizef (Fn n) = 8*n+1"
+lemma sizef_Fn: "sizef (Fn n) = 8*n+1"
   by (induction n; auto)
 
-lemma Fn_in_cnf: "is_cnf (Fn n)"
+lemma is_cnf_Fn: "is_cnf (Fn n)"
   by (induction n; auto)
 
-lemma Fn_in_nnf: "is_nnf (Fn n)"
-  using Fn_in_cnf[THEN cnf_in_nnf] .
+lemma is_nnf_Fn: "is_nnf (Fn n)"
+  using is_cnf_Fn[THEN cnf_in_nnf] .
 
 lemma Fn_sat: "\<exists>Val. Val \<Turnstile> Fn n"
 proof -
@@ -748,9 +748,9 @@ proof -
   note def_F = F_def
   note def_G = G_def G_spec
   have size_F: "sizef F = 8*n+1" 
-    using def_F by (simp add: size_Fn)
+    using def_F by (simp add: sizef_Fn)
   have in_cnf_F: "is_cnf F" 
-    using def_F by (simp add: Fn_in_cnf)
+    using def_F by (simp add: is_cnf_Fn)
   have in_dnf_G: "is_dnf G" 
     using def_G is_dnf_BigOr' by auto
 
@@ -978,7 +978,7 @@ lemma proposition4':
 proof (cases n)
   case 0
   then show ?thesis
-    using Fn_in_cnf size_Fn by fastforce
+    using is_cnf_Fn sizef_Fn by fastforce
 next
   case (Suc n')
 
@@ -988,10 +988,10 @@ next
   show ?thesis
   proof (intro exI conjI allI impI)
     show "is_cnf (Fn n)"
-      using Fn_in_cnf .
+      using is_cnf_Fn .
   next
     show "sizef (Fn n) = 8 * n + 1"
-      using size_Fn .
+      using sizef_Fn .
   next
     fix G\<^sub>n :: "var formula"
     assume "equiv (Fn n) G\<^sub>n"
@@ -1059,7 +1059,7 @@ proof -
         using equiv_Fprime_G[symmetric, unfolded Fprime_def] .
       also have "equiv \<dots> (Not (Not (Fn n)))"
         unfolding equiv_Not_left_Not_right
-        using equiv_dualize[OF Fn_in_nnf] .
+        using equiv_dualize[OF is_nnf_Fn] .
       also have "equiv \<dots> (Fn n)"
         unfolding equiv_Not_Not_left
         using equiv_reflexive .
