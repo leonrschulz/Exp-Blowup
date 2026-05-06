@@ -272,6 +272,13 @@ Because \cref{def_sizef} ignores negations, it always evaluates to a smaller num
 \end{lemma}
 
 \begin{lemma}
+  \label{thm_is_cnf_Fn}
+  Let $n$ be a natural number.
+  The formula $F_n$ is in conjunctive normal form.
+\end{lemma}
+
+\begin{lemma}
+  \label{thm_sizef_Fn}
   Let $n$ be a natural number.
   $\isaAp{\cstSizef}{F_n} = 8 \cdot n + 1$.
 \end{lemma}
@@ -380,7 +387,7 @@ We now prove that this exponential blowup holds for any equivalent formula in di
   We start by a case analysis on $n$.
   The interesting case is when $n > 0$.
   We define $\phi = F_n$ (see \cref{def_Fn});
-  it is easy to show that $F_n$ is in conjunctive normal form and that $\isaAp{\cstSizef}{F_n} = 8 \cdot n + 1$.
+  it is easy to show that $F_n$ is in conjunctive normal form (using \cref{thm_is_cnf_Fn}) and that $\isaAp{\cstSizef}{F_n} = 8 \cdot n + 1$ (using \cref{thm_sizef_Fn}).
   To prove the last property, we assume that there is an equivalent formula $\psi$ in disjunctive normal form.
   We first obtain a list $Ts$ (by filtering $\isaAp{\cst{undnf}}{\psi}$) of all terms in $\psi$ such that
   all formulas in $Ts$ are conjunctive and satisfiable,
