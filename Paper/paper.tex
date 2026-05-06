@@ -289,14 +289,15 @@ Because \cref{def_sizef} ignores negations, it always evaluates to a smaller num
 \end{lemma}
 
 \begin{lemma}
-  \label{thm_sizef_BigOr_undnf}
-  Let $\phi$ be a formula in disjunctive normal form.
-  $\isaAp{\cstSizef}{(\bigvee_{i = 0}^{\listLength{\isaAp{\cst{undnf}}{\phi}}} \listNth{(\isaAp{\cst{undnf}}{\phi})}{i})} = \isaAp{\cstSizef}{\phi}$.
+	\label{thm_sizef_BigAnd_uncnf}
+	Let $\phi$ be a formula in conjunctive normal form.
+	$\isaAp{\cstSizef}{(\bigwedge_{i = 0}^{\listLength{\isaAp{\cst{uncnf}}{\phi}}} \listNth{(\isaAp{\cst{uncnf}}{\phi})}{i})} = \isaAp{\cstSizef}{\phi}$.
 \end{lemma}
 
 \begin{lemma}
-  Let $\phi$ be a formula in conjunctive normal form.
-  $\isaAp{\cstSizef}{(\bigwedge_{i = 0}^{\listLength{\isaAp{\cst{uncnf}}{\phi}}} \listNth{(\isaAp{\cst{uncnf}}{\phi})}{i})} = \isaAp{\cstSizef}{\phi}$.
+  \label{thm_sizef_BigOr_undnf}
+  Let $\phi$ be a formula in disjunctive normal form.
+  $\isaAp{\cstSizef}{(\bigvee_{i = 0}^{\listLength{\isaAp{\cst{undnf}}{\phi}}} \listNth{(\isaAp{\cst{undnf}}{\phi})}{i})} = \isaAp{\cstSizef}{\phi}$.
 \end{lemma}
 
 
@@ -500,10 +501,12 @@ To prove step 2, we introduced a new lemma, inspired by \cref{card_inj_on_le}, t
 
 We use \cref{card_le_card_if_mem_imp_ex_mem} to prove that every $T \in \isaAp{\cst{set}}{Ts}$ contains at least $n$ atoms and thus that $\isaAp{\cstSizef}{T} \ge n$.
 To do so, we instantiate $X$ with $\{1,\ldots,n\}$, $Y$ with the set of atoms of $T$, and the $f$ with the constructor for variables.
-Finding the correct statement for \cref{card_le_card_if_mem_imp_ex_mem} was challenging but, once found, it was easy to discharge the assumptions using step 1.
+Finding the correct statement for \cref{card_le_card_if_mem_imp_ex_mem} was challenging but, once found, it was easy to discharge the assumptions using step 1.\\
 
 %TODO (LRS): add a paragraph to explain why we defined our own version of BigAnd' and BigOr' instead of reusing BigAnd and BigOr from "Tobias Nipkow's formalization" Propositional_Proof_Systems.
 %Hint: this was necessary to prove the sizef equality of lemma sizef_BigOr'_undnf and analogously for BigAnd'.
+
+Moreover, it was necessary to modify the functions \textsf{BigAnd} and \textsf{BigOr} from \cite{Propositional_Proof_Systems-AFP} and to define our own versions in \cref{def_BigOr_BigAnd}, where the base cases are handled differently. Our functions therefore avoid appending $\lnot\bot$ and $\bot$ to the produced formula. This way we were able to prove the size equality in \cref{thm_sizef_BigAnd_uncnf} and \cref{thm_sizef_BigOr_undnf} instead of having the left-hand side of the lemmas be slightly smaller than the right-hand side. Using the original functions would be possible but it would result in \cref{thm_cnf_to_dnf_blowup_math} and \cref{thm_dnf_to_cnf_blowup_math} stating that the formula size is greater than or equal to $n \cdot 2^n - 2$ instead of $n \cdot 2^n$. To keep the corollaries as close as possible to their mathematical counterparts we therefore chose to introduce the functions \textsf{BigAnd'} and \textsf{BigOr'}.
 
 \section{Conclusion}
 \label{sec_concl}
