@@ -77,6 +77,15 @@ lemma equiv_symmetric[sym]: "\<And>\<phi> \<psi>. equiv \<phi> \<psi> \<Longrigh
 lemma equiv_transitive[trans]: "\<And>\<xi> \<phi> \<psi>. equiv \<xi> \<phi> \<Longrightarrow> equiv \<phi> \<psi> \<Longrightarrow> equiv \<xi> \<psi>"
   unfolding equiv_def by simp
 
+lemma equiv_Not_left_Not_right[simp]: "\<And>\<phi> \<psi>. equiv (Not \<phi>) (Not \<psi>) \<longleftrightarrow> equiv \<phi> \<psi>"
+  unfolding equiv_def by simp_all
+
+lemma equiv_Not_Not_left[simp]: "\<And>\<phi> \<psi>. equiv (Not (Not \<phi>)) \<psi> \<longleftrightarrow> equiv \<phi> \<psi>"
+  unfolding equiv_def by simp_all
+
+lemma equiv_Not_Not_right[simp]: "\<And>\<phi> \<psi>. equiv \<phi> (Not (Not \<psi>)) \<longleftrightarrow> equiv \<phi> \<psi>"
+  unfolding equiv_def by simp_all
+
 
 subsection \<open>Conjunctive Normal Form\<close>
 
@@ -523,7 +532,10 @@ lemma size_dualized_Fn: "sizef (dualize (Fn n)) = 8 * n + 1"
 lemma dualized_Fn_in_dnf: "is_dnf (dualize (Fn n))"
   by(induction n; auto)
 
-lemma size_ident_dualize[simp]: "is_nnf F \<Longrightarrow> sizef (dualize F) = sizef F"
+lemma sizef_dualize: "is_nnf F \<Longrightarrow> sizef (dualize F) = sizef F"
+  by (induction F; simp)
+
+lemma size_dualize_le: "is_nnf F \<Longrightarrow> size (dualize F) \<le> 2 * size F"
   by (induction F; simp)
 
 lemma equiv_dualize: "is_nnf F \<Longrightarrow> equiv (dualize F) (Not F)"
@@ -1025,33 +1037,40 @@ proof -
     using def_G is_cnf_BigAnd' by auto
   have G_in_nnf: "is_nnf G" 
     using G_in_cnf cnf_in_nnf by auto
+
   show ?thesis
   proof (rule ccontr)
     assume "\<not> n*2^n \<le> sizef G"
-    then have "sizef G < n*2^n" 
-      by simp
-    then have dualized_G_exp_size: "sizef (dualize G) < n*2^n" 
-      using G_in_nnf by (simp add: size_ident_dualize)
-    have "equiv (dualize G) (Fn n)"
+    then have "sizef G < n*2^n"
+      by presburger
+    then have "sizef (dualize G) < n*2^n"
+      using sizef_dualize[OF G_in_nnf] by presburger
+
+    obtain Ts where
+      "dualize G = BigOr' Ts" "\<forall>T\<in>set Ts. is_conj T \<and> (\<exists> Val. Val \<Turnstile> T)"
+      using def_G dualized_conj_of_disjs_is_disj_of_conjs by metis
+
+    moreover have "equiv (Fn n) (dualize G)"
     proof -
-      have "equiv G (dualize (Fn n))"
-        using equiv_Fprime_G[symmetric]
-        unfolding Fprime_def .
-      also have "equiv \<dots> (Not (Fn n))"
+      have "equiv (dualize G) (Not G)"
+        using equiv_dualize[OF G_in_nnf] .
+      also have "equiv \<dots> (Not (dualize (Fn n)))"
+        unfolding equiv_Not_left_Not_right
+        using equiv_Fprime_G[symmetric, unfolded Fprime_def] .
+      also have "equiv \<dots> (Not (Not (Fn n)))"
+        unfolding equiv_Not_left_Not_right
         using equiv_dualize[OF Fn_in_nnf] .
-      finally have "equiv G (Not (Fn n))" .
-      then have "equiv (Not G) (Fn n)" 
-        by (simp add: equiv_def)
-      then show ?thesis 
-        using G_in_nnf equiv_dualize equiv_def by meson
+      also have "equiv \<dots> (Fn n)"
+        unfolding equiv_Not_Not_left
+        using equiv_reflexive .
+      finally show ?thesis
+        by (rule equiv_symmetric)
     qed
-    have dualized_G_disj_of_conj: "\<exists>Ts.
-      (dualize G) = BigOr' Ts \<and> (\<forall>T\<in>set Ts. is_conj T \<and> (\<exists> Val. Val \<Turnstile> T))"
-      using def_G dualized_conj_of_disjs_is_disj_of_conjs by auto
-    show False
-      using proposition4
-      using dualized_G_exp_size \<open>equiv (dualize G) (Fn n)\<close>[symmetric] dualized_G_disj_of_conj
-      by (metis le_antisym n_greater_0 nat_less_le)
+
+    ultimately have "n * 2 ^ n \<le> sizef (dualize G)"
+      using proposition4[of n Ts] by force
+    then show False
+      using \<open>sizef (dualize G) < n*2^n\<close> by presburger
   qed
 qed
 
