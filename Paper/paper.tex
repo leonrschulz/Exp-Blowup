@@ -170,7 +170,7 @@ $\neg F$.
 Note that every formula in disjunctive normal form or conjunctive
 normal form is also in negation normal form. For a formula $F$ in
 conjunctive normal form, the dual formula $\bar F$ is in disjunctive
-normal form, and vice cersa.
+normal form, and vice versa.
 
 It is well known that every formula of propositional logic can be
 transformed into an equivalent formula in disjunctive normal form, and
@@ -262,7 +262,7 @@ We now define some operations to build the conjunction and disjunction of a list
 \end{definitionx}
 
 \begin{remark*}
-  Our formalization always use nonempty lists and the base cases of \cref{def_BigOr_BigAnd} could be be left unspecified.
+  Our formalization always uses nonempty lists and the base cases of \cref{def_BigOr_BigAnd} could be be left unspecified.
   However, providing these base cases allows us to prove many lemmas for arbitrary lists without requiring a nonemptyness assumption that would need to be repeatedly discharged.
 \end{remark*}
 
@@ -588,7 +588,7 @@ We use \cref{card_le_card_if_mem_imp_ex_mem} to prove that every $T \in \isaAp{\
 To do so, we instantiate $X$ with $\{1,\ldots,n\}$, $Y$ with the set of atoms of $T$, and the $f$ with the constructor for variables.
 Finding the correct statement for \cref{card_le_card_if_mem_imp_ex_mem} was challenging but, once found, it was easy to discharge the assumptions using step 1.\\
 
-Moreover, we chose modify the functions \textsf{BigAnd} and \textsf{BigOr} from Michaelis and Nipkow \cite{Propositional_Proof_Systems-AFP} and to define our own versions in \cref{def_BigOr_BigAnd}, where the base cases are handled differently.
+Moreover, we chose to modify the functions \textsf{BigAnd} and \textsf{BigOr} from Michaelis and Nipkow \cite{Propositional_Proof_Systems-AFP} and to define our own versions in \cref{def_BigOr_BigAnd}, where the base cases are handled differently.
 Our functions avoid appending $\lnot\bot$ and $\bot$ to the produced formula when the provided list is nonempty.
 This allowed us to prove the size equalities in \cref{thm_sizef_BigOr_undnf_BigAnd_unconj} instead of having the left-hand side of the lemmas be slightly smaller than the right-hand side.
 Using the original functions would have been possible, but it would have resulted in \cref{thm_cnf_to_dnf_blowup_math,thm_dnf_to_cnf_blowup_math} stating that the size $\left|\psi\right| + 2 \ge n \cdot 2^n$ instead of $\left|\psi\right| \ge n \cdot 2^n$.
