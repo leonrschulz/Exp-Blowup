@@ -636,40 +636,38 @@ proof -
     by auto
 qed
 
-lemma not_sat_Fn_both_false:
-  assumes "n \<noteq> 0" and "\<exists>i \<in> {1..n}. Val (Var i False) = False \<and> Val (Var i True) = False"
-  shows "\<not> Val \<Turnstile> Fn n"
-  using assms
+lemma sat_Fn_iff:
+  shows "\<alpha> \<Turnstile> Fn n \<longleftrightarrow> (\<forall>i \<in> {1..n}. \<alpha> (Var i False) \<noteq> \<alpha> (Var i True))"
 proof (induction n)
   case 0
-  then show ?case 
+  show ?case
     by simp
 next
   case (Suc n)
-  have "\<not> Val (Var (Suc n) False) \<and> \<not> Val (Var (Suc n) True) \<or> 
-        Val (Var (Suc n) False) \<and> Val (Var (Suc n) True) \<or> \<not> Val \<Turnstile> Fn n" 
-    by (metis One_nat_def Suc.IH Suc.prems(2) Suc_leI atLeastAtMost_iff le_antisym 
-        le_neq_implies_less nat_le_linear)
-  then show ?case 
-    by simp
-qed
 
-lemma not_sat_Fn_both_true:
-  assumes "n \<noteq> 0" and "\<exists>i \<in> {1..n}. Val (Var i False) = True \<and> Val (Var i True) = True"
-  shows "\<not> Val \<Turnstile> Fn n"
-  using assms
-proof (induction n)
-  case 0
-  then show ?case 
+  let ?F = "
+    And
+      (Or
+        (Atom (Var (Suc n) False))
+        (Atom (Var (Suc n) True)))
+      (Or
+        (Not (Atom (Var (Suc n) False)))
+        (Not (Atom (Var (Suc n) True))))"
+
+  have "\<alpha> \<Turnstile> Fn (Suc n) \<longleftrightarrow> \<alpha> \<Turnstile> And ?F (Fn n)"
     by simp
-next
-  case (Suc n)
-  have "\<not> Val (Var (Suc n) False) \<and> \<not> Val (Var (Suc n) True) \<or> 
-        Val (Var (Suc n) False) \<and> Val (Var (Suc n) True) \<or> \<not> Val \<Turnstile> Fn n" 
-    by (metis One_nat_def Suc.IH Suc.prems(2) Suc_leI atLeastAtMost_iff le_antisym 
-        le_neq_implies_less nat_le_linear)
-  then show ?case 
+  also have "\<dots> \<longleftrightarrow> \<alpha> \<Turnstile> ?F \<and> \<alpha> \<Turnstile> (Fn n)"
     by simp
+  also have "\<dots> \<longleftrightarrow> (\<alpha> (Var (Suc n) False) \<noteq> \<alpha> (Var (Suc n) True)) \<and> \<alpha> \<Turnstile> (Fn n)"
+    by force
+  also have "\<dots> \<longleftrightarrow> (\<alpha> (Var (Suc n) False) \<noteq> \<alpha> (Var (Suc n) True)) \<and>
+    (\<forall>i\<in>{1..n}. \<alpha> (Var i False) \<noteq> \<alpha> (Var i True))"
+    unfolding Suc.IH ..
+  also have "\<dots> \<longleftrightarrow> (\<forall>i\<in>insert (Suc n) {1..n}. \<alpha> (Var i False) \<noteq> \<alpha> (Var i True))"
+    by simp
+  also have "\<dots> \<longleftrightarrow> (\<forall>i\<in>{1..Suc n}. \<alpha> (Var i False) \<noteq> \<alpha> (Var i True))"
+    by (simp add: atLeastAtMostSuc_conv)
+  finally show ?case .
 qed
 
 
@@ -945,7 +943,7 @@ proof -
         unfolding Val_def by auto
       then have "\<exists> Val. Val \<Turnstile> G \<and> \<not>(Val \<Turnstile> F)"
         unfolding G_def F_def
-        using BigOr'_semantics \<open>T \<in> set Ts\<close> \<open>i \<in> {1..n}\<close> not_sat_Fn_both_false n_greater_0 by blast
+        using BigOr'_semantics \<open>T \<in> set Ts\<close> \<open>i \<in> {1..n}\<close> sat_Fn_iff by metis
       then have "\<not> equiv F G"
         unfolding equiv_def by auto
       then show False
@@ -958,7 +956,7 @@ proof -
         using \<open>T \<in> set Ts\<close> both_present not_sat_conj_pos_false def_G by blast
       then have "\<exists> Val. Val \<Turnstile> G \<and> \<not>(Val \<Turnstile> F)"
         unfolding G_def F_def
-        using BigOr'_semantics \<open>T \<in> set Ts\<close> \<open>i \<in> {1..n}\<close> not_sat_Fn_both_true n_greater_0 by blast
+        using BigOr'_semantics \<open>T \<in> set Ts\<close> \<open>i \<in> {1..n}\<close> sat_Fn_iff by metis
       then have "\<not> equiv F G"
         unfolding equiv_def by auto
       then show False
