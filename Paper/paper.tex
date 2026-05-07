@@ -584,9 +584,6 @@ We use \cref{card_le_card_if_mem_imp_ex_mem} to prove that every $T \in \isaAp{\
 To do so, we instantiate $X$ with $\{1,\ldots,n\}$, $Y$ with the set of atoms of $T$, and the $f$ with the constructor for variables.
 Finding the correct statement for \cref{card_le_card_if_mem_imp_ex_mem} was challenging but, once found, it was easy to discharge the assumptions using step 1.\\
 
-%TODO (LRS): add a paragraph to explain why we defined our own version of BigAnd' and BigOr' instead of reusing BigAnd and BigOr from "Tobias Nipkow's formalization" Propositional_Proof_Systems.
-%Hint: this was necessary to prove the sizef equality of lemma sizef_BigOr'_undisj and analogously for BigAnd'.
-
 Moreover, we chose modify the functions \textsf{BigAnd} and \textsf{BigOr} from Michaelis and Nipkow \cite{Propositional_Proof_Systems-AFP} and to define our own versions in \cref{def_BigOr_BigAnd}, where the base cases are handled differently.
 Our functions avoid appending $\lnot\bot$ and $\bot$ to the produced formula when the provided list is nonempty.
 This allowed us to prove the size equalities in \cref{thm_sizef_BigOr_undnf_BigAnd_unconj} instead of having the left-hand side of the lemmas be slightly smaller than the right-hand side.
