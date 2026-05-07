@@ -244,7 +244,7 @@ We now define some operations to build the conjunction and disjunction of a list
   $\tyAnnot{\cst{BigAnd'}}{\tyList{\tyFormula{\yA}} \Rightarrow \tyFormula{\yA}}$ and
   $\tyAnnot{\cst{BigOr'}}{\tyList{\tyFormula{\yA}} \Rightarrow \tyFormula{\yA}}$ respectively
   build the conjunction and disjunction of all formulas in a list:%
-  \footnote{The infix operatior $\listCons{x}{xs}$ adds an element $x$ at the front of a list $xs$.}
+  \footnote{The infix operation $\listCons{x}{xs}$ adds an element $x$ at the front of a list $xs$.}
   \begin{align*}
     \isaAp{\cst{BigAnd'}}{[]} =\; & \neg\bot &
     \isaAp{\cst{BigOr'}}{[]} =\; & \bot \\
@@ -259,11 +259,28 @@ We now define some operations to build the conjunction and disjunction of a list
 \end{definitionx}
 
 \begin{remark*}
-  Our formalization always use nonempty list and the base cases of \cref{def_BigOr_BigAnd} could be be left unspecified.
+  Our formalization always use nonempty lists and the base cases of \cref{def_BigOr_BigAnd} could be be left unspecified.
   However, providing these base cases allows us to prove many lemmas for arbiraty lists without requiring a nonemptyness assumption that would need to be repeatedly discharged.
 \end{remark*}
 
-We also define a very specific family of formulas.
+We will later need to generate lists of formulas for $\cst{BigAnd'}$ and $\cst{BigOr'}$ and define two functions to do so.
+
+\begin{definition}
+  \label{def_uncnf_undnf}
+  The functions
+  $\tyAnnot{\cst{uncnf}}{\tyFormula{\yA} \Rightarrow \tyList{\tyFormula{\yA}}}$ and
+  $\tyAnnot{\cst{undnf}}{\tyFormula{\yA} \Rightarrow \tyList{\tyFormula{\yA}}}$ respectively
+  extract the list of subformulas directly under the conjunctions and disjunctions of a given formula:%
+  \footnote{The infix operation $xs \mathop{@} ys$ appends a list $xs$ at the front of a list $ys$.}
+  \begin{align*}
+    \isaAp{\cst{uncnf}}{(\phi \land \psi)} =\; & \isaAp{\cst{uncnf}}{\phi} \mathop{@} \isaAp{\cst{uncnf}}{\psi} &
+    \isaAp{\cst{undnf}}{(\phi \lor \psi)} =\; & \isaAp{\cst{undnf}}{\phi} \mathop{@} \isaAp{\cst{undnf}}{\psi} \\
+    \isaAp{\cst{uncnf}}{\phi} =\; & [\phi] &
+    \isaAp{\cst{undnf}}{\phi} =\; & [\phi]
+  \end{align*}
+\end{definition}
+
+We will also need to construct formulas of a very specific family and define a function to do so.
 
 \begin{definitionx}
   \label{def_Fn}
