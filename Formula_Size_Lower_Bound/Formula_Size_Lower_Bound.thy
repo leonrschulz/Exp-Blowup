@@ -636,7 +636,7 @@ proof -
     by auto
 qed
 
-lemma sat_Fn_iff: "\<alpha> \<Turnstile> Fn n \<longleftrightarrow> (\<forall>i \<in> {1..n}. \<alpha> (Var i False) \<noteq> \<alpha> (Var i True))"
+lemma semantics_Fn_iff: "\<alpha> \<Turnstile> Fn n \<longleftrightarrow> (\<forall>i \<in> {1..n}. \<alpha> (Var i False) \<noteq> \<alpha> (Var i True))"
 proof (induction n)
   case 0
   show ?case
@@ -942,7 +942,7 @@ proof -
         unfolding Val_def by auto
       then have "\<exists> Val. Val \<Turnstile> G \<and> \<not>(Val \<Turnstile> F)"
         unfolding G_def F_def
-        using BigOr'_semantics \<open>T \<in> set Ts\<close> \<open>i \<in> {1..n}\<close> sat_Fn_iff by metis
+        using BigOr'_semantics \<open>T \<in> set Ts\<close> \<open>i \<in> {1..n}\<close> semantics_Fn_iff by metis
       then have "\<not> equiv F G"
         unfolding equiv_def by auto
       then show False
@@ -955,7 +955,7 @@ proof -
         using \<open>T \<in> set Ts\<close> both_present not_sat_conj_pos_false def_G by blast
       then have "\<exists> Val. Val \<Turnstile> G \<and> \<not>(Val \<Turnstile> F)"
         unfolding G_def F_def
-        using BigOr'_semantics \<open>T \<in> set Ts\<close> \<open>i \<in> {1..n}\<close> sat_Fn_iff by metis
+        using BigOr'_semantics \<open>T \<in> set Ts\<close> \<open>i \<in> {1..n}\<close> semantics_Fn_iff by metis
       then have "\<not> equiv F G"
         unfolding equiv_def by auto
       then show False
