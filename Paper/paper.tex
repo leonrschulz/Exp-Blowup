@@ -101,7 +101,7 @@ This paper is based on Schulz's bachelor thesis supervised by Johannsen with the
 \section{Introduction}
 \label{sec_intro}
 
-The metatheory of propositional logic has been studied for many decades and the subject of extensive formalization effort for many years.
+The metatheory of propositional logic has been studied for many decades and has been the subject of extensive formalization effort for many years.
 However, to the best of our knowledge, very few quantitative results have been formalized.
 One well-known quantitative folklore result is that transforming a formula in disjunctive or conjunctive normal form can lead to an exponential blowup of the formula size.
 
@@ -114,7 +114,7 @@ First, we prove the low-level \cref{thm_cnf_to_dnf_blowup} that assumes the exis
 Second, we use this \lcnamecref{thm_cnf_to_dnf_blowup} to prove in the desired \cref{thm_cnf_to_dnf_blowup_math} that such formulas always exist.
 
 We analogously prove the same exponential blowup when converting a formula from disjunctive to conjunctive normal form (\cref{sec_DNF_to_CNF}).
-We do this again with two steps:
+We do this again in two steps:
 First, the low-level \Cref{thm_dnf_to_cnf_blowup} assumes again the existence of two equivalent formulas fulfilling some assumptions and exhibits the exponential lower bound on the formula size;
 the proof uses \cref{thm_cnf_to_dnf_blowup}.
 Second, we use \cref{thm_dnf_to_cnf_blowup} to prove in the desired \cref{thm_dnf_to_cnf_blowup_math} that such formulas always exist.
@@ -126,9 +126,9 @@ Our formalization consists of ???? nonempty lines%
 \footnote{Counted using \inlineshell{grep -Ev '\textasciicircum{}[[:blank:]]*\$'}.}
 and is available online \cite{Formalization_GitHub};
 we will soon submit it to the \emph{Archive of Formal Proofs}.
-It was developped with Isabelle2025 \cite{Nipkow_Klein_2014,Nipkow_Paulson_Wenzel_2002} and with extensive usage of Sledgehammer \cite{Blanchette_Boehme_Paulson_JAR2013,Paulson_Blanchette_IWIL2010} and the structured Isar language \cite{Wenzel_2007}.
+It was developed with Isabelle2025 \cite{Nipkow_Klein_2014,Nipkow_Paulson_Wenzel_2002} and with extensive usage of Sledgehammer \cite{Blanchette_Boehme_Paulson_JAR2013,Paulson_Blanchette_IWIL2010} and the structured Isar language \cite{Wenzel_2007}.
 In this paper, we only provide some interesting lemmas and proof sketches;
-we refer interested reader to the formalization for more details.
+we refer interested readers to the formalization for more details.
 
 \section{Background}
 \label{sec_background}
@@ -170,7 +170,7 @@ For every formula $\phi$ in negation normal form, $\bar{\phi}$ is equivalent to 
 Note that every formula in disjunctive or conjunctive
 normal form is also in negation normal form. For a formula $\phi$ in
 conjunctive normal form, the dual formula $\bar \phi$ is in disjunctive
-normal form, and vice cersa.
+normal form, and vice versa.
 
 It is well known that every formula of propositional logic can be transformed
 into an equivalent formula in disjunctive normal form and
@@ -254,7 +254,7 @@ We now define some operations to build the conjunction and disjunction of a list
 \end{definitionx}
 
 \begin{remark*}
-  Our formalization always use nonempty lists and the base cases of \cref{def_BigOr_BigAnd} could be be left unspecified.
+  Our formalization always uses nonempty lists and the base cases of \cref{def_BigOr_BigAnd} could be be left unspecified.
   However, providing these base cases allows us to prove many lemmas for arbitrary lists without requiring a nonemptyness assumption that would need to be repeatedly discharged.
 \end{remark*}
 
@@ -584,7 +584,7 @@ We use \cref{card_le_card_if_mem_imp_ex_mem} to prove that every $T \in \isaAp{\
 To do so, we instantiate $X$ with $\{1,\ldots,n\}$, $Y$ with the set of atoms of $T$, and the $f$ with the constructor for variables.
 Finding the correct statement for \cref{card_le_card_if_mem_imp_ex_mem} was challenging but, once found, it was easy to discharge the assumptions using step 1.\\
 
-Moreover, we chose modify the functions \textsf{BigAnd} and \textsf{BigOr} from Michaelis and Nipkow \cite{Propositional_Proof_Systems-AFP} and to define our own versions in \cref{def_BigOr_BigAnd}, where the base cases are handled differently.
+Moreover, we chose to modify the functions \textsf{BigAnd} and \textsf{BigOr} from Michaelis and Nipkow \cite{Propositional_Proof_Systems-AFP} and to define our own versions in \cref{def_BigOr_BigAnd}, where the base cases are handled differently.
 Our functions avoid appending $\lnot\bot$ and $\bot$ to the produced formula when the provided list is nonempty.
 This allowed us to prove the size equalities in \cref{thm_sizef_BigOr_undnf_BigAnd_unconj} instead of having the left-hand side of the lemmas be slightly smaller than the right-hand side.
 Using the original functions would have been possible, but it would have resulted in \cref{thm_cnf_to_dnf_blowup_math,thm_dnf_to_cnf_blowup_math} stating that the size $\left|\psi\right| + 2 \ge n \cdot 2^n$ instead of $\left|\psi\right| \ge n \cdot 2^n$.
