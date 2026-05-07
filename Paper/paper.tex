@@ -116,7 +116,7 @@ First, the low-level \Cref{thm_dnf_to_cnf_blowup} assumes again the existence of
 the proof uses \cref{thm_cnf_to_dnf_blowup}.
 Second, we use \cref{thm_dnf_to_cnf_blowup} to prove in the desired \cref{thm_dnf_to_cnf_blowup_math} that such formulas always exist.
 
-Finally, we discus (\cref{sec_discussion}) some of the challenges we encountered when proving statements about the size of formulas.
+Finally, we discuss (\cref{sec_discussion}) some of the challenges we encountered when proving statements about the size of formulas.
 
 Our work is part of the IsaFoL (Isabelle Formalization of Logic) effort \cite{Blanchette_CPP2019_IsaFoL}.
 Our formalization consists of ???? nonempty lines%
@@ -260,7 +260,7 @@ We now define some operations to build the conjunction and disjunction of a list
 
 \begin{remark*}
   Our formalization always use nonempty lists and the base cases of \cref{def_BigOr_BigAnd} could be be left unspecified.
-  However, providing these base cases allows us to prove many lemmas for arbiraty lists without requiring a nonemptyness assumption that would need to be repeatedly discharged.
+  However, providing these base cases allows us to prove many lemmas for arbitrary lists without requiring a nonemptyness assumption that would need to be repeatedly discharged.
 \end{remark*}
 
 We will later need to generate lists of formulas for $\cst{BigAnd'}$ and $\cst{BigOr'}$ and define two functions to do so.
