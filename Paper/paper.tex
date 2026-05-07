@@ -549,7 +549,7 @@ We claim that \cref{thm_dnf_to_cnf_blowup_math} is a formalization of the paper 
 
 Whereas most ideas of the paper proof can be directly used for the formalization, some intuitive mathematical proof steps required significant formalization effort.
 This was most pronounced in the proof steps 2 and 4 of \cref{thm_cnf_to_dnf_blowup}, where we derived statements about the size of a formula from its properties.
-To prove step 4, we use a general lemma (already included in Isabelle/HOL) about the cardinality of finite sets:
+To prove step 4, we use a general lemma (already included in Isabelle/HOL) about the cardinality of finite sets.
 
 \begin{lemma}
   \label{card_inj_on_le}
@@ -569,7 +569,8 @@ The first assumption was the most intricate and its proof uses both steps 1 and 
 the second assumption follows from step 3,
 the third assumption easily holds.
 
-To prove step 2, we introduced a new lemma, inspired by \cref{card_inj_on_le}, that uses a binary function that is right total w.r.t.\ the target set:
+To prove step 2, we introduced a new lemma, inspired by \cref{card_inj_on_le}, that uses a binary function that is right total w.r.t.\ the target set.
+
 \begin{lemma}
 	\label{card_le_card_if_mem_imp_ex_mem}
 	Let $X$ be a set of elements of type $\yA$ and $Y$ be a set of elements of type $\yC$.
