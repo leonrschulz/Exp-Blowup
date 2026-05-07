@@ -127,61 +127,62 @@ Our formalization consists of ???? nonempty lines%
 and is available online \cite{Formalization_GitHub};
 we will soon submit it to the \emph{Archive of Formal Proofs}.
 It was developped with Isabelle2025 \cite{Nipkow_Klein_2014,Nipkow_Paulson_Wenzel_2002} and with extensive usage of Sledgehammer \cite{Blanchette_Boehme_Paulson_JAR2013,Paulson_Blanchette_IWIL2010} and the structured Isar language \cite{Wenzel_2007}.
-We reused some background theories from Michaelis and Nipkow's formalization of proof systems for classical propositional logic \cite{Propositional_Proof_Systems-AFP,Michaelis_Nipkow_TYPES2017}.
 In this paper, we only provide some interesting lemmas and proof sketches;
 we refer interested reader to the formalization for more details.
 
 \section{Background}
 \label{sec_background}
 
-Formulas of propositional logic are constructed from variables
-(or \emph{atoms}) with the logical connectives negation $\neg$,
-disjunction $\lor$, conjunction $\land$ and implication $\to$.
+A \emph{formula} of propositional logic is defined inductively as either falsehood ($\bot$), an atom (or \emph{variable}), the negation ($\neg$) of a formula, or the disjunction ($\lor$), conjunction ($\land$) or implication ($\rightarrow$) of two formulas.
+A \emph{literal} is either an atom $x$, a negated atom $\neg x$, falsehood $\bot$, or negated falsehood $\neg\bot$.
+The literals $x$ and $\neg x$ as well as $\bot$ and $\neg\bot$ are \emph{complements} of each other.
 
-A \emph{literal} is a variable $x$ oder a negated variable
-$\neg x$. The literals $x$ and $\neg x$ are \emph{complements}
-of each other.
-%The complement of a lieral $a$ is denoted by $\bar{a}$.
+A \emph{valuation} is a function from atoms to Boolean values.
+The \emph{evaluation} of a formula w.r.t.\ a valuation is the Boolean value obtained after replacing all atoms with the specific truth values assigned by the valuation and evaluating according to the usual Boolean evaluation rules.
 
-A formula $F$ is in \emph{negation normal form}, if $F$ contains
-no implications, and negations in $F$ only occur immediately in front
-of variables, i.e., $F$ is built from literals by conjunction and
-disjunction only.
+We say that a valuation $\alpha$ \emph{satisfies} a formula $\phi$, written $\alpha \models \phi$, if the formula evaluates to true w.r.t.\ $\alpha$.
+A formula $\phi$ is
+\emph{satisfiable} if there exists a valuation that satisfies it (i.e., $\existsOne{\alpha}{\alpha \models \phi}$) and
+\emph{tautological} if it is satisfied by every valuation (i.e., $\forallOne{\alpha}{\alpha \models \phi}$).
+Two formulas $\phi$ and $\psi$ are \emph{equivalent} if they evaluate to the same truth value for every valuation (i.e., $\forallOne{\alpha}{\alpha \models \phi \iff \alpha \models \psi}$).
 
-For a formula $F$ in negation normal form we define the dual formula
-$\bar F$ in negation normal form by replacing every literal by its
-complement, and interchanging the symbols $\land$ and $\lor$.  For
-every formula $F$ in negation normal form, $\bar{F}$ is equivalent to
-$\neg F$.
+A formula $\phi$ is in \emph{negation normal form} if $\phi$ contains no implications and if negations only occur immediately in front of atoms or falsehood
+(i.e., $\phi$ is built from literals by conjunction and disjunction only).
 
-\begin{definition}
+For a formula $\phi$ in negation normal form we define the dual formula
+$\bar{\phi}$ in negation normal form by replacing every literal by its
+complement and interchanging the symbols $\land$ and $\lor$.
+For every formula $\phi$ in negation normal form, $\bar{\phi}$ is equivalent to $\neg \phi$.
+
+\begin{definitionx}
   We define the following classes of formulas:
 \begin{itemize}
-\item A \emph{term} is a conjunction $a_1 \lor \ldots \lor a_k$
+\item A \emph{term} is a conjunction $a_1 \land \ldots \land a_k$
   of literals.
-\item A \emph{clause} is a disjunction $a_1 \lor \ldots \lor a_k$ von Literalen.
+\item A \emph{clause} is a disjunction $a_1 \lor \ldots \lor a_k$ of literals.
 \item A formula in \emph{disjunctive normal form} (DNF) is a
   disjunction $T_1 \lor \ldots \lor T_m$ of terms.
 \item A formula in \emph{conjunctive normal form} (CNF) is a
   conjunction $C_1 \land \ldots \land C_m$ of clauses.
 \end{itemize}
-\end{definition}
+\end{definitionx}
 
-Note that every formula in disjunctive normal form or conjunctive
-normal form is also in negation normal form. For a formula $F$ in
-conjunctive normal form, the dual formula $\bar F$ is in disjunctive
+Note that every formula in disjunctive or conjunctive
+normal form is also in negation normal form. For a formula $\phi$ in
+conjunctive normal form, the dual formula $\bar \phi$ is in disjunctive
 normal form, and vice cersa.
 
-It is well known that every formula of propositional logic can be
-transformed into an equivalent formula in disjunctive normal form, and
-in conjunctive normal form, but the cost of these transformations is an
-exponential increase in size in the worst case, see, e.g., the textbook of
-Kleine B\"uning and Lettmann \cite{KleineBueningLettmann_Aussagenlogik}.
+It is well known that every formula of propositional logic can be transformed
+into an equivalent formula in disjunctive normal form and
+into an equivalent formula in conjunctive normal form.
+However, the cost of these transformations is an
+exponential increase in the formula size in the worst case (see, e.g., the textbook of
+Kleine B\"uning and Lettmann \cite{KleineBueningLettmann_Aussagenlogik}).
 
 \begin{theorem} \label{dnfblowup}
   For all sufficiently large $n\in\Nat$, there are formulas $F_n$ in
   conjunctive normal form with $|F_n| = O(n)$, such that every equivalent formula $G_n$ in
-  disjunctive normal form is of size $|G_n| \geq n2^n$.
+  disjunctive normal form is of size $|G_n| \geq n \cdot 2^n$.
 \end{theorem}
 \begin{proof}
 The formulas $F_n$ are defined as
@@ -189,26 +190,29 @@ $F_n = \bigwedge_{i=1}^n ( x_{i,0} \lor x_{i,1} ) \land (\neg x_{i,0} \lor \neg 
 
 If $G_n = \bigvee_{j\leq m} T_j$ is a formula in conjunctive normal form equivalent to $F_n$, then the following two claims hold, which together prove the statement.
 
-Claim 1. Each of the terms $T_j$ contains exactly one of the literals $x_{i,0}$ and $x_{i,1}$, for every $i\leq n$. In particular, every term $T_j$ is of size at least $n$.
+Claim 1. Each of the terms $T_j$ contains exactly one of the literals $x_{i,0}$ and $x_{i,1}$, for every $i\leq n$;
+otherwise, there is a valuation that satisfies this term, and thus $G_n$, but does not satisfy $F_n$.
+It follows that every term $T_j$ is of size at least $n$.
 
 Claim 2. For every vector
 $\epsilon = (\epsilon_1 , \ldots ,\epsilon_n) \in \{ 0,1 \}^n$,
 there is one of the terms $T_j$ in  $G_n$, which contains the literals
-$x_{1,\epsilon_1}, \ldots , x_{n,\epsilon_n}$.
-In particular, $G_n$ has at least $2^n$ many terms.
+$x_{1,\epsilon_1}, \ldots , x_{n,\epsilon_n}$;
+otherwise, we can find a valuation that satisfies $F_n$, but does not satisfy $G_n$.
+It follows that $G_n$ has at least $m \geq 2^n$ many terms.
 \end{proof}
 
 \begin{theorem} \label{cnfblowup}
   For all sufficiently large $n\in\Nat$, there are formulas $F'_n$ in
   disjunctive normal form with $|F'_n| = O(n)$, such that every equivalent formula $G_n$
-  in conjunctive normal form is of size $|G_n| \geq n2^n$.
+  in conjunctive normal form is of size $|G_n| \geq n \cdot 2^n$.
 \end{theorem}
 
 \begin{proof}
-  Let $F'_n := {\bar F}_n$ for the formulas $F_n$ of Theorem~\ref{dnfblowup}.
-  If there were formulas  $G_n \equiv F'_n$ in conjunctive normal form with $G_n < n2^n$,
-  then ${\bar G}_n \equiv F_n$ would be a formula in disjunctive normal form with
-  $|{\bar G}_n| = |G_n| < n2^n$, contradicting Theorem~\ref{dnfblowup}.
+  Let $F'_n = {\bar F}_n$ for the formula $F_n$ from the proof of \cref{dnfblowup}.
+  If there was a formula  $G_n$ in conjunctive normal form equivalent to $F'_n$ with $\left|G_n\right| < n \cdot 2^n$,
+  then ${\bar{G}}_n$ would be a formula in disjunctive normal form equivalent to $F_n$ with
+  $|{\bar{G}}_n| = |G_n| < n \cdot 2^n$, contradicting \cref{dnfblowup}.
 \end{proof}
 
 % TODO: Cite at least the book, and check for transitive citations.
@@ -219,25 +223,13 @@ In particular, $G_n$ has at least $2^n$ many terms.
 \section{Preliminaries}
 \label{sec_preliminaries}
 
-A \emph{formula} is defined inductively as either an atom, falsehood ($\bot$), the negation ($\neg$) of a formula, or the disjunction ($\lor$), conjunction ($\land$) or implication ($\rightarrow$) of two formulas.
-A \emph{literal} is a special case of a formula consisting of either a positive or negative atom, or a positive or negative $\bot$.
+We reused the theories of proposition formulas from Michaelis and Nipkow's formalization of proof systems for classical propositional logic \cite{Propositional_Proof_Systems-AFP,Michaelis_Nipkow_TYPES2017}.
+Formulas have type $\tyFormula{\yA}$, where $\yA$ is an abstract type of atoms.
 Basic operations on formulas and related lemmas are expressed for any atom type.
 However, our main theorems instantiate the atom type with variables $x_{i,b}$, where $i$ is a natural number and $b$ is a Boolean value.
+
 A formula is \emph{conjunctive} if it is either a literal or its first subformula is a literal and its second a conjunctive formula.
 Analogously a formula is \emph{disjunctive} if it is either a literal or its first subformula is a literal and its second a disjunctive formula.
-
-A \emph{valuation} is a function from atoms to Boolean values.
-The \emph{evaluation} of a formula w.r.t.\ a valuation is the Boolean value we get after replacing all atoms with the specific truth values assigned by the valuation.
-We say that a valuation $\alpha$ \emph{satisfies} a formula $\phi$, written $\alpha \models \phi$, if the formula evaluates to true w.r.t.\ the valuation.
-A formula $\phi$ is
-\emph{satisfiable} if there exists a valuation that satisfies it (i.e., $\existsOne{\alpha}{\alpha \models \phi}$) and
-\emph{tautological} if it is satisfied by every valuation (i.e., $\forallOne{\alpha}{\alpha \models \phi}$).
-Two formulas $\phi$ and $\psi$ are \emph{equivalent} if they have the same truth value for every valuation (i.e., $\forallOne{\alpha}{\alpha \models \phi \iff \alpha \models \psi}$).
-
-%\begin{definitionx}
-%  \label{def_set}
-%  The function $\tyAnnot{\cst{set}}{\tyList{\yA} \Rightarrow \tySet{\yA}}$ converts a list into a set.
-%\end{definitionx}
 
 We now define some operations to build the conjunction and disjunction of a list of formulas.
 
@@ -473,6 +465,10 @@ We start by defining a function to produce the dual of a formula and proving a f
   a conjunction $\phi \land \psi$ becomes $\isaAp{\cst{dualize}}{\phi} \lor \isaAp{\cst{dualize}}{\psi}$, and
   an implication $\phi \rightarrow \psi$ becomes $\phi \land \isaAp{\cst{dualize}}{\psi}$.
 \end{definitionx}
+
+\begin{remark*}
+  In contrast to the definition of dual formulas in \cref{sec_background}, we specify the $\cst{dualize}$ function for arbitrary formulas to avoid the recuring assumption that formulas are in negation normal form.
+\end{remark*}
 
 The semantics of the dual of a formula is the exact opposite of that of the original formula.
 
