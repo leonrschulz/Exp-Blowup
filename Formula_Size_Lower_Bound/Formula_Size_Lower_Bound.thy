@@ -636,8 +636,7 @@ proof -
     by auto
 qed
 
-lemma sat_Fn_iff:
-  shows "\<alpha> \<Turnstile> Fn n \<longleftrightarrow> (\<forall>i \<in> {1..n}. \<alpha> (Var i False) \<noteq> \<alpha> (Var i True))"
+lemma sat_Fn_iff: "\<alpha> \<Turnstile> Fn n \<longleftrightarrow> (\<forall>i \<in> {1..n}. \<alpha> (Var i False) \<noteq> \<alpha> (Var i True))"
 proof (induction n)
   case 0
   show ?case

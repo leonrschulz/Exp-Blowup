@@ -301,6 +301,13 @@ We will also need to construct formulas of a very specific family and define a f
   The formula $F_n$ is in conjunctive normal form.
 \end{lemma}
 
+\begin{lemma}
+  \label{thm_semantics_Fn_iff}
+  Let $n$ be a natural number.
+  Let $\alpha$ be a valuation.
+  The valuation $\alpha$ satisfies $F_n$ if and only if $(\isaAp{\alpha}{x_{i,false}}) \neq (\isaAp{\alpha}{x_{i,true}})$ for every $1 \le i \le n$.
+\end{lemma}
+
 Finally, we provide two different definitions for the size of a formula.
 
 \begin{definitionx}
@@ -408,7 +415,7 @@ We can now prove that some specific formulas equivalent to $F_n$ (see \cref{def_
   Either the variables $x_{i,0}$ and $x_{i,1}$ are both positively contained in $T$ or they are both not positively contained.
   In both cases, we proceed by defining a valuation that satisfies $G$ but not $F_n$.
   For instance, in the second case, we find a valuation that satisfies $T$ and change the assignment of the variables $x_{i,0}$ and $x_{i,1}$ to false.
-  We then show using \cref{aux_lemma_prop4_step1,aux_lemma_prop4_step3} that this modified valuation satisfies $T$ (and thus $G$) but does not satisfy $F_n$.
+  We then show using \cref{aux_lemma_prop4_step1,aux_lemma_prop4_step3,thm_semantics_Fn_iff} that this modified valuation satisfies $T$ (and thus $G$) but does not satisfy $F_n$.
   This means that $F_n$ is not equivalent to $G$, which contradicts the \lcnamecref{thm_cnf_to_dnf_blowup}'s assumption.
   \textbf{(2)}~From step 1, we derive that every $T \in \isaAp{\cst{set}}{Ts}$ has $\isaAp{\cstSizef}{T} \ge n$.
   \textbf{(3)}~Furthermore, we prove that for every Boolean list $\epsilon = [\epsilon_1,\ldots,\epsilon_n]$ there exists a $T \in \isaAp{\cst{set}}{Ts}$ that contains the corresponding variables $x_{1,\epsilon_1},\ldots,x_{n,\epsilon_n}$ positively.
