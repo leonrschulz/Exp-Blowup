@@ -89,24 +89,24 @@ lemma equiv_Not_Not_right[simp]: "\<And>\<phi> \<psi>. equiv \<phi> (Not (Not \<
 
 subsection \<open>Conjunctive Normal Form\<close>
 
-fun uncnf :: "'a formula \<Rightarrow> 'a formula list" where
-  "uncnf (And \<phi> \<psi>) = uncnf \<phi> @ uncnf \<psi>" |
-  "uncnf \<phi> = [\<phi>]"
+fun unconj :: "'a formula \<Rightarrow> 'a formula list" where
+  "unconj (And \<phi> \<psi>) = unconj \<phi> @ unconj \<psi>" |
+  "unconj \<phi> = [\<phi>]"
 
-lemma uncnf_neq_Nil[simp]: "uncnf \<phi> \<noteq> []"
+lemma unconj_neq_Nil[simp]: "unconj \<phi> \<noteq> []"
   by (induction \<phi>) simp_all
 
 fun count_And :: "'a formula \<Rightarrow> nat" where
   "count_And (And \<phi> \<psi>) = count_And \<phi> + count_And \<psi> + 1" |
   "count_And _ = 0"
 
-lemma length_uncnf: "length (uncnf \<phi>) = count_And \<phi> + 1"
+lemma length_unconj: "length (unconj \<phi>) = count_And \<phi> + 1"
   by (induction \<phi>) simp_all
 
-lemma ball_uncnf_is_disj:
+lemma ball_unconj_is_disj:
   fixes \<phi> :: "'a formula"
   assumes "is_cnf \<phi>"
-  shows "\<And>C. C \<in> set (uncnf \<phi>) \<Longrightarrow> is_disj C"
+  shows "\<And>C. C \<in> set (unconj \<phi>) \<Longrightarrow> is_disj C"
   using assms
   by (induction \<phi> rule: is_cnf.induct) auto
 
@@ -124,17 +124,17 @@ fun is_dnf :: "'a formula \<Rightarrow> bool" where
 lemma conj_is_dnf: "is_conj \<phi> \<Longrightarrow> is_dnf \<phi>"
   by (induction \<phi>) auto
 
-fun undnf :: "'a formula \<Rightarrow> 'a formula list" where
-  "undnf (Or \<phi> \<psi>) = undnf \<phi> @ undnf \<psi>" |
-  "undnf \<phi> = [\<phi>]"
+fun undisj :: "'a formula \<Rightarrow> 'a formula list" where
+  "undisj (Or \<phi> \<psi>) = undisj \<phi> @ undisj \<psi>" |
+  "undisj \<phi> = [\<phi>]"
 
-lemma undnf_neq_Nil[simp]: "undnf \<phi> \<noteq> []"
+lemma undisj_neq_Nil[simp]: "undisj \<phi> \<noteq> []"
   by (induction \<phi>) simp_all
 
-lemma ball_undnf_is_conj:
+lemma ball_undisj_is_conj:
   fixes \<phi> :: "'a formula"
   assumes "is_dnf \<phi>"
-  shows "\<And>T. T \<in> set (undnf \<phi>) \<Longrightarrow> is_conj T"
+  shows "\<And>T. T \<in> set (undisj \<phi>) \<Longrightarrow> is_conj T"
   using assms
   by (induction \<phi> rule: is_dnf.induct) auto
 
@@ -142,7 +142,7 @@ fun count_Or :: "'a formula \<Rightarrow> nat" where
   "count_Or (Or \<phi> \<psi>) = count_Or \<phi> + count_Or \<psi> + 1" |
   "count_Or _ = 0"
 
-lemma length_undnf: "length (undnf \<phi>) = count_Or \<phi> + 1"
+lemma length_undisj: "length (undisj \<phi>) = count_Or \<phi> + 1"
   by (induction \<phi>) simp_all
 
 subsection \<open>Big Conjunction\<close>
@@ -192,23 +192,23 @@ qed
 lemma equiv_BigOr'_append: "equiv (BigOr' (xs @ ys)) (Or (BigOr' xs) (BigOr' ys))"
   by (induction xs) (simp_all add: equiv_def)
 
-lemma equiv_BigOr'_undnf_if_dnf:
+lemma equiv_BigOr'_undisj_if_dnf:
   fixes \<phi> :: "'a formula"
-  shows "equiv (BigOr' (undnf \<phi>)) \<phi>"
+  shows "equiv (BigOr' (undisj \<phi>)) \<phi>"
 proof (induction \<phi> rule: is_dnf.induct)
   case (1 F G)
   then show ?case
     using equiv_BigOr'_append
-    by (smt (verit) equiv_def formula_semantics.simps(5) undnf.simps(1))
+    by (smt (verit) equiv_def formula_semantics.simps(5) undisj.simps(1))
 qed (simp_all add: equiv_def)
 
-lemma equiv_BigAnd'_uncnf_if_cnf:
+lemma equiv_BigAnd'_unconj_if_cnf:
   fixes \<phi> :: "'a formula"
-  shows "equiv (BigAnd' (uncnf \<phi>)) \<phi>"
-proof (induction \<phi> rule: uncnf.induct)
+  shows "equiv (BigAnd' (unconj \<phi>)) \<phi>"
+proof (induction \<phi> rule: unconj.induct)
   case (1 F G)
   then show ?case
-    by (smt (verit) equiv_def equiv_BigAnd'_append formula_semantics.simps(4) uncnf.simps(1))
+    by (smt (verit) equiv_def equiv_BigAnd'_append formula_semantics.simps(4) unconj.simps(1))
 qed (simp_all add: equiv_def)
 
 
@@ -402,81 +402,81 @@ lemma sizef_BigAnd': "xs \<noteq> [] \<Longrightarrow> sizef (BigAnd' xs) + 1 = 
 lemma size_BigAnd': "xs \<noteq> [] \<Longrightarrow> size (BigAnd' xs) + 1 = sum_list (map size xs) + length xs"
   by (induction xs rule: BigAnd'.induct) simp_all
 
-lemma sizef_conv_sum_list_undnf: "sizef \<phi> = sum_list (map sizef (undnf \<phi>)) + count_Or \<phi>"
+lemma sizef_conv_sum_list_undisj: "sizef \<phi> = sum_list (map sizef (undisj \<phi>)) + count_Or \<phi>"
   by (induction \<phi>) simp_all
 
-lemma size_conv_sum_list_undnf: "size \<phi> = sum_list (map size (undnf \<phi>)) + count_Or \<phi>"
+lemma size_conv_sum_list_undisj: "size \<phi> = sum_list (map size (undisj \<phi>)) + count_Or \<phi>"
   by (induction \<phi>) simp_all
 
-lemma sizef_conv_sum_list_uncnf: "sizef \<phi> = sum_list (map sizef (uncnf \<phi>)) + count_And \<phi>"
+lemma sizef_conv_sum_list_unconj: "sizef \<phi> = sum_list (map sizef (unconj \<phi>)) + count_And \<phi>"
   by (induction \<phi>) simp_all
 
-lemma size_conv_sum_list_uncnf: "size \<phi> = sum_list (map size (uncnf \<phi>)) + count_And \<phi>"
+lemma size_conv_sum_list_unconj: "size \<phi> = sum_list (map size (unconj \<phi>)) + count_And \<phi>"
   by (induction \<phi>) simp_all
 
-lemma sizef_BigOr'_undnf:
+lemma sizef_BigOr'_undisj:
   fixes \<phi> :: "'a formula"
-  shows "sizef (BigOr' (undnf \<phi>)) = sizef \<phi>"
+  shows "sizef (BigOr' (undisj \<phi>)) = sizef \<phi>"
 proof -
-  have "sizef \<phi> + 1 = sum_list (map sizef (undnf \<phi>)) + count_Or \<phi> + 1"
-    using sizef_conv_sum_list_undnf[of \<phi>] by presburger
+  have "sizef \<phi> + 1 = sum_list (map sizef (undisj \<phi>)) + count_Or \<phi> + 1"
+    using sizef_conv_sum_list_undisj[of \<phi>] by presburger
 
-  also have "\<dots> = sum_list (map sizef (undnf \<phi>)) + length (undnf \<phi>)"
-    using length_undnf[of \<phi>] by presburger
+  also have "\<dots> = sum_list (map sizef (undisj \<phi>)) + length (undisj \<phi>)"
+    using length_undisj[of \<phi>] by presburger
 
-  also have "\<dots> = sizef (BigOr' (undnf \<phi>)) + 1"
-    using sizef_BigOr'[of "undnf \<phi>", simplified] by presburger
+  also have "\<dots> = sizef (BigOr' (undisj \<phi>)) + 1"
+    using sizef_BigOr'[of "undisj \<phi>", simplified] by presburger
 
   finally show ?thesis
     by presburger
 qed
 
-lemma size_BigOr'_undnf:
+lemma size_BigOr'_undisj:
   fixes \<phi> :: "'a formula"
-  shows "size (BigOr' (undnf \<phi>)) = size \<phi>"
+  shows "size (BigOr' (undisj \<phi>)) = size \<phi>"
 proof -
-  have "size \<phi> + 1 = sum_list (map size (undnf \<phi>)) + count_Or \<phi> + 1"
-    using size_conv_sum_list_undnf[of \<phi>] by presburger
+  have "size \<phi> + 1 = sum_list (map size (undisj \<phi>)) + count_Or \<phi> + 1"
+    using size_conv_sum_list_undisj[of \<phi>] by presburger
 
-  also have "\<dots> = sum_list (map size (undnf \<phi>)) + length (undnf \<phi>)"
-    using length_undnf[of \<phi>] by presburger
+  also have "\<dots> = sum_list (map size (undisj \<phi>)) + length (undisj \<phi>)"
+    using length_undisj[of \<phi>] by presburger
 
-  also have "\<dots> = size (BigOr' (undnf \<phi>)) + 1"
-    using size_BigOr'[of "undnf \<phi>", simplified] by presburger
+  also have "\<dots> = size (BigOr' (undisj \<phi>)) + 1"
+    using size_BigOr'[of "undisj \<phi>", simplified] by presburger
 
   finally show ?thesis
     by presburger
 qed
 
-lemma sizef_BigAnd'_uncnf:
+lemma sizef_BigAnd'_unconj:
   fixes \<phi> :: "'a formula"
-  shows "sizef (BigAnd' (uncnf \<phi>)) = sizef \<phi>"
+  shows "sizef (BigAnd' (unconj \<phi>)) = sizef \<phi>"
 proof -
-  have "sizef \<phi> + 1 = sum_list (map sizef (uncnf \<phi>)) + count_And \<phi> + 1"
-    using sizef_conv_sum_list_uncnf[of \<phi>] by presburger
+  have "sizef \<phi> + 1 = sum_list (map sizef (unconj \<phi>)) + count_And \<phi> + 1"
+    using sizef_conv_sum_list_unconj[of \<phi>] by presburger
 
-  also have "\<dots> = sum_list (map sizef (uncnf \<phi>)) + length (uncnf \<phi>)"
-    using length_uncnf[of \<phi>] by presburger
+  also have "\<dots> = sum_list (map sizef (unconj \<phi>)) + length (unconj \<phi>)"
+    using length_unconj[of \<phi>] by presburger
 
-  also have "\<dots> = sizef (BigAnd' (uncnf \<phi>)) + 1"
-    using sizef_BigAnd'[of "uncnf \<phi>", simplified] by presburger
+  also have "\<dots> = sizef (BigAnd' (unconj \<phi>)) + 1"
+    using sizef_BigAnd'[of "unconj \<phi>", simplified] by presburger
 
   finally show ?thesis
     by presburger
 qed
 
-lemma size_BigAnd'_uncnf:
+lemma size_BigAnd'_unconj:
   fixes \<phi> :: "'a formula"
-  shows "size (BigAnd' (uncnf \<phi>)) = size \<phi>"
+  shows "size (BigAnd' (unconj \<phi>)) = size \<phi>"
 proof -
-  have "size \<phi> + 1 = sum_list (map size (uncnf \<phi>)) + count_And \<phi> + 1"
-    using size_conv_sum_list_uncnf[of \<phi>] by presburger
+  have "size \<phi> + 1 = sum_list (map size (unconj \<phi>)) + count_And \<phi> + 1"
+    using size_conv_sum_list_unconj[of \<phi>] by presburger
 
-  also have "\<dots> = sum_list (map size (uncnf \<phi>)) + length (uncnf \<phi>)"
-    using length_uncnf[of \<phi>] by presburger
+  also have "\<dots> = sum_list (map size (unconj \<phi>)) + length (unconj \<phi>)"
+    using length_unconj[of \<phi>] by presburger
 
-  also have "\<dots> = size (BigAnd' (uncnf \<phi>)) + 1"
-    using size_BigAnd'[of "uncnf \<phi>", simplified] by presburger
+  also have "\<dots> = size (BigAnd' (unconj \<phi>)) + 1"
+    using size_BigAnd'[of "unconj \<phi>", simplified] by presburger
 
   finally show ?thesis
     by presburger
@@ -1103,25 +1103,25 @@ lemma ex_equiv_disj_list_if_is_dnf:
     (\<forall>T \<in> set Ts. \<exists>\<alpha>. \<alpha> \<Turnstile> T)"
 proof -
   define Ts :: "'a formula list" where
-    "Ts = filter (\<lambda>T. \<exists>\<alpha>. \<alpha> \<Turnstile> T) (undnf \<phi>)"
+    "Ts = filter (\<lambda>T. \<exists>\<alpha>. \<alpha> \<Turnstile> T) (undisj \<phi>)"
 
   show ?thesis
   proof (intro exI[of _ Ts] conjI ballI)
-    have "equiv \<phi> (BigOr' (undnf \<phi>))"
-      using equiv_BigOr'_undnf_if_dnf[symmetric] .
+    have "equiv \<phi> (BigOr' (undisj \<phi>))"
+      using equiv_BigOr'_undisj_if_dnf[symmetric] .
     then show "equiv \<phi> (BigOr' Ts)"
       unfolding Ts_def
       by (smt (verit) BigOr'_semantics equiv_def mem_Collect_eq set_filter)
   next
-    have "sizef (BigOr' (undnf \<phi>)) = sizef \<phi>"
-      using sizef_BigOr'_undnf .
+    have "sizef (BigOr' (undisj \<phi>)) = sizef \<phi>"
+      using sizef_BigOr'_undisj .
     then show "sizef (BigOr' Ts) \<le> sizef \<phi>"
       unfolding Ts_def
-      using sizef_BigOr'_filter_le[of "\<lambda>T. \<exists>\<alpha>. \<alpha> \<Turnstile> T" "undnf \<phi>"]
+      using sizef_BigOr'_filter_le[of "\<lambda>T. \<exists>\<alpha>. \<alpha> \<Turnstile> T" "undisj \<phi>"]
       by presburger
   next
     show "\<And>T. T \<in> set Ts \<Longrightarrow> is_conj T"
-      using ball_undnf_is_conj[OF dnf]
+      using ball_undisj_is_conj[OF dnf]
       by (simp add: Ts_def)
   next
     show "\<And>T. T \<in> set Ts \<Longrightarrow> \<exists>\<alpha>. \<alpha> \<Turnstile> T"
@@ -1137,30 +1137,30 @@ lemma ex_equiv_disj_list_if_is_dnf':
     (\<forall>T \<in> set Ts. is_conj T) \<and>
     (\<forall>T \<in> set Ts. \<exists>\<alpha>. \<alpha> \<Turnstile> T)"
 proof -
-  have bex_sat: "\<exists>T \<in> set (undnf \<phi>). \<exists>\<alpha>. \<alpha> \<Turnstile> T"
+  have bex_sat: "\<exists>T \<in> set (undisj \<phi>). \<exists>\<alpha>. \<alpha> \<Turnstile> T"
     using sat
-    by (metis equiv_def BigOr'_semantics equiv_BigOr'_undnf_if_dnf)
+    by (metis equiv_def BigOr'_semantics equiv_BigOr'_undisj_if_dnf)
 
   define Ts :: "'a formula list" where
-    "Ts = filter (\<lambda>T. \<exists>\<alpha>. \<alpha> \<Turnstile> T) (undnf \<phi>)"
+    "Ts = filter (\<lambda>T. \<exists>\<alpha>. \<alpha> \<Turnstile> T) (undisj \<phi>)"
 
   show ?thesis
   proof (intro exI[of _ Ts] conjI ballI)
-    have "equiv \<phi> (BigOr' (undnf \<phi>))"
-      using equiv_BigOr'_undnf_if_dnf[symmetric] .
+    have "equiv \<phi> (BigOr' (undisj \<phi>))"
+      using equiv_BigOr'_undisj_if_dnf[symmetric] .
     then show "equiv \<phi> (BigOr' Ts)"
       unfolding Ts_def
       by (smt (verit) BigOr'_semantics equiv_def mem_Collect_eq set_filter)
   next
-    have "size (BigOr' (undnf \<phi>)) = size \<phi>"
-      using size_BigOr'_undnf .
+    have "size (BigOr' (undisj \<phi>)) = size \<phi>"
+      using size_BigOr'_undisj .
     then show "size (BigOr' Ts) \<le> size \<phi>"
       unfolding Ts_def
       using size_BigOr'_filter_le_if[OF bex_sat]
       by presburger
   next
     show "\<And>T. T \<in> set Ts \<Longrightarrow> is_conj T"
-      using ball_undnf_is_conj[OF dnf]
+      using ball_undisj_is_conj[OF dnf]
       by (simp add: Ts_def)
   next
     show "\<And>T. T \<in> set Ts \<Longrightarrow> \<exists>\<alpha>. \<alpha> \<Turnstile> T"
@@ -1285,25 +1285,25 @@ lemma ex_equiv_conj_list_if_is_cnf:
     (\<forall>C \<in> set Cs. \<not> \<Turnstile> C)"
 proof -
   define Cs :: "'a formula list" where
-    "Cs = filter (\<lambda>C. \<not> \<Turnstile> C) (uncnf \<phi>)"
+    "Cs = filter (\<lambda>C. \<not> \<Turnstile> C) (unconj \<phi>)"
 
   show ?thesis
   proof (intro exI[of _ Cs] conjI ballI)
-    have "equiv \<phi> (BigAnd' (uncnf \<phi>))"
-      using equiv_BigAnd'_uncnf_if_cnf[symmetric] .
+    have "equiv \<phi> (BigAnd' (unconj \<phi>))"
+      using equiv_BigAnd'_unconj_if_cnf[symmetric] .
     then show "equiv \<phi> (BigAnd' Cs)"
       unfolding Cs_def
       by (smt (verit, del_insts) BigAnd'_semantics equiv_def mem_Collect_eq set_filter)
   next
-    have "sizef (BigAnd' (uncnf \<phi>)) = sizef \<phi>"
-      using sizef_BigAnd'_uncnf .
+    have "sizef (BigAnd' (unconj \<phi>)) = sizef \<phi>"
+      using sizef_BigAnd'_unconj .
     then show "sizef (BigAnd' Cs) \<le> sizef \<phi>"
       unfolding Cs_def
-      using sizef_BigAnd'_filter_le[of "\<lambda>C. \<not> \<Turnstile> C" "uncnf \<phi>"]
+      using sizef_BigAnd'_filter_le[of "\<lambda>C. \<not> \<Turnstile> C" "unconj \<phi>"]
       by presburger
   next
     show "\<And>C. C \<in> set Cs \<Longrightarrow> is_disj C"
-      using ball_uncnf_is_disj[OF cnf]
+      using ball_unconj_is_disj[OF cnf]
       by (simp add: Cs_def)
   next
     show "\<And>C. C \<in> set Cs \<Longrightarrow> \<not> \<Turnstile> C"

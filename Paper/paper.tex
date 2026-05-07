@@ -265,20 +265,20 @@ We now define some operations to build the conjunction and disjunction of a list
 
 We will later need to generate lists of formulas for $\cst{BigAnd'}$ and $\cst{BigOr'}$ and define two functions to do so.
 
-\begin{definition}
-  \label{def_uncnf_undnf}
+\begin{definitionx}
+  \label{def_unconj_undisj}
   The functions
-  $\tyAnnot{\cst{uncnf}}{\tyFormula{\yA} \Rightarrow \tyList{\tyFormula{\yA}}}$ and
-  $\tyAnnot{\cst{undnf}}{\tyFormula{\yA} \Rightarrow \tyList{\tyFormula{\yA}}}$ respectively
+  $\tyAnnot{\cst{unconj}}{\tyFormula{\yA} \Rightarrow \tyList{\tyFormula{\yA}}}$ and
+  $\tyAnnot{\cst{undisj}}{\tyFormula{\yA} \Rightarrow \tyList{\tyFormula{\yA}}}$ respectively
   extract the list of subformulas directly under the conjunctions and disjunctions of a given formula:%
   \footnote{The infix operation $xs \mathop{@} ys$ appends a list $xs$ at the front of a list $ys$.}
   \begin{align*}
-    \isaAp{\cst{uncnf}}{(\phi \land \psi)} =\; & \isaAp{\cst{uncnf}}{\phi} \mathop{@} \isaAp{\cst{uncnf}}{\psi} &
-    \isaAp{\cst{undnf}}{(\phi \lor \psi)} =\; & \isaAp{\cst{undnf}}{\phi} \mathop{@} \isaAp{\cst{undnf}}{\psi} \\
-    \isaAp{\cst{uncnf}}{\phi} =\; & [\phi] &
-    \isaAp{\cst{undnf}}{\phi} =\; & [\phi]
+    \isaAp{\cst{unconj}}{(\phi \land \psi)} =\; & \isaAp{\cst{unconj}}{\phi} \mathop{@} \isaAp{\cst{unconj}}{\psi} &
+    \isaAp{\cst{undisj}}{(\phi \lor \psi)} =\; & \isaAp{\cst{undisj}}{\phi} \mathop{@} \isaAp{\cst{undisj}}{\psi} \\
+    \isaAp{\cst{unconj}}{\phi} =\; & [\phi] &
+    \isaAp{\cst{undisj}}{\phi} =\; & [\phi]
   \end{align*}
-\end{definition}
+\end{definitionx}
 
 We will also need to construct formulas of a very specific family and define a function to do so.
 
@@ -333,15 +333,15 @@ We can observe the difference between the two definitions by looking at the size
 \end{lemma}
 
 \begin{lemma}
-  \label{thm_sizef_BigOr_undnf_BigAnd_uncnf}
+  \label{thm_sizef_BigOr_undnf_BigAnd_unconj}
 	Let $\phi$ be a formula in conjunctive normal form and $\psi$ be a formula in disjunctive normal form.
   The following equalities hold:
   \begin{align*}
-    \isaAp{\cstSizef}{\left(\bigwedge\nolimits_{i = 0}\nolimits^{\listLength{\isaAp{\cst{uncnf}}{\phi}}} \listNth{(\isaAp{\cst{uncnf}}{\phi})}{i}\right)} =\:& \isaAp{\cstSizef}{\phi} &
-    \left|\bigwedge\nolimits_{i = 0}\nolimits^{\listLength{\isaAp{\cst{uncnf}}{\phi}}} \listNth{(\isaAp{\cst{uncnf}}{\phi})}{i}\right| =\:& \left|\phi\right|
+    \isaAp{\cstSizef}{\left(\bigwedge\nolimits_{i = 0}\nolimits^{\listLength{\isaAp{\cst{unconj}}{\phi}}} \listNth{(\isaAp{\cst{unconj}}{\phi})}{i}\right)} =\:& \isaAp{\cstSizef}{\phi} &
+    \left|\bigwedge\nolimits_{i = 0}\nolimits^{\listLength{\isaAp{\cst{unconj}}{\phi}}} \listNth{(\isaAp{\cst{unconj}}{\phi})}{i}\right| =\:& \left|\phi\right|
     \\
-    \isaAp{\cstSizef}{\left(\bigvee\nolimits_{i = 0}\nolimits^{\listLength{\isaAp{\cst{undnf}}{\psi}}} \listNth{(\isaAp{\cst{undnf}}{\psi})}{i}\right)} =\:& \isaAp{\cstSizef}{\psi} &
-    \left|\bigvee\nolimits_{i = 0}\nolimits^{\listLength{\isaAp{\cst{undnf}}{\psi}}} \listNth{(\isaAp{\cst{undnf}}{\psi})}{i}\right| =\:& \left|\psi\right|
+    \isaAp{\cstSizef}{\left(\bigvee\nolimits_{i = 0}\nolimits^{\listLength{\isaAp{\cst{undisj}}{\psi}}} \listNth{(\isaAp{\cst{undisj}}{\psi})}{i}\right)} =\:& \isaAp{\cstSizef}{\psi} &
+    \left|\bigvee\nolimits_{i = 0}\nolimits^{\listLength{\isaAp{\cst{undisj}}{\psi}}} \listNth{(\isaAp{\cst{undisj}}{\psi})}{i}\right| =\:& \left|\psi\right|
   \end{align*}
 \end{lemma}
 
@@ -434,10 +434,10 @@ We now prove that such equivalent formulas do exist and that the exponential blo
   We define $\phi = F_n$ (see \cref{def_Fn});
   it is easy to show that $F_n$ is in conjunctive normal form (using \cref{thm_is_cnf_Fn}) and that $\left|\phi\right| = 10 \cdot n + 2$ (using \cref{thm_sizef_Fn}).
   To prove the last property, we assume that there is an equivalent formula $\psi$ in disjunctive normal form.
-  We first obtain a list $Ts$ (by filtering $\isaAp{\cst{undnf}}{\psi}$) of all satisfiable terms in $\psi$ such that
+  We first obtain a list $Ts$ (by filtering $\isaAp{\cst{undisj}}{\psi}$) of all satisfiable terms in $\psi$ such that
   all formulas in $Ts$ are conjunctive and satisfiable,
-  %TODO: think whether we could explain the trick with filter and undnf. Maybe extract to its own lemma?
-  $\isaAp{\cstSizef}{\psi} \ge \isaAp{\cstSizef}{(\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i})}$ (using \cref{thm_sizef_BigOr_undnf_BigAnd_uncnf}),
+  %TODO: think whether we could explain the trick with filter and undisj. Maybe extract to its own lemma?
+  $\isaAp{\cstSizef}{\psi} \ge \isaAp{\cstSizef}{(\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i})}$ (using \cref{thm_sizef_BigOr_undnf_BigAnd_unconj}),
   and $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$ is equivalent to $\psi$.
   From this last equivalence, we show that $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$ is equivalent to $F_n$.
   This allows us to prove that $\isaAp{\cstSizef}{(\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i})} \ge n \cdot 2^n$ using \cref{thm_cnf_to_dnf_blowup}.
@@ -578,11 +578,11 @@ To do so, we instantiate $X$ with $\{1,\ldots,n\}$, $Y$ with the set of atoms of
 Finding the correct statement for \cref{card_le_card_if_mem_imp_ex_mem} was challenging but, once found, it was easy to discharge the assumptions using step 1.\\
 
 %TODO (LRS): add a paragraph to explain why we defined our own version of BigAnd' and BigOr' instead of reusing BigAnd and BigOr from "Tobias Nipkow's formalization" Propositional_Proof_Systems.
-%Hint: this was necessary to prove the sizef equality of lemma sizef_BigOr'_undnf and analogously for BigAnd'.
+%Hint: this was necessary to prove the sizef equality of lemma sizef_BigOr'_undisj and analogously for BigAnd'.
 
 Moreover, we chose modify the functions \textsf{BigAnd} and \textsf{BigOr} from Michaelis and Nipkow \cite{Propositional_Proof_Systems-AFP} and to define our own versions in \cref{def_BigOr_BigAnd}, where the base cases are handled differently.
 Our functions avoid appending $\lnot\bot$ and $\bot$ to the produced formula when the provided list is nonempty.
-This allowed us to prove the size equalities in \cref{thm_sizef_BigOr_undnf_BigAnd_uncnf} instead of having the left-hand side of the lemmas be slightly smaller than the right-hand side.
+This allowed us to prove the size equalities in \cref{thm_sizef_BigOr_undnf_BigAnd_unconj} instead of having the left-hand side of the lemmas be slightly smaller than the right-hand side.
 Using the original functions would have been possible, but it would have resulted in \cref{thm_cnf_to_dnf_blowup_math,thm_dnf_to_cnf_blowup_math} stating that the size $\left|\psi\right| + 2 \ge n \cdot 2^n$ instead of $\left|\psi\right| \ge n \cdot 2^n$.
 To keep the statements as close as possible to their mathematical counterparts, we therefore chose to introduce the functions \textsf{BigAnd'} and \textsf{BigOr'}.
 
