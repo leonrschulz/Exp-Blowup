@@ -111,13 +111,13 @@ In this paper, we first briefly cover the necessary mathematical background (\cr
 We start by presenting a few preliminary definitions and lemmas (\cref{sec_preliminaries}).
 
 We then prove the exponential blowup when converting a formula from conjunctive to disjunctive normal form (\cref{sec_CNF_to_DNF}).
-We do this in two steps:
+We achieve this in two steps:
 First, we prove the low-level \cref{thm_cnf_to_dnf_blowup} that assumes the existence of two equivalent formulas fulfilling some assumptions and that exhibits the exponential lower bound on the formula size.
 Second, we use this \lcnamecref{thm_cnf_to_dnf_blowup} to prove in the desired \cref{thm_cnf_to_dnf_blowup_math} that such formulas always exist.
 
 We analogously prove the same exponential blowup when converting a formula from disjunctive to conjunctive normal form (\cref{sec_DNF_to_CNF}).
 We do this again in two steps:
-First, the low-level \Cref{thm_dnf_to_cnf_blowup} assumes again the existence of two equivalent formulas fulfilling some assumptions and exhibits the exponential lower bound on the formula size;
+First, the low-level \Cref{thm_dnf_to_cnf_blowup} assumes the existence of two equivalent formulas fulfilling some assumptions and exhibits the exponential lower bound on the formula size;
 the proof uses \cref{thm_cnf_to_dnf_blowup}.
 Second, we use \cref{thm_dnf_to_cnf_blowup} to prove in the desired \cref{thm_dnf_to_cnf_blowup_math} that such formulas always exist.
 
@@ -129,7 +129,7 @@ Our formalization consists of approximately 1100 nonempty lines%
 and is available online \cite{Formalization_GitHub};
 we will soon submit it to the \emph{Archive of Formal Proofs}.
 It was developed with Isabelle2025 \cite{Nipkow_Klein_2014,Nipkow_Paulson_Wenzel_2002} and with extensive usage of Sledgehammer \cite{Blanchette_Boehme_Paulson_JAR2013,Paulson_Blanchette_IWIL2010} and the structured Isar language \cite{Wenzel_2007}.
-In this paper, we only provide some interesting lemmas and proof sketches;
+In this paper, we only provide some key lemmas and proof sketches;
 we refer interested readers to the formalization for more details.
 
 \section{Background}
