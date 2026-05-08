@@ -602,6 +602,9 @@ However, if we tried to restate and prove the statement of \cref{thm_dnf_to_cnf_
 \section{Conclusion}
 \label{sec_concl}
 
+We formalized in Isabelle/HOL the well-known folklore result about propositional logic that transforming a formula in disjunctive or conjunctive normal form can lead to an exponential blowup of the formula size.
+The proof is split into a low-level \lcnamecref{thm_cnf_to_dnf_blowup} and a \lcnamecref{thm_cnf_to_dnf_blowup_math} for conversion to disjunctive normal form and analogously for conversion to conjunctive normal form.
+We also reported of some challenges we faced we encountered when proving statements about the size of formula.
 
 %%
 %% Bibliography
