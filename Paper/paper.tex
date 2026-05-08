@@ -365,7 +365,7 @@ We first prove a monotonicity property of satisfiability w.r.t. valuations.
   \label{aux_lemma_prop4_step1}
   Let $\phi$ be a conjunctive formula.
   Let $\alpha$ and $\beta$ be valuations.
-  If both valuations map every variable occuring in $\phi$ to the same Boolean value and
+  If both valuations map every variable occurring in $\phi$ to the same Boolean value and
   if $\alpha$ satisfies $\phi$,
   then $\beta$ also satisfies $\phi$.
 \end{lemma}
@@ -460,7 +460,7 @@ We start by defining a function to produce the dual of a formula and proving a f
 
 \begin{definitionx}
   \label{def_dualize}
-  The function $\tyAnnot{\cst{dualize}}{\tyFormula{\yA} \Rightarrow \tyFormula{\yA}}$ converts a formula to its dualized form by replacing each literal with its complementary:
+  The function $\tyAnnot{\cst{dualize}}{\tyFormula{\yA} \Rightarrow \tyFormula{\yA}}$ converts a formula to its dual form by replacing each literal with its complementary:
   an atom $A$ becomes $\neg A$,
   falsehood $\bot$ becomes $\neg\bot$,
   a negation $\neg \phi$ becomes $\phi$,
@@ -470,7 +470,7 @@ We start by defining a function to produce the dual of a formula and proving a f
 \end{definitionx}
 
 \begin{remark*}
-  In contrast to the definition of dual formulas in \cref{sec_background}, we specify the $\cst{dualize}$ function for arbitrary formulas to avoid the recuring assumption that formulas are in negation normal form.
+  In contrast to the definition of dual formulas in \cref{sec_background}, we specify the $\cst{dualize}$ function for arbitrary formulas to avoid the recurring assumption that formulas are in negation normal form.
 \end{remark*}
 
 The semantics of the dual of a formula is the exact opposite of that of the original formula.
@@ -489,7 +489,7 @@ Because the $\cstSizef$ function ignores negations, the $\cst{dualize}$ function
   $\isaAp{\cstSizef}{(\isaAp{\cst{dualize}}{\phi})} = \isaAp{\cstSizef}{\phi}$.
 \end{lemma}
 
-Next, we prove some sufficient condition for a dualized formula to be satisfiable.
+Next, we prove some sufficient condition for a dual formula to be satisfiable.
 
 \begin{lemma}
   \label{thm_dualized_disj_not_taut_impl_sat}
@@ -508,7 +508,7 @@ Next, we prove that the dual of some specific formulas in disjunctive normal for
 \end{lemma}
 \begin{proof}
   We prove this by structural induction over the list $Cs$ using \cref{thm_dualized_disj_not_taut_impl_sat}.
-  The idea is that each element of $Cs$ gets dualized.
+  The idea is to map each element of $Cs$ to its dual form.
 \end{proof}
 
 We can now prove that some specific formulas equivalent to the dual of $F_n$ (see \cref{def_Fn}) have a size exponential in $n$.
