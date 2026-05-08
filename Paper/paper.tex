@@ -392,7 +392,8 @@ Next, we prove a lower bound of the size of $\bigvee_{i=0}^{\listLength{\phi{}s}
   Let $\phi{}s$ be a list of formulas.
   If every $\phi \in \isaAp{\cst{set}}{\phi{}s}$ has $\isaAp{\cstSizef}{\phi} \ge m$ and
   if $\listLength{\phi{}s} \ge 2^n$,
-  then $\isaAp{\cstSizef}{(\bigvee_{i=0}^{\listLength{\phi{}s}} \listNth{\phi{}s}{i})} \ge m \cdot 2^n$.
+  then $\isaAp{\cstSizef}{(\bigvee_{i=0}^{\listLength{\phi{}s}} \listNth{\phi{}s}{i})} \ge m \cdot 2^n$.%
+  \footnote{The function $\tyAnnot{\cst{set}}{\tyList{\yA} \Rightarrow \tySet{\yA}}$ converts a list into a set.}
 \end{lemma}
 
 We can now prove that some specific formulas equivalent to $F_n$ (see \cref{def_Fn}) have a size exponential in $n$.
