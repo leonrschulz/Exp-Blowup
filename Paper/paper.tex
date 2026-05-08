@@ -16,6 +16,17 @@
 
 %\graphicspath{{./graphics/}}%helpful if your graphic files are in another directory
 
+\usepackage{amssymb}
+\newcommand{\Nat}{\mathbb{N}}
+
+\usepackage{cleveref}
+
+\theoremstyle{definition}
+\newtheorem{definitionx}[theorem]{Definition}
+
+\crefname{definitionx}{Definition}{Definitions}
+\Crefname{definitionx}{Definition}{Definitions}
+
 \bibliographystyle{plainurl}% the mandatory bibstyle
 
 \title{Formalizing the Exponential Blowup in the Transformations between CNF and DNF}
@@ -74,16 +85,6 @@ This paper is based on Schulz's bachelor thesis supervised by Johannsen with the
 
 % TODO: write a Makefile that uses podman to compile the paper in a container based on TL2025-historic
 
-\usepackage{amssymb}
-\newcommand{\Nat}{\mathbb{N}}
-
-\usepackage{cleveref}
-
-\theoremstyle{definition}
-\newtheorem{definitionx}[theorem]{Definition}
-
-\crefname{definitionx}{Definition}{Definitions}
-\Crefname{definitionx}{Definition}{Definitions}
 
 \input{def.tex}
 
