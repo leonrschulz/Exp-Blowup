@@ -91,7 +91,6 @@ We thank Jasmin Blanchette for suggesting textual improvements.
 \input{def.tex}
 
 %TODO: Change label of proof environment to "Proof sketch"
-%TODO: Sadly, use abbreviations for DNF and CNF everywhere.
 
 \begin{document}
 
@@ -170,28 +169,26 @@ For every formula $\phi$ in negation normal form, $\bar{\phi}$ is equivalent to 
 \end{itemize}
 \end{definitionx}
 
-Note that every formula in disjunctive or conjunctive
-normal form is also in negation normal form. For a formula $\phi$ in
-conjunctive normal form, the dual formula $\bar \phi$ is in disjunctive
-normal form, and vice versa.
+Note that every formula in DNF or CNF is also in negation normal form.
+For a formula $\phi$ in CNF, the dual formula $\bar \phi$ is in DNF, and vice versa.
 
 It is well known that every formula of propositional logic can be transformed
-into an equivalent formula in disjunctive normal form and
-into an equivalent formula in conjunctive normal form.
+into an equivalent formula in DNF and
+into an equivalent formula in CNF.
 However, the cost of these transformations is an
 exponential increase in the formula size in the worst case (see, e.g., Kleine B\"uning and Lettmann's textbook \cite{KleineBueningLettmann_Aussagenlogik}).
 
 \begin{theorem} \label{dnfblowup}
   For all sufficiently large $n\in\Nat$, there exist formulas $F_n$ in
-  conjunctive normal form with $|F_n| = O(n)$ such that every equivalent formula $G_n$ in
-  disjunctive normal form is of size $|G_n| \geq n \cdot 2^n$.
+  CNF with $|F_n| = O(n)$ such that every equivalent formula $G_n$ in
+  DNF is of size $|G_n| \geq n \cdot 2^n$.
 \end{theorem}
 \begin{proof}
 The formulas $F_n$ are defined as
 $F_n = \bigwedge_{i=1}^n ( x_{i,0} \lor x_{i,1} ) \land (\neg x_{i,0} \lor \neg x_{i,1})$
 (i.e., the conjunction of exclusive disjunctions).
 
-If $G_n = \bigvee_{j\leq m} T_j$ is a formula in conjunctive normal form equivalent to $F_n$, then the following two claims hold, which together prove the statement.
+If $G_n = \bigvee_{j\leq m} T_j$ is a formula in CNF equivalent to $F_n$, then the following two claims hold, which together prove the statement.
 
 Claim 1. Each term $T_j$ contains exactly one of the literals $x_{i,0}$ and $x_{i,1}$, for every $i\leq n$;
 otherwise, there exists a valuation that satisfies this term, and thus $G_n$, but does not satisfy $F_n$.
@@ -207,14 +204,14 @@ It follows that $G_n$ has at least $m \geq 2^n$ many terms.
 
 \begin{theorem} \label{cnfblowup}
   For all sufficiently large $n\in\Nat$, there exist formulas $F'_n$ in
-  disjunctive normal form with $|F'_n| = O(n)$ such that every equivalent formula $G_n$
-  in conjunctive normal form is of size $|G_n| \geq n \cdot 2^n$.
+  DNF with $|F'_n| = O(n)$ such that every equivalent formula $G_n$
+  in CNF is of size $|G_n| \geq n \cdot 2^n$.
 \end{theorem}
 
 \begin{proof}
   Let $F'_n = {\bar F}_n$ for the formula $F_n$ from the proof of \cref{dnfblowup}.
-  If there was a formula  $G_n$ in conjunctive normal form equivalent to $F'_n$ with $\left|G_n\right| < n \cdot 2^n$,
-  then ${\bar{G}}_n$ would be a formula in disjunctive normal form equivalent to $F_n$ with
+  If there was a formula  $G_n$ in CNF equivalent to $F'_n$ with $\left|G_n\right| < n \cdot 2^n$,
+  then ${\bar{G}}_n$ would be a formula in DNF equivalent to $F_n$ with
   $|{\bar{G}}_n| = |G_n| < n \cdot 2^n$, contradicting \cref{dnfblowup}.
 \end{proof}
 
@@ -292,12 +289,12 @@ We will also need to construct formulas of a very specific family and define a f
   In the rest of this paper, we write $F_n$ for $\isaAp{\cst{Fn}}{n}$.
 \end{definitionx}
 
-\Cref{def_Fn} is designed such that a formula $F_n$ is in conjunctive normal form and can only be satisfied by valuations that assign different truth values to the variables $x_{i,\cstFalse}$ and $x_{i,\cstTrue}$.
+\Cref{def_Fn} is designed such that a formula $F_n$ is in CNF and can only be satisfied by valuations that assign different truth values to the variables $x_{i,\cstFalse}$ and $x_{i,\cstTrue}$.
 
 \begin{lemma}
   \label{thm_is_cnf_Fn}
   Let $n$ be a natural number.
-  The formula $F_n$ is in conjunctive normal form.
+  The formula $F_n$ is in CNF.
 \end{lemma}
 
 \begin{lemma}
@@ -340,7 +337,7 @@ We can observe the difference and similarity between the two definitions by look
 
 \begin{lemma}
   \label{thm_sizef_BigOr_undnf_BigAnd_unconj}
-	Let $\phi$ be a formula in conjunctive normal form and $\psi$ be a formula in disjunctive normal form.
+	Let $\phi$ be a formula in CNF and $\psi$ be a formula in DNF.
   The following equalities hold:
   \begin{align*}
     \isaAp{\cstSizef}{\left(\bigwedge\nolimits_{i = 0}\nolimits^{\listLength{\isaAp{\cst{unconj}}{\phi}}} \listNth{(\isaAp{\cst{unconj}}{\phi})}{i}\right)} =\:& \isaAp{\cstSizef}{\phi} &
@@ -435,20 +432,20 @@ We can now prove that some specific formulas equivalent to $F_n$ (\cref{def_Fn})
   \end{enumerate}
 \end{proof}
 
-\Cref{thm_cnf_to_dnf_blowup} assumes the existence of two equivalent formulas $F_n$ (in conjunctive normal form) and $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$ (in disjunctive normal form) and proves a lower bound on the size of the later.
+\Cref{thm_cnf_to_dnf_blowup} assumes the existence of two equivalent formulas $F_n$ (in CNF) and $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$ (in DNF) and proves a lower bound on the size of the later.
 We now prove that such equivalent formulas do exist and that the exponential blowup holds for all of them.
 
 \begin{theorem}[Exponential Blowup from CNF to DNF]
   \label{thm_cnf_to_dnf_blowup_math}
   Let $n$ be a natural number.
-  There exists a formula $\phi$ in conjunctive normal form with size $\left|\phi\right| = 10 \cdot n + 2$ such that every equivalent formula $\psi$ in disjunctive normal form has size $\left|\psi\right| \ge n \cdot 2^n$.
+  There exists a formula $\phi$ in CNF with size $\left|\phi\right| = 10 \cdot n + 2$ such that every equivalent formula $\psi$ in DNF has size $\left|\psi\right| \ge n \cdot 2^n$.
 \end{theorem}
 \begin{proof}
   We start by a case analysis on $n$.
   The interesting case is when $n > 0$.
   We define $\phi = F_n$ (\cref{def_Fn});
-  it is easy to show that $F_n$ is in conjunctive normal form (using \cref{thm_is_cnf_Fn}) and that $\left|\phi\right| = 10 \cdot n + 2$ (using \cref{thm_sizef_Fn}).
-  To prove the last property, we assume that there is an equivalent formula $\psi$ in disjunctive normal form.
+  it is easy to show that $F_n$ is in CNF (using \cref{thm_is_cnf_Fn}) and that $\left|\phi\right| = 10 \cdot n + 2$ (using \cref{thm_sizef_Fn}).
+  To prove the last property, we assume that there is an equivalent formula $\psi$ in DNF.
   We first obtain a list $Ts$ (by filtering $\isaAp{\cst{undisj}}{\psi}$) of all satisfiable terms in $\psi$ such that
   all formulas in $Ts$ are conjunctive and satisfiable,
   %TODO: think whether we could explain the trick with filter and undisj. Maybe extract to its own lemma?
@@ -508,7 +505,7 @@ Next, we prove some sufficient condition for a dual formula to be satisfiable.
 	then $\isaAp{\cst{dual}}{\phi}$ is satisfiable.
 \end{lemma}
 
-Next, we prove that the dual of some specific formulas in disjunctive normal form are in conjunctive normal form.
+Next, we prove that the dual of some specific formulas in DNF are in CNF.
 
 \begin{lemma}
   \label{thm_dual_conj_of_disjs_is_disj_of_conjs}
@@ -547,13 +544,13 @@ We can now prove that some specific formulas equivalent to the dual of $F_n$ (\c
   \end{enumerate}
 \end{proof}
 
-\Cref{thm_dnf_to_cnf_blowup} assumes the existence of two equivalent formulas $\isaAp{\cst{dual}}{F_n}$ (in disjunctive normal form) and $\bigwedge_{i = 0}^{\listLength{Cs}} \listNth{Cs}{i}$ (in conjunctive normal form) and proves a lower bound on the size of the later.
+\Cref{thm_dnf_to_cnf_blowup} assumes the existence of two equivalent formulas $\isaAp{\cst{dual}}{F_n}$ (in DNF) and $\bigwedge_{i = 0}^{\listLength{Cs}} \listNth{Cs}{i}$ (in CNF) and proves a lower bound on the size of the later.
 We now prove that such equivalent formulas do exist and that the exponential blowup holds for all of them.
 
 \begin{theorem}[Exponential Blowup from DNF to CNF]
   \label{thm_dnf_to_cnf_blowup_math}
   Let $n$ be a natural number.
-  There exists a formula $\phi$ in disjunctive normal form with size $\left|\phi\right| = 10 \cdot n + 1$ such that every equivalent formula $\psi$ in conjunctive normal form has size $\left|\psi\right| \ge n \cdot 2^n$.
+  There exists a formula $\phi$ in DNF with size $\left|\phi\right| = 10 \cdot n + 1$ such that every equivalent formula $\psi$ in CNF has size $\left|\psi\right| \ge n \cdot 2^n$.
 \end{theorem}
 \begin{proof}
   The proof is analogous to the proof of \cref{thm_cnf_to_dnf_blowup_math}.
@@ -617,8 +614,8 @@ However, if we tried to restate and prove the statement of \cref{thm_dnf_to_cnf_
 \section{Conclusion}
 \label{sec_concl}
 
-We formalized in Isabelle/HOL the well-known result about propositional logic that transforming a formula into disjunctive or conjunctive normal form can lead to an exponential blowup of the formula size.
-The proof is split into a low-level \lcnamecref{thm_cnf_to_dnf_blowup} and a \lcnamecref{thm_cnf_to_dnf_blowup_math} for conversion to disjunctive normal form and analogously for conversion to conjunctive normal form.
+We formalized in Isabelle/HOL the well-known result about propositional logic that transforming a formula into DNF or CNF can lead to an exponential blowup of the formula size.
+The proof is split into a low-level \lcnamecref{thm_cnf_to_dnf_blowup} and a \lcnamecref{thm_cnf_to_dnf_blowup_math} for conversion to DNF and analogously for conversion to CNF.
 We also reported of some challenges we faced we encountered when proving statements about the size of formula.
 
 Our formalization may serve as a basis and template for future formalizations of quantitative results in propositional logic.
