@@ -698,32 +698,7 @@ lemma size_dual_le: "size (dual F) \<le> 2 * size F"
 lemma equiv_dual: "equiv (dual F) (Not F)"
   by (induction F) (simp_all add: equiv_def)
 
-lemma duald_cnf_in_dnf: "is_cnf F \<Longrightarrow> is_dnf (dual F)"
-proof (induction F)
-  case (Not F)
-  have "is_lit_plus (Not F)" 
-    using Not.prems by auto
-  then have "is_dnf F" 
-    by (metis conj_is_dnf Not.prems cnf_in_nnf is_conj.simps(2,3) is_lit_plus.simps(1,3) 
-        is_nnf_NotD)
-  then show ?case 
-    by simp
-next
-  case (Or F1 F2)
-  then have a: "is_lit_plus F1 \<and> is_disj F2" 
-    by simp
-  have 1: "is_lit_plus (dual F1)"
-    using a is_lit_plus.elims(2) by fastforce
-  have 2: "is_conj (dual F2)"
-    using a
-    by (smt (verit) Or.IH(2) formula.distinct(3) is_cnf.simps(5) is_conj.simps(2,3,4)
-        is_disj.elims(2) is_disj.simps(4) is_dnf.simps(5) is_lit_plus.elims(2)
-        is_lit_plus.simps(1,11,2,3,4,9) dual.simps(1,2,3,5))
-  show ?case 
-    using 1 2 by simp
-qed simp_all
-
-lemma duald_conj_is_disj: "is_conj F \<Longrightarrow> is_disj (dual F)"
+lemma is_disj_dual_if_is_conj: "is_conj F \<Longrightarrow> is_disj (dual F)"
 proof (induction F)
   case (Not F)
   then show ?case 
@@ -732,31 +707,42 @@ proof (induction F)
 next
   case (And F1 F2)
   then show ?case
-    by (metis is_cnf.simps(5) is_conj.simps(1) is_disj.simps(1) is_dnf.simps(5)
-        dual.simps(4,5) duald_cnf_in_dnf)
+    unfolding dual.simps is_conj.simps is_disj.simps
+    by (metis dual.simps(1,2,3) is_lit_plus.elims(2) is_lit_plus.simps(1,2,3,4))
 qed simp_all
 
-lemma duald_dnf_in_cnf: "is_dnf F \<Longrightarrow> is_cnf (dual F)"
+lemma is_conj_dual_if_is_disj: "is_disj F \<Longrightarrow> is_conj (dual F)"
 proof (induction F)
   case (Not F)
-  then show ?case 
-    by (metis is_cnf.simps(2,3) is_conj.simps(4) is_disj.simps(2,3) is_dnf.simps(4)
-        is_lit_plus.simps(1,3) is_nnf.simps(6) is_nnf_NotD dual.simps(3))
+  then show ?case
+    using is_nnf_NotD by force
+next
+  case (Or F1 F2)
+  then show ?case
+    unfolding dual.simps is_conj.simps is_disj.simps
+    by (metis dual.simps(1,2,3) is_lit_plus.elims(2) is_lit_plus.simps(1,2,3,4))
+qed simp_all
+
+lemma is_dnf_dual_if_is_cnf: "is_cnf F \<Longrightarrow> is_dnf (dual F)"
+proof (induction F)
+  case (Not F)
+  then show ?case
+    using conj_is_dnf is_cnf.simps(4) is_conj_dual_if_is_disj by blast
+next
+  case (Or F1 F2)
+  then show ?case
+    using conj_is_dnf is_cnf.simps(5) is_conj_dual_if_is_disj by blast
+qed simp_all
+
+lemma is_cnf_dual_if_is_dnf: "is_dnf F \<Longrightarrow> is_cnf (dual F)"
+proof (induction F)
+  case (Not F)
+  then show ?case
+    using disj_is_cnf is_disj_dual_if_is_conj is_dnf.simps(4) by blast
 next
   case (And F1 F2)
-  have "is_conj (And F1 F2)" 
-    using \<open>is_dnf (F1 \<^bold>\<and> F2)\<close> by simp
-  then have "is_lit_plus F1" and "is_conj F2" 
-    by auto
-  have 1: "is_lit_plus (dual F1)"
-    using \<open>is_lit_plus F1\<close> 
-    by (metis is_lit_plus.elims(2) is_lit_plus.simps(1,2,3,4) dual.simps(1,2,3))
-  have 2: "is_disj (dual F2)"
-    using \<open>is_conj F2\<close> by (simp add: duald_conj_is_disj)
-  have "is_lit_plus (dual F1) \<and> is_disj (dual F2)"
-    using 1 2 by simp
-  then show ?case 
-    by simp
+  then show ?case
+    using disj_is_cnf is_disj_dual_if_is_conj is_dnf.simps(5) by blast
 qed auto
 
 lemma duald_disj_not_taut_impl_sat: "is_disj F \<Longrightarrow> \<exists>Val. \<not> Val \<Turnstile> F \<Longrightarrow> \<exists>Val. Val \<Turnstile> dual F"
@@ -776,55 +762,43 @@ proof (induction F)
     by auto
 qed auto
 
-lemma duald_conj_of_disjs_is_disj_of_conjs:
-  "(\<forall> C \<in> set Cs. is_disj C \<and> (\<exists> Val. \<not>(Val \<Turnstile> C))) \<Longrightarrow> 
-   \<exists> Ts. (dual (BigAnd' Cs)) = BigOr' Ts \<and> (\<forall>T\<in>set Ts. is_conj T \<and> (\<exists> Val. Val \<Turnstile> T))"
-  \<comment> \<open>TODO: try to prove the lemma for \<^term>\<open>Ts = map dual Cs\<close>\<close>
+lemma dual_conj_of_disjs_is_disj_of_conjs:
+  fixes Cs
+  assumes "\<forall> C \<in> set Cs. is_disj C \<and> (\<exists> Val. \<not>(Val \<Turnstile> C))"
+  defines "Ts \<equiv> map dual Cs"
+  shows "dual (BigAnd' Cs) = BigOr' Ts" "\<forall>T\<in>set Ts. is_conj T \<and> (\<exists> Val. Val \<Turnstile> T)"
+  unfolding atomize_conj Ts_def
+  using assms(1)
 proof (induction Cs)
   case Nil
   then show ?case
-    by (metis BigAnd'.simps(1) BigOr'.simps(1) dual.simps(3) empty_iff list.set(1))
+    by simp
 next
   case (Cons C Cs)
-  have is_disj_C: "is_disj C" 
-    using Cons.prems by simp
-  have is_no_taut_C: "\<exists>\<alpha>. \<not> \<alpha> \<Turnstile> C" 
-    using Cons.prems by simp
-  then obtain TsCs where 
-    def_TsCs: "dual (BigAnd' Cs) = BigOr' TsCs" "\<forall>T\<in>set TsCs. is_conj T \<and> (\<exists>Val. Val \<Turnstile> T)"
-    by atomize_elim (auto simp add: Cons.IH Cons.prems)
-  define Ts where 
-    "Ts = [dual C] @ TsCs"
-  then have 1: "BigOr' Ts = Or (dual C) (dual (BigAnd' Cs))" if "Cs \<noteq> []"
-    by (metis BigAnd'.simps(2,3) BigOr'.simps(1,3) Cons.prems append_Cons append_Nil def_TsCs(1)
-        dual.simps(4) duald_disj_not_taut_impl_sat formula.distinct(15)
-        formula_semantics.simps(2) list.exhaust list.set_intros(1,2) that)
-  have a2: "is_conj (dual C)"
-    using is_disj_C
-    by (metis disj_is_cnf is_conj.simps(1) is_disj.simps(1) is_dnf.simps(5) 
-        is_lit_plus.simps(2) dual.simps(5) duald_cnf_in_dnf)
-  have b2: "\<forall>T\<in>set TsCs. is_conj T" 
-    using def_TsCs by auto
-  have 2: "(\<forall>T\<in>set Ts. is_conj T)" 
-    using Ts_def a2 b2 by auto
-  have a3: "\<exists>\<alpha>. \<alpha> \<Turnstile> dual C"
-    using is_disj_C is_no_taut_C duald_disj_not_taut_impl_sat by auto
-  have b3: "\<forall>T\<in>set TsCs. (\<exists>Val. Val \<Turnstile> T)" 
-    using def_TsCs by auto
-  have 3: "\<forall>T\<in>set Ts. (\<exists>Val. Val \<Turnstile> T)" 
-    using Ts_def a3 b3 by auto
+
+  then have IH:
+      "dual (BigAnd' Cs) = BigOr' (map dual Cs)"
+      "(\<forall>T\<in>set (map dual Cs). is_conj T \<and> (\<exists>Val. Val \<Turnstile> T))"
+    by (auto simp add: Cons.IH Cons.prems)
+
   show ?case
-  proof (intro exI[of _ Ts] conjI ballI)
-    show "dual (BigAnd' (C # Cs)) = BigOr' Ts"
-      by (metis (no_types, lifting) "1" BigAnd'.cases BigAnd'.simps(1,2,3) BigOr'.simps(2,3) Ts_def
-          append.left_neutral append_Cons def_TsCs(1,2) dual.simps(3,4) formula.distinct(15)
-          formula_semantics.simps(2) list.set_intros(1))
+  proof (intro conjI ballI)
+    show "dual (BigAnd' (C # Cs)) = BigOr' (map dual (C # Cs))"
+      by (cases Cs) (use IH(1) in simp_all)
   next
-    show "\<And>T. T \<in> set Ts \<Longrightarrow> is_conj T"
-      by (metis 2)
+    have "is_disj C"
+      using Cons.prems by simp
+    then have "is_conj (dual C)"
+      by (rule is_conj_dual_if_is_disj)
+    then show "\<And>T. T \<in> set (map dual (C # Cs)) \<Longrightarrow> is_conj T"
+      using IH(2) by auto
   next
-    show "\<And>T. T \<in> set Ts \<Longrightarrow> \<exists>Val. Val \<Turnstile> T"
-      by (metis 3)
+    have "\<exists>\<alpha>. \<not> \<alpha> \<Turnstile> C"
+      using Cons.prems by simp
+    then have "\<exists>\<alpha>. \<alpha> \<Turnstile> dual C"
+      using equiv_dual[of C, unfolded equiv_def] by simp
+    then show "\<And>T. T \<in> set (map dual (C # Cs)) \<Longrightarrow> \<exists>Val. Val \<Turnstile> T"
+      using IH(2) by auto
   qed
 qed
 
@@ -1212,7 +1186,7 @@ proof -
 
     obtain Ts where
       "dual G = BigOr' Ts" "\<forall>T\<in>set Ts. is_conj T \<and> (\<exists> Val. Val \<Turnstile> T)"
-      using def_G duald_conj_of_disjs_is_disj_of_conjs by metis
+      using def_G dual_conj_of_disjs_is_disj_of_conjs by metis
 
     moreover have "equiv (Fn n) (dual G)"
     proof -
