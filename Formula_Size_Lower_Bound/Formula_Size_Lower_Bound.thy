@@ -1106,10 +1106,10 @@ qed
 
 theorem exp_blowup_from_CNF_to_DNF:
   fixes n :: nat
-  shows "\<exists>(F\<^sub>n :: var formula).
-    is_cnf F\<^sub>n \<and>
-    size F\<^sub>n = 10 * n + 2 \<and>
-    (\<forall>(G\<^sub>n :: var formula). equiv F\<^sub>n G\<^sub>n \<longrightarrow> is_dnf G\<^sub>n \<longrightarrow> size G\<^sub>n \<ge> n * 2 ^ n)"
+  shows "\<exists>(\<phi> :: var formula).
+    is_cnf \<phi> \<and>
+    size \<phi> = 10 * n + 2 \<and>
+    (\<forall>(\<psi> :: var formula). equiv \<phi> \<psi> \<longrightarrow> is_dnf \<psi> \<longrightarrow> size \<psi> \<ge> n * 2 ^ n)"
 proof (cases n)
   case 0
   then show ?thesis
@@ -1128,27 +1128,27 @@ next
     show "size (Fn n) = 10 * n + 2"
       using size_Fn .
   next
-    fix G\<^sub>n :: "var formula"
-    assume "equiv (Fn n) G\<^sub>n"
-    then have sat_G\<^sub>n: "\<exists>\<alpha>. \<alpha> \<Turnstile> G\<^sub>n"
+    fix \<psi> :: "var formula"
+    assume "equiv (Fn n) \<psi>"
+    then have sat_G\<^sub>n: "\<exists>\<alpha>. \<alpha> \<Turnstile> \<psi>"
       unfolding equiv_def
       using Fn_sat[of n] by metis
 
-    assume "is_dnf G\<^sub>n"
+    assume "is_dnf \<psi>"
     then obtain Ts :: "var formula list" where
       "\<forall>T \<in> set Ts. is_conj T" and
       "\<forall>T \<in> set Ts. \<exists>\<alpha>. \<alpha> \<Turnstile> T" and
-      "equiv G\<^sub>n (BigOr' Ts)" and
-      size: "size (BigOr' Ts) \<le> size G\<^sub>n"
+      "equiv \<psi> (BigOr' Ts)" and
+      size: "size (BigOr' Ts) \<le> size \<psi>"
       using ex_equiv_disj_list_if_is_dnf[OF _ sat_G\<^sub>n] by metis
 
     moreover have "equiv (Fn n) (BigOr' Ts)"
-      using equiv_transitive[OF \<open>equiv (Fn n) G\<^sub>n\<close> \<open>equiv G\<^sub>n (BigOr' Ts)\<close>] .
+      using equiv_transitive[OF \<open>equiv (Fn n) \<psi>\<close> \<open>equiv \<psi> (BigOr' Ts)\<close>] .
 
     ultimately have "n * 2 ^ n \<le> sizef (BigOr' Ts)"
       using exp_blowup_from_Fn_to_BigOr'[OF \<open>0 < n\<close>, of Ts] by metis
 
-    then show "n * 2 ^ n \<le> size G\<^sub>n"
+    then show "n * 2 ^ n \<le> size \<psi>"
       using size sizef_le_size[of "BigOr' Ts"] by presburger
   qed
 qed
@@ -1249,10 +1249,10 @@ qed
 
 theorem exp_blowup_from_DNF_to_CNF:
   fixes n :: nat
-  shows "\<exists>(F\<^sub>n :: var formula).
-    is_dnf F\<^sub>n \<and>
-    size F\<^sub>n = 10 * n + 1 \<and>
-    (\<forall>(G\<^sub>n :: var formula). equiv F\<^sub>n G\<^sub>n \<longrightarrow> is_cnf G\<^sub>n \<longrightarrow> size G\<^sub>n \<ge> n * 2 ^ n)"
+  shows "\<exists>(\<phi> :: var formula).
+    is_dnf \<phi> \<and>
+    size \<phi> = 10 * n + 1 \<and>
+    (\<forall>(\<psi> :: var formula). equiv \<phi> \<psi> \<longrightarrow> is_cnf \<psi> \<longrightarrow> size \<psi> \<ge> n * 2 ^ n)"
 proof (cases n)
   case 0
   then show ?thesis
@@ -1272,25 +1272,25 @@ next
     show "size (dual (Fn n)) = 10 * n + 1"
       using size_dual_Fn .
   next
-    fix G\<^sub>n :: "var formula"
-    assume "equiv (dual (Fn n)) G\<^sub>n"
-    assume "is_cnf G\<^sub>n"
+    fix \<psi> :: "var formula"
+    assume "equiv (dual (Fn n)) \<psi>"
+    assume "is_cnf \<psi>"
 
     then obtain Cs :: "var formula list" where
       "\<forall>C \<in> set Cs. is_disj C" and
       "\<forall>C \<in> set Cs. \<not> \<Turnstile> C" and
-      "equiv G\<^sub>n (BigAnd' Cs)" and
-      sizef: "sizef (BigAnd' Cs) \<le> sizef G\<^sub>n"
-      using ex_equiv_conj_list_if_is_cnf[of G\<^sub>n] by metis
+      "equiv \<psi> (BigAnd' Cs)" and
+      sizef: "sizef (BigAnd' Cs) \<le> sizef \<psi>"
+      using ex_equiv_conj_list_if_is_cnf[of \<psi>] by metis
 
     moreover have "equiv (dual (Fn n)) (BigAnd' Cs)"
-      using equiv_transitive[OF \<open>equiv (dual (Fn n)) G\<^sub>n\<close> \<open>equiv G\<^sub>n (BigAnd' Cs)\<close>] .
+      using equiv_transitive[OF \<open>equiv (dual (Fn n)) \<psi>\<close> \<open>equiv \<psi> (BigAnd' Cs)\<close>] .
 
     ultimately have "n * 2 ^ n \<le> sizef (BigAnd' Cs)"
       using exp_blowup_from_dual_Fn_to_BigAdn'[OF \<open>0 < n\<close>, of Cs] by metis
 
-    then show "n * 2 ^ n \<le> size G\<^sub>n"
-      using sizef sizef_le_size[of G\<^sub>n] by presburger
+    then show "n * 2 ^ n \<le> size \<psi>"
+      using sizef sizef_le_size[of \<psi>] by presburger
   qed
 qed
 
