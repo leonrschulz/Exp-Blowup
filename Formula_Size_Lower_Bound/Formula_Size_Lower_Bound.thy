@@ -878,12 +878,6 @@ proposition exp_blowup_from_Fn_to_BigOr':
 proof -
   note def_F = F_def
   note def_G = G_def G_spec
-  have size_F: "sizef F = 8*n+1" 
-    using def_F by (simp add: sizef_Fn)
-  have in_cnf_F: "is_cnf F" 
-    using def_F by (simp add: is_cnf_Fn)
-  have in_dnf_G: "is_dnf G" 
-    using def_G is_dnf_BigOr' by auto
 
   have occ_var_bool_diff: "cont_pos T (Var i False) \<noteq> cont_pos T (Var i True)"
     if "T \<in> set Ts" and "i \<in> {1..n}"
@@ -1156,7 +1150,7 @@ qed
 
 section \<open>DNF to CNF\<close>
 
-proposition exp_blowup_from_dual_Fn_to_BigAdn':
+proposition exp_blowup_from_dual_Fn_to_BigAnd':
   fixes n :: nat and Cs :: "var formula list"
   defines "Fprime \<equiv> dual (Fn n)" and "G \<equiv> BigAnd' Cs"
   assumes
@@ -1167,10 +1161,6 @@ proposition exp_blowup_from_dual_Fn_to_BigAdn':
 proof -
   note def_Fprime = Fprime_def
   note def_G = G_def G_spec
-  have size_Fprime: "sizef Fprime = 8*n+1" 
-    using def_Fprime by (simp add: sizef_dual_Fn)
-  have Fprime_in_dnf: "is_dnf Fprime" 
-    by (simp add: def_Fprime is_dnf_dual_Fn)
   have G_in_cnf: "is_cnf G" 
     using def_G is_cnf_BigAnd' by auto
   have G_in_nnf: "is_nnf G" 
@@ -1287,7 +1277,7 @@ next
       using equiv_transitive[OF \<open>equiv (dual (Fn n)) \<psi>\<close> \<open>equiv \<psi> (BigAnd' Cs)\<close>] .
 
     ultimately have "n * 2 ^ n \<le> sizef (BigAnd' Cs)"
-      using exp_blowup_from_dual_Fn_to_BigAdn'[OF \<open>0 < n\<close>, of Cs] by metis
+      using exp_blowup_from_dual_Fn_to_BigAnd'[OF \<open>0 < n\<close>, of Cs] by metis
 
     then show "n * 2 ^ n \<le> size \<psi>"
       using sizef sizef_le_size[of \<psi>] by presburger
