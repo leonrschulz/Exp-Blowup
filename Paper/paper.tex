@@ -27,13 +27,15 @@
 \crefname{definitionx}{Definition}{Definitions}
 \Crefname{definitionx}{Definition}{Definitions}
 
+\AtBeginDocument{\renewcommand\proofname{Proof sketch}}
+
 \bibliographystyle{plainurl}% the mandatory bibstyle
 
 \hideLIPIcs
 
 \title{Formalizing the Exponential Blowup in the Transformations between CNF and DNF}
 
-%\titlerunning{} %TODO optional, please use if title is longer than one line
+%\titlerunning{}
 
 \def\lmu{Ludwig-Maximilians-Universität München}
 
@@ -47,9 +49,9 @@ This research was co-funded by the European Union (ERC, Nekoka, 101083038). View
 
 \Copyright{Leon Raffael Schulz and Martin Desharnais-Schäfer and Jan Johannsen}
 
-\ccsdesc[500]{Theory of computation~Logic and verification} %TODO mandatory: Please choose ACM 2012 classifications from https://dl.acm.org/ccs/ccs_flat.cfm
+\ccsdesc[500]{Theory of computation~Logic and verification}
 
-\keywords{Propositional logic, disjunctive normal form, conjunctive normal form, formula size, Isabelle/HOL} %TODO mandatory; please add comma-separated list of keywords
+\keywords{Propositional logic, disjunctive normal form, conjunctive normal form, formula size, Isabelle/HOL}
 
 \category{} %optional, e.g. invited paper
 
@@ -89,8 +91,6 @@ We thank Jasmin Blanchette for suggesting textual improvements.
 
 
 \input{def.tex}
-
-%TODO: Change label of proof environment to "Proof sketch"
 
 \begin{document}
 
@@ -215,10 +215,6 @@ It follows that $G_n$ has at least $m \geq 2^n$ many terms.
   $|{\bar{G}}_n| = |G_n| < n \cdot 2^n$, contradicting \cref{dnfblowup}.
 \end{proof}
 
-% TODO: Cite at least the book, and check for transitive citations.
-% TODO: All definitions required to understand the proposition and corollary.
-% TODO: With proof sketch so the formalization can later compare the result.
-% TODO: Related work?
 
 \section{Formalization Preliminaries}
 \label{sec_preliminaries}
@@ -439,7 +435,7 @@ We can now prove that some specific formulas equivalent to $F_n$ (\cref{def_Fn})
 
     \item We then prove that the number of Boolean lists of length $n$ is $2^n \le \setCard{\isaAp{\cst{set}}{Ts}} \le \listLength{Ts}$ using steps~1 and~3.
 
-    \item Finally, we show that $\isaAp{\cstSizef}{G} \ge n \cdot 2^n$ by combining the results from steps~2 and~4 to discharge the assumptions of \cref{thm_exp_size}.
+    \item Finally, we show that $\isaAp{\cstSizef}{G} \ge n \cdot 2^n$ by combining the results from steps~2 and~4 to discharge the assumptions of \cref{thm_exp_size}. \qedhere
   \end{enumerate}
 \end{proof}
 
@@ -459,7 +455,6 @@ We now prove that such equivalent formulas do exist and that the exponential blo
   To prove the last property, we assume that there is an equivalent formula $\psi$ in DNF.
   We first obtain a list $Ts$ (by filtering $\isaAp{\cst{undisj}}{\psi}$) of all satisfiable terms in $\psi$ such that
   all formulas in $Ts$ are conjunctive and satisfiable,
-  %TODO: think whether we could explain the trick with filter and undisj. Maybe extract to its own lemma?
   $\isaAp{\cstSizef}{\psi} \ge \isaAp{\cstSizef}{(\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i})}$ (using \cref{thm_sizef_BigOr_undnf_BigAnd_unconj}),
   and $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$ is equivalent to $\psi$.
   From this last equivalence, we show that $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$ is equivalent to $F_n$.
@@ -551,7 +546,7 @@ We can now prove that some specific formulas equivalent to the dual of $F_n$ (\c
 
     \item From steps~2 and~3, we can discharge the assumptions of \cref{thm_cnf_to_dnf_blowup} for $F_n$ and $\isaAp{\cst{dual}}{G}$ and thus show that $\isaAp{\cstSizef}{(\isaAp{\cst{dual}}{G})} \ge n \cdot 2^n$.
 
-    \item The result of step~1 contradicts the result of step~4, completing the proof.
+    \item The result of step~1 contradicts the result of step~4, completing the proof. \qedhere
   \end{enumerate}
 \end{proof}
 
