@@ -127,15 +127,14 @@ Second, we use \cref{thm_dnf_to_cnf_blowup} to prove in the desired \cref{thm_dn
 Finally, we discuss (\cref{sec_discussion}) some of the challenges we encountered when proving statements about the size of formulas.
 
 Our work is part of the IsaFoL (Isabelle Formalization of Logic) effort \cite{Blanchette_CPP2019_IsaFoL}.
-Our formalization consists of approximately 1100 nonempty lines%
-\footnote{Counted using \inlineshell{grep -Ev '\textasciicircum{}[[:blank:]]*\$'}.}
+Our formalization consists of approximately 1100 nonempty lines
 and is available online \cite{Formalization_GitHub};
 we will soon submit it to the \emph{Archive of Formal Proofs}.
 It was developed with Isabelle2025 \cite{Nipkow_Klein_2014,Nipkow_Paulson_Wenzel_2002} and with extensive usage of Sledgehammer \cite{Blanchette_Boehme_Paulson_JAR2013,Paulson_Blanchette_IWIL2010} and the structured Isar language \cite{Wenzel_2007}.
 In this paper, we only provide some key lemmas and proof sketches;
 we refer interested readers to the formalization for more details.
 
-\section{Background}
+\section{Mathematical Background}
 \label{sec_background}
 
 A \emph{formula} of propositional logic is defined inductively as either falsehood ($\bot$), an atom (or \emph{variable}), the negation ($\neg$) of a formula, or the disjunction ($\lor$), conjunction ($\land$), or implication ($\rightarrow$) of two formulas.
@@ -190,7 +189,8 @@ exponential increase in the formula size in the worst case (see, e.g., Kleine B\
 \end{theorem}
 \begin{proof}
 The formulas $F_n$ are defined as
-$F_n = \bigwedge_{i=1}^n ( x_{i,0} \lor x_{i,1} ) \land (\neg x_{i,0} \lor \neg x_{i,1})$.
+$F_n = \bigwedge_{i=1}^n ( x_{i,0} \lor x_{i,1} ) \land (\neg x_{i,0} \lor \neg x_{i,1})$
+(i.e., the conjunction of exclusive disjunctions).
 
 If $G_n = \bigvee_{j\leq m} T_j$ is a formula in conjunctive normal form equivalent to $F_n$, then the following two claims hold, which together prove the statement.
 
@@ -224,7 +224,7 @@ It follows that $G_n$ has at least $m \geq 2^n$ many terms.
 % TODO: With proof sketch so the formalization can later compare the result.
 % TODO: Related work?
 
-\section{Preliminaries}
+\section{Formalization Preliminaries}
 \label{sec_preliminaries}
 
 For our Isabelle/HOL formalization, we reused the theories of proposition formulas from Michaelis and Nipkow's formalization of proof systems for classical propositional logic \cite{Propositional_Proof_Systems-AFP,Michaelis_Nipkow_TYPES2017}.
@@ -241,8 +241,8 @@ We now define some operations to build the conjunction and disjunction of a list
   \label{def_BigOr_BigAnd}
   The functions
   $\tyAnnot{\cst{BigAnd'}}{\tyList{\tyFormula{\yA}} \Rightarrow \tyFormula{\yA}}$ and
-  $\tyAnnot{\cst{BigOr'}}{\tyList{\tyFormula{\yA}} \Rightarrow \tyFormula{\yA}}$ respectively
-  build the conjunction and disjunction of all formulas in a list:%
+  $\tyAnnot{\cst{BigOr'}}{\tyList{\tyFormula{\yA}} \Rightarrow \tyFormula{\yA}}$
+  build the conjunction and disjunction, respectively, of all formulas in a list:%
   \footnote{The infix operation $\listCons{x}{xs}$ adds an element $x$ at the front of a list $xs$.}
   \begin{align*}
     \isaAp{\cst{BigAnd'}}{[]} =\; & \neg\bot &
@@ -254,7 +254,8 @@ We now define some operations to build the conjunction and disjunction of a list
   \end{align*}
   In the rest of this paper, we write
   $\bigwedge_{i = 0}^{\listLength{\phi{}s}} \listNth{\phi{}s}{i}$ for $\isaAp{\cst{BigAnd'}}{\phi{}s}$ and
-  $\bigvee_{i = 0}^{\listLength{\phi{}s}} \listNth{\phi{}s}{i}$ for $\isaAp{\cst{BigOr'}}{\phi{}s}$.
+  $\bigvee_{i = 0}^{\listLength{\phi{}s}} \listNth{\phi{}s}{i}$ for $\isaAp{\cst{BigOr'}}{\phi{}s}$.%
+  \footnote{The operation $\listNth{xs}{i}$ refers to the $i$\textsuperscript{th} element of a list $xs$. Indices are zero-based from left to right.}
 \end{definitionx}
 
 \begin{remark*}
@@ -268,8 +269,8 @@ We will later need to generate lists of formulas for $\cst{BigAnd'}$ and $\cst{B
   \label{def_unconj_undisj}
   The functions
   $\tyAnnot{\cst{unconj}}{\tyFormula{\yA} \Rightarrow \tyList{\tyFormula{\yA}}}$ and
-  $\tyAnnot{\cst{undisj}}{\tyFormula{\yA} \Rightarrow \tyList{\tyFormula{\yA}}}$ respectively
-  extract the list of subformulas directly under the conjunctions and disjunctions of a given formula:%
+  $\tyAnnot{\cst{undisj}}{\tyFormula{\yA} \Rightarrow \tyList{\tyFormula{\yA}}}$
+  extract the list of subformulas directly under a given formula's conjunctions and disjunctions, respectively:%
   \footnote{The infix operation $xs \mathop{@} ys$ appends a list $xs$ at the front of a list $ys$.}
   \begin{align*}
     \isaAp{\cst{unconj}}{(\phi \land \psi)} =\; & \isaAp{\cst{unconj}}{\phi} \mathop{@} \isaAp{\cst{unconj}}{\psi} &
@@ -292,7 +293,7 @@ We will also need to construct formulas of a very specific family and define a f
   In the rest of this paper, we write $F_n$ for $\isaAp{\cst{Fn}}{n}$.
 \end{definitionx}
 
-\Cref{def_Fn} is chosen such that a formula $F_n$ is in conjunctive normal form and can only be satisfied by valuations that assign different truth values to the variables $x_{i,\cstFalse}$ and $x_{i,\cstTrue}$.
+\Cref{def_Fn} is designed such that a formula $F_n$ is in conjunctive normal form and can only be satisfied by valuations that assign different truth values to the variables $x_{i,\cstFalse}$ and $x_{i,\cstTrue}$.
 
 \begin{lemma}
   \label{thm_is_cnf_Fn}
@@ -321,7 +322,7 @@ Finally, we provide two different definitions for the size of a formula.
   the negations are ignored.
 \end{definitionx}
 
-Because $\cst{sizef}$ ignores negations, it always evaluates to a smaller number than $\left|\cdot\right|$.
+Because $\cst{sizef}$ ignores negations, it always evaluates to a smaller than or equal to number than $\left|\cdot\right|$.
 
 \begin{lemma}
   \label{thm_sizef_le_size}
@@ -399,7 +400,7 @@ Next, we prove a lower bound of the size of $\bigvee_{i=0}^{\listLength{\phi{}s}
   \footnote{The function $\tyAnnot{\cst{set}}{\tyList{\yA} \Rightarrow \tySet{\yA}}$ converts a list into a set.}
 \end{lemma}
 
-We can now prove that some specific formulas equivalent to $F_n$ (see \cref{def_Fn}) have a size exponential in $n$.
+We can now prove that some specific formulas equivalent to $F_n$ (\cref{def_Fn}) have a size exponential in $n$.
 
 \begin{proposition}
   \label{thm_cnf_to_dnf_blowup}
@@ -412,7 +413,7 @@ We can now prove that some specific formulas equivalent to $F_n$ (see \cref{def_
 \end{proposition}
 \begin{proof}
   We proceed with five steps:
-  \textbf{(1)}~First, we show that every conjunctive formula $T \in \isaAp{\cst{set}}{Ts}$ contains for all $i \in \{1,\ldots,n\}$ either the variable $x_{i,0}$ or $x_{i,1}$ positively.
+  \textbf{(1)}~First, we show that every conjunctive formula $T \in \isaAp{\cst{set}}{Ts}$ contains for all $i \in \{1,\ldots,n\}$ either the variable $x_{i,\cstFalse}$ or $x_{i,\cstTrue}$ positively.
   We prove this step by negation, where we must to derive false for two cases:
   Either the variables $x_{i,0}$ and $x_{i,1}$ are both positively contained in $T$ or they are both not positively contained.
   In both cases, we proceed by defining a valuation that satisfies $G$ but not $F_n$.
@@ -440,7 +441,7 @@ We now prove that such equivalent formulas do exist and that the exponential blo
 \begin{proof}
   We start by a case analysis on $n$.
   The interesting case is when $n > 0$.
-  We define $\phi = F_n$ (see \cref{def_Fn});
+  We define $\phi = F_n$ (\cref{def_Fn});
   it is easy to show that $F_n$ is in conjunctive normal form (using \cref{thm_is_cnf_Fn}) and that $\left|\phi\right| = 10 \cdot n + 2$ (using \cref{thm_sizef_Fn}).
   To prove the last property, we assume that there is an equivalent formula $\psi$ in disjunctive normal form.
   We first obtain a list $Ts$ (by filtering $\isaAp{\cst{undisj}}{\psi}$) of all satisfiable terms in $\psi$ such that
@@ -515,7 +516,7 @@ Next, we prove that the dual of some specific formulas in disjunctive normal for
   The idea is to map each element of $Cs$ to its dual form.
 \end{proof}
 
-We can now prove that some specific formulas equivalent to the dual of $F_n$ (see \cref{def_Fn}) have a size exponential in $n$.
+We can now prove that some specific formulas equivalent to the dual of $F_n$ (\cref{def_Fn}) have a size exponential in $n$.
 
 \begin{proposition}
   \label{thm_dnf_to_cnf_blowup}
