@@ -360,7 +360,7 @@ For formulas in NNF, sizef represents the number of logical symbols if one consi
 \section{CNF to DNF}
 \label{sec_CNF_to_DNF}
 
-Our formalization splits the paper proof of \cref{dnfblowup} in a low-level \lcnamecref{thm_cnf_to_dnf_blowup}, which assumes the existence of formulas with specific shapes and properties, and a \lcnamecref{thm_cnf_to_dnf_blowup_math}, which proves that such formulas can always be obtained.
+Our formalization splits the paper proof of \cref{dnfblowup} into a low-level \lcnamecref{thm_cnf_to_dnf_blowup}, which assumes the existence of formulas with specific shapes and properties, and a \lcnamecref{thm_cnf_to_dnf_blowup_math}, which proves that such formulas can always be obtained.
 We start by proving a few basic properties of conjunctive formulas w.r.t.\ valuations.
 
 We first prove a monotonicity property of satisfiability w.r.t. valuations.
@@ -412,22 +412,28 @@ We can now prove that some specific formulas equivalent to $F_n$ (\cref{def_Fn})
   then $\isaAp{\cstSizef}{G} \ge n \cdot 2^n$.
 \end{proposition}
 \begin{proof}
-  We proceed with five steps:
-  \textbf{(1)}~First, we show that every conjunctive formula $T \in \isaAp{\cst{set}}{Ts}$ contains for all $i \in \{1,\ldots,n\}$ either the variable $x_{i,\cstFalse}$ or $x_{i,\cstTrue}$ positively.
-  We prove this step by contradiction, where we must to derive false for two cases:
-  Either the variables $x_{i,0}$ and $x_{i,1}$ are both positively contained in $T$ or they are both not positively contained.
-  In both cases, we proceed by defining a valuation that satisfies $G$ but not $F_n$.
-  For instance, in the second case, we find a valuation that satisfies $T$ and change the assignment of the variables $x_{i,0}$ and $x_{i,1}$ to false.
-  We then show using \cref{aux_lemma_prop4_step1,aux_lemma_prop4_step3,thm_semantics_Fn_iff} that this modified valuation satisfies $T$ (and thus $G$) but does not satisfy $F_n$.
-  This means that $F_n$ is not equivalent to $G$, which contradicts the \lcnamecref{thm_cnf_to_dnf_blowup}'s assumption.
-  \textbf{(2)}~From step 1, we derive that every $T \in \isaAp{\cst{set}}{Ts}$ has $\isaAp{\cstSizef}{T} \ge n$.
-  \textbf{(3)}~Furthermore, we prove that for every Boolean list $\epsilon = [\epsilon_1,\ldots,\epsilon_n]$ there exists a $T \in \isaAp{\cst{set}}{Ts}$ that contains the corresponding variables $x_{1,\epsilon_1},\ldots,x_{n,\epsilon_n}$ positively.
-  If this is not the case for a specific list $\epsilon$, we show using step 1 that every $T$ must contain one of the variables $x_{1,\neg\epsilon_1},\ldots,x_{n,\neg\epsilon_n}$ positively.
-  We then define a valuation that maps all variables $x_{i,\epsilon_i}$ to true and $x_{i,\neg\epsilon_i}$ to false for $i \in \{1,\ldots,n\}$.
-  We show using \cref{aux_lemma_prop4_step3} that this valuation satisfies $F_n$ but not $G$.
-  This means that $F_n$ is not equivalent to $G$, which contradicts the \lcnamecref{thm_cnf_to_dnf_blowup}'s assumption.
-  \textbf{(4)}~We then prove that the number of Boolean lists of length $n$ is $2^n \le \setCard{\isaAp{\cst{set}}{Ts}} \le \listLength{Ts}$ using steps 1 and 3.
-  \textbf{(5)}~Finally, we show that $\isaAp{\cstSizef}{G} \ge n \cdot 2^n$ by combining the results from steps 2 and 4 to discharge the assumptions of \cref{thm_exp_size}.
+  We proceed in five steps:
+  \begin{enumerate}
+    \item First, we show that every conjunctive formula $T \in \isaAp{\cst{set}}{Ts}$ contains for all $i \in \{1,\ldots,n\}$ either the variable $x_{i,\cstFalse}$ or $x_{i,\cstTrue}$ positively.
+    We prove this step by contradiction, where we must derive false for two cases:
+    Either the variables $x_{i,\cstFalse}$ and $x_{i,\cstTrue}$ are both positively contained in $T$ or they are both not positively contained.
+    In both cases, we proceed by defining a valuation that satisfies $G$ but not $F_n$.
+    For instance, in the second case, we find a valuation that satisfies $T$ and change the assignment of the variables $x_{i,\cstFalse}$ and $x_{i,\cstTrue}$ to false.
+    We then show using \cref{aux_lemma_prop4_step1,aux_lemma_prop4_step3,thm_semantics_Fn_iff} that this modified valuation satisfies $T$ (and thus $G$) but does not satisfy $F_n$.
+    This means that $F_n$ is not equivalent to $G$, which contradicts the \lcnamecref{thm_cnf_to_dnf_blowup}'s assumption.
+
+    \item From step~1, we derive that every $T \in \isaAp{\cst{set}}{Ts}$ has $\isaAp{\cstSizef}{T} \ge n$.
+
+    \item Furthermore, we prove that for every Boolean list $\epsilon = [\epsilon_1,\ldots,\epsilon_n]$ there exists a $T \in \isaAp{\cst{set}}{Ts}$ that contains the corresponding variables $x_{1,\epsilon_1},\ldots,x_{n,\epsilon_n}$ positively.
+    If this is not the case for a specific list $\epsilon$, we show using step~1 that every $T$ must contain one of the variables $x_{1,\neg\epsilon_1},\ldots,x_{n,\neg\epsilon_n}$ positively.
+    We then define a valuation that maps all variables $x_{i,\epsilon_i}$ to true and $x_{i,\neg\epsilon_i}$ to false for $i \in \{1,\ldots,n\}$.
+    We show using \cref{aux_lemma_prop4_step3} that this valuation satisfies $F_n$ but not $G$.
+    This means that $F_n$ is not equivalent to $G$, which contradicts the \lcnamecref{thm_cnf_to_dnf_blowup}'s assumption.
+
+    \item We then prove that the number of Boolean lists of length $n$ is $2^n \le \setCard{\isaAp{\cst{set}}{Ts}} \le \listLength{Ts}$ using steps~1 and~3.
+
+    \item Finally, we show that $\isaAp{\cstSizef}{G} \ge n \cdot 2^n$ by combining the results from steps~2 and~4 to discharge the assumptions of \cref{thm_exp_size}.
+  \end{enumerate}
 \end{proof}
 
 \Cref{thm_cnf_to_dnf_blowup} assumes the existence of two equivalent formulas $F_n$ (in conjunctive normal form) and $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$ (in disjunctive normal form) and proves a lower bound on the size of the later.
@@ -460,7 +466,7 @@ We claim that \cref{thm_cnf_to_dnf_blowup_math} is a formalization of the paper 
 \section{DNF to CNF}
 \label{sec_DNF_to_CNF}
 
-Our formalization splits the paper proof of \cref{cnfblowup} again in a low-level \lcnamecref{thm_dnf_to_cnf_blowup}, which assumes the existence of formulas with specific shapes and properties, and a \lcnamecref{thm_dnf_to_cnf_blowup_math}, which proves that such formulas can always be obtained.
+Our formalization splits the paper proof of \cref{cnfblowup} into a low-level \lcnamecref{thm_dnf_to_cnf_blowup}, which assumes the existence of formulas with specific shapes and properties, and a \lcnamecref{thm_dnf_to_cnf_blowup_math}, which proves that such formulas can always be obtained.
 We start by defining a function to produce the dual of a formula and proving a few basic properties.
 
 \begin{definitionx}
@@ -528,13 +534,18 @@ We can now prove that some specific formulas equivalent to the dual of $F_n$ (\c
 \end{proposition}
 \begin{proof}
   We prove this by contradiction using \cref{thm_cnf_to_dnf_blowup}.
-  We assume $\isaAp{\cstSizef}{G} < n \cdot 2^n$ and from that derive false in five steps.
-  \textbf{(1)}~First, we know from \cref{thm_sizef_dualize} that $\isaAp{\cstSizef}{(\isaAp{\cst{dualize}}{G})} = \isaAp{\cstSizef}{G}$, thus $\isaAp{\cstSizef}{(\isaAp{\cst{dualize}}{G})} < n \cdot 2^n$.
-  \textbf{(2)}~Moreover, we show that $\isaAp{\cst{dualize}}{G}$ is equivalent to $F_n$ using, among others, \cref{thm_equiv_dualize}.
-  \textbf{(3)}~Also, we prove using \cref{thm_dualized_conj_of_disjs_is_disj_of_conjs} that there exists a list $Ts$ such that every formula contained in $Ts$ is both conjunctive and satisfiable and such that $\isaAp{\cst{dualize}}{G}$ is syntactically equal to $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$.
-  \textbf{(4)}~From steps 2 and 3, it follows that \cref{thm_cnf_to_dnf_blowup} holds for $F_n$ and $\isaAp{\cst{dualize}}{G}$.
-  According to \cref{thm_cnf_to_dnf_blowup}, it therefore must be the case that $\isaAp{\cstSizef}{(\isaAp{\cst{dualize}}{G})} \ge n \cdot 2^n$.
-  \textbf{(5)}~The result of step 1 contradicts the result of step 4, completing the proof.
+  We assume $\isaAp{\cstSizef}{G} < n \cdot 2^n$ and from that derive false in five steps:
+  \begin{enumerate}
+    \item First, we know from \cref{thm_sizef_dualize} that $\isaAp{\cstSizef}{(\isaAp{\cst{dualize}}{G})} = \isaAp{\cstSizef}{G}$, thus $\isaAp{\cstSizef}{(\isaAp{\cst{dualize}}{G})} < n \cdot 2^n$.
+
+    \item Moreover, we show that $\isaAp{\cst{dualize}}{G}$ is equivalent to $F_n$ using, among others, \cref{thm_equiv_dualize}.
+
+    \item Also, we prove using \cref{thm_dualized_conj_of_disjs_is_disj_of_conjs} that there exists a list $Ts$ such that every formula contained in $Ts$ is both conjunctive and satisfiable and such that $\isaAp{\cst{dualize}}{G}$ is syntactically equal to $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$.
+
+    \item From steps~2 and~3, we can discharge the assumptions of \cref{thm_cnf_to_dnf_blowup} for $F_n$ and $\isaAp{\cst{dualize}}{G}$ and thus show that $\isaAp{\cstSizef}{(\isaAp{\cst{dualize}}{G})} \ge n \cdot 2^n$.
+
+    \item The result of step~1 contradicts the result of step~4, completing the proof.
+  \end{enumerate}
 \end{proof}
 
 \Cref{thm_dnf_to_cnf_blowup} assumes the existence of two equivalent formulas $\isaAp{\cst{dualize}}{F_n}$ (in disjunctive normal form) and $\bigwedge_{i = 0}^{\listLength{Cs}} \listNth{Cs}{i}$ (in conjunctive normal form) and proves a lower bound on the size of the later.
@@ -555,8 +566,8 @@ We claim that \cref{thm_dnf_to_cnf_blowup_math} is a formalization of the paper 
 \label{sec_discussion}
 
 Whereas most ideas of the paper proof can be directly used for the formalization, some intuitive mathematical proof steps required significant formalization effort.
-This was most pronounced in the proof steps 2 and 4 of \cref{thm_cnf_to_dnf_blowup}, where we derived statements about the size of a formula from its properties.
-To prove step 4, we use a general lemma (already included in Isabelle/HOL) about the cardinality of finite sets.
+This was most pronounced in the proof steps~2 and~4 of \cref{thm_cnf_to_dnf_blowup}, where we derived statements about the size of a formula from its properties.
+To prove step~4, we use a general lemma (already included in Isabelle/HOL) about the cardinality of finite sets.
 
 \begin{lemma}
   \label{card_inj_on_le}
@@ -570,38 +581,38 @@ To prove step 4, we use a general lemma (already included in Isabelle/HOL) about
 We use \cref{card_inj_on_le} to prove that the number of Boolean lists of length $n$ is less than or equal to the cardinality of $\isaAp{\cst{set}}{Ts}$.
 We instantiate $X$ with the set of all Boolean lists of length $n$,
 $Y$ with $\isaAp{\cst{set}}{Ts}$, and
-$f$ with a function that takes a Boolean list and returns some conjunctive formula $T \in \isaAp{\cst{set}}{Ts}$ for which the predicate of step 3 holds.
+$f$ with a function that takes a Boolean list and returns some conjunctive formula $T \in \isaAp{\cst{set}}{Ts}$ for which the predicate of step~3 holds.
 Finding an appropriate function for $f$ and discharging \cref{card_inj_on_le}'s assumptions was surprisingly challenging:
-The first assumption was the most intricate and its proof uses both steps 1 and 3,
-the second assumption follows from step 3,
+The first assumption was the most intricate and its proof uses both steps~1 and~3,
+the second assumption follows from step~3, and
 the third assumption easily holds.
 
-To prove step 2, we introduced a new lemma, inspired by \cref{card_inj_on_le}, that uses a binary function that is right total w.r.t.\ the target set.
+To prove step~2, we introduced a new lemma, inspired by \cref{card_inj_on_le}, that uses a binary function that is right total w.r.t.\ the target set.
 
 \begin{lemma}
 	\label{card_le_card_if_mem_imp_ex_mem}
 	Let $X$ be a set of elements of type $\yA$ and $Y$ be a set of elements of type $\yC$.
 	Let $\tyAnnot{f}{\yA \Rightarrow \yB \Rightarrow \yC}$ be a binary function.
 	If $X$ and $Y$ are finite sets, and
-	if for all $x \in X$ there exists a $y$ such that $\isaApAp{f}{x}{y} \in Y$, and
+	if for all $x \in X$ there exists an element $y$ such that $\isaApAp{f}{x}{y} \in Y$, and
 	if the function $f$ is injective on all those pairs of $x$ and $y$,
 	then the cardinality of $X$ is less than or equal to the cardinality of $Y$.
 \end{lemma}
 
 We use \cref{card_le_card_if_mem_imp_ex_mem} to prove that every $T \in \isaAp{\cst{set}}{Ts}$ contains at least $n$ atoms and thus that $\isaAp{\cstSizef}{T} \ge n$.
-To do so, we instantiate $X$ with $\{1,\ldots,n\}$, $Y$ with the set of atoms of $T$, and the $f$ with the constructor for variables.
-Finding the correct statement for \cref{card_le_card_if_mem_imp_ex_mem} was challenging but, once found, it was easy to discharge the assumptions using step 1.
+To achieve this, we instantiate $X$ with $\{1,\ldots,n\}$, $Y$ with the set of atoms of $T$, and $f$ with the constructor for variables.
+Finding the correct statement for \cref{card_le_card_if_mem_imp_ex_mem} was challenging but, once it was found, it was easy to discharge the assumptions using step~1.
 
-Moreover, we chose to modify the functions \textsf{BigAnd} and \textsf{BigOr} from Michaelis and Nipkow \cite{Propositional_Proof_Systems-AFP} and to define our own versions in \cref{def_BigOr_BigAnd}, where the base cases are handled differently.
+Moreover, we chose to modify the functions $\cst{BigAnd}$ and $\cst{BigOr}$ from Michaelis and Nipkow \cite{Propositional_Proof_Systems-AFP} and to define our own versions in \cref{def_BigOr_BigAnd}, where the base cases are handled differently.
 Our functions avoid appending $\lnot\bot$ and $\bot$ to the produced formula when the provided list is nonempty.
 This allowed us to prove the size equalities in \cref{thm_sizef_BigOr_undnf_BigAnd_unconj} instead of having the left-hand side of the lemmas be slightly smaller than the right-hand side.
 Using the original functions would have been possible, but it would have resulted in \cref{thm_cnf_to_dnf_blowup_math,thm_dnf_to_cnf_blowup_math} stating that the size $\left|\psi\right| + 2 \ge n \cdot 2^n$ instead of $\left|\psi\right| \ge n \cdot 2^n$.
-To keep the statements as close as possible to their mathematical counterparts, we therefore chose to introduce the functions \textsf{BigAnd'} and \textsf{BigOr'}.
+To keep the statements close to their mathematical counterparts, we therefore chose to introduce the functions $\cst{BigAnd'}$ and $\cst{BigOr'}$.
 
 Finally we introduced the function $\cstSizef$ to be able to prove the equality of \cref{thm_sizef_dualize}.
 Without $\cstSizef$, we could only prove the inequality $\left|\isaAp{\cst{dualize}}{\phi}\right| \le 2 \cdot \left|\phi\right|$ because $\cst{dualize}$ adds and removes negations depending on the formula.
 It would be possible to restate and prove the statement of \cref{thm_cnf_to_dnf_blowup} in terms of $\left|\cdot\right|$.
-However, if we tried to restate and prove the statement of \cref{thm_dnf_to_cnf_blowup} in terms of $\left|\cdot\right|$, we would prove $\left|\isaAp{\cst{dualize}}{G}\right| < 2 \cdot n \cdot 2^n$ in step 1 and $\left|\isaAp{\cst{dualize}}{G}\right| \ge n \cdot 2^n$ in step 4, and we would not be able to derive a contradiction in step~5.
+However, if we tried to restate and prove the statement of \cref{thm_dnf_to_cnf_blowup} in terms of $\left|\cdot\right|$, we would prove $\left|\isaAp{\cst{dualize}}{G}\right| < 2 \cdot n \cdot 2^n$ in step~1 and $\left|\isaAp{\cst{dualize}}{G}\right| \ge n \cdot 2^n$ in step~4, and we would not be able to derive a contradiction in step~5.
 
 
 \section{Conclusion}
