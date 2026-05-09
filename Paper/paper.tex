@@ -92,7 +92,6 @@ We thank Jasmin Blanchette for suggesting textual improvements.
 
 %TODO: Change label of proof environment to "Proof sketch"
 %TODO: Sadly, use abbreviations for DNF and CNF everywhere.
-%TODO: rename dualize to dual
 
 \begin{document}
 
@@ -470,55 +469,55 @@ Our formalization splits the paper proof of \cref{cnfblowup} into a low-level \l
 We start by defining a function to produce the dual of a formula and proving a few basic properties.
 
 \begin{definitionx}
-  \label{def_dualize}
-  The function $\tyAnnot{\cst{dualize}}{\tyFormula{\yA} \Rightarrow \tyFormula{\yA}}$ converts a formula to its dual form by replacing each literal with its complementary:
-  an atom $A$ becomes $\neg A$,
+  \label{def_dual}
+  The function $\tyAnnot{\cst{dual}}{\tyFormula{\yA} \Rightarrow \tyFormula{\yA}}$ converts a formula to its dual form by replacing each literal with its complement:
+  an atom $x$ becomes $\neg x$,
   falsehood $\bot$ becomes $\neg\bot$,
   a negation $\neg \phi$ becomes $\phi$,
-  a disjunction $\phi \lor \psi$ becomes $\isaAp{\cst{dualize}}{\phi} \land \isaAp{\cst{dualize}}{\psi}$,
-  a conjunction $\phi \land \psi$ becomes $\isaAp{\cst{dualize}}{\phi} \lor \isaAp{\cst{dualize}}{\psi}$, and
-  an implication $\phi \rightarrow \psi$ becomes $\phi \land \isaAp{\cst{dualize}}{\psi}$.
+  a disjunction $\phi \lor \psi$ becomes $\isaAp{\cst{dual}}{\phi} \land \isaAp{\cst{dual}}{\psi}$,
+  a conjunction $\phi \land \psi$ becomes $\isaAp{\cst{dual}}{\phi} \lor \isaAp{\cst{dual}}{\psi}$, and
+  an implication $\phi \rightarrow \psi$ becomes $\phi \land \isaAp{\cst{dual}}{\psi}$.
 \end{definitionx}
 
 \begin{remark*}
-  In contrast to the definition of dual formulas in \cref{sec_background}, we specify the $\cst{dualize}$ function for arbitrary formulas to avoid the recurring assumption that formulas are in negation normal form.
+  In contrast to the definition of dual formulas in \cref{sec_background}, we specify the $\cst{dual}$ function for arbitrary formulas to avoid the recurring assumption that formulas are in negation normal form.
 \end{remark*}
 
-The semantics of the dual of a formula is the exact opposite of that of the original formula.
+The semantics of a dual formula is the exact opposite of that of the original formula.
 
 \begin{lemma}
-  \label{thm_equiv_dualize}
+  \label{thm_equiv_dual}
   Let $\phi$ be a formula.
-  The formula $\isaAp{\cst{dualize}}{\phi}$ is equivalent to $\neg\phi$.
+  The formula $\isaAp{\cst{dual}}{\phi}$ is equivalent to $\neg\phi$.
 \end{lemma}
 
-Because the $\cstSizef$ function ignores negations, the $\cst{dualize}$ function preserves the size of the original formula.
+Because the $\cstSizef$ function ignores negations, the $\cst{dual}$ function preserves the size of the original formula.
 
 \begin{lemma}
-	\label{thm_sizef_dualize}
+	\label{thm_sizef_dual}
   Let $\phi$ be a formula.
-  $\isaAp{\cstSizef}{(\isaAp{\cst{dualize}}{\phi})} = \isaAp{\cstSizef}{\phi}$.
+  $\isaAp{\cstSizef}{(\isaAp{\cst{dual}}{\phi})} = \isaAp{\cstSizef}{\phi}$.
 \end{lemma}
 
 Next, we prove some sufficient condition for a dual formula to be satisfiable.
 
 \begin{lemma}
-  \label{thm_dualized_disj_not_taut_impl_sat}
+  \label{thm_dual_disj_not_taut_impl_sat}
 	Let $\phi$ be a formula.
 	If $\phi$ is disjunctive and not tautological,
-	then $\isaAp{\cst{dualize}}{\phi}$ is satisfiable.
+	then $\isaAp{\cst{dual}}{\phi}$ is satisfiable.
 \end{lemma}
 
 Next, we prove that the dual of some specific formulas in disjunctive normal form are in conjunctive normal form.
 
 \begin{lemma}
-  \label{thm_dualized_conj_of_disjs_is_disj_of_conjs}
+  \label{thm_dual_conj_of_disjs_is_disj_of_conjs}
   Let $Cs$ be a list of formulas.
   If all formulas in $Cs$ are disjunctive and not tautological,
-  then there exists a list $Ts$ such that all formulas in $Ts$ are conjunctive and satisfiable, and $\isaAp{\cst{dualize}}{(\bigwedge_{i = 0}^{\listLength{Cs}} \listNth{Cs}{i})} = \bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$.
+  then there exists a list $Ts$ such that all formulas in $Ts$ are conjunctive and satisfiable, and $\isaAp{\cst{dual}}{(\bigwedge_{i = 0}^{\listLength{Cs}} \listNth{Cs}{i})} = \bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$.
 \end{lemma}
 \begin{proof}
-  We prove this by structural induction over the list $Cs$ using \cref{thm_dualized_disj_not_taut_impl_sat}.
+  We prove this by structural induction over the list $Cs$ using \cref{thm_dual_disj_not_taut_impl_sat}.
   The idea is to map each element of $Cs$ to its dual form.
 \end{proof}
 
@@ -529,26 +528,26 @@ We can now prove that some specific formulas equivalent to the dual of $F_n$ (\c
   Let $n > 0$ be a natural number.
   Let $Cs$ be a list of formulas.
   Let $G = \bigwedge_{i = 0}^{\listLength{Cs}} \listNth{Cs}{i}$.
-  If all formulas in $Cs$ are disjunctive and not tautological, and $\isaAp{\cst{dualize}}{F_n}$ is equivalent to $G$,
+  If all formulas in $Cs$ are disjunctive and not tautological, and $\isaAp{\cst{dual}}{F_n}$ is equivalent to $G$,
   then $\isaAp{\cstSizef}{G} \ge n \cdot 2^n$.
 \end{proposition}
 \begin{proof}
   We prove this by contradiction using \cref{thm_cnf_to_dnf_blowup}.
   We assume $\isaAp{\cstSizef}{G} < n \cdot 2^n$ and from that derive false in five steps:
   \begin{enumerate}
-    \item First, we know from \cref{thm_sizef_dualize} that $\isaAp{\cstSizef}{(\isaAp{\cst{dualize}}{G})} = \isaAp{\cstSizef}{G}$, thus $\isaAp{\cstSizef}{(\isaAp{\cst{dualize}}{G})} < n \cdot 2^n$.
+    \item First, we know from \cref{thm_sizef_dual} that $\isaAp{\cstSizef}{(\isaAp{\cst{dual}}{G})} = \isaAp{\cstSizef}{G}$, thus $\isaAp{\cstSizef}{(\isaAp{\cst{dual}}{G})} < n \cdot 2^n$.
 
-    \item Moreover, we show that $\isaAp{\cst{dualize}}{G}$ is equivalent to $F_n$ using, among others, \cref{thm_equiv_dualize}.
+    \item Moreover, we show that $\isaAp{\cst{dual}}{G}$ is equivalent to $F_n$ using, among others, \cref{thm_equiv_dual}.
 
-    \item Also, we prove using \cref{thm_dualized_conj_of_disjs_is_disj_of_conjs} that there exists a list $Ts$ such that every formula contained in $Ts$ is both conjunctive and satisfiable and such that $\isaAp{\cst{dualize}}{G}$ is syntactically equal to $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$.
+    \item Also, we prove using \cref{thm_dual_conj_of_disjs_is_disj_of_conjs} that there exists a list $Ts$ such that every formula contained in $Ts$ is both conjunctive and satisfiable and such that $\isaAp{\cst{dual}}{G}$ is syntactically equal to $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$.
 
-    \item From steps~2 and~3, we can discharge the assumptions of \cref{thm_cnf_to_dnf_blowup} for $F_n$ and $\isaAp{\cst{dualize}}{G}$ and thus show that $\isaAp{\cstSizef}{(\isaAp{\cst{dualize}}{G})} \ge n \cdot 2^n$.
+    \item From steps~2 and~3, we can discharge the assumptions of \cref{thm_cnf_to_dnf_blowup} for $F_n$ and $\isaAp{\cst{dual}}{G}$ and thus show that $\isaAp{\cstSizef}{(\isaAp{\cst{dual}}{G})} \ge n \cdot 2^n$.
 
     \item The result of step~1 contradicts the result of step~4, completing the proof.
   \end{enumerate}
 \end{proof}
 
-\Cref{thm_dnf_to_cnf_blowup} assumes the existence of two equivalent formulas $\isaAp{\cst{dualize}}{F_n}$ (in disjunctive normal form) and $\bigwedge_{i = 0}^{\listLength{Cs}} \listNth{Cs}{i}$ (in conjunctive normal form) and proves a lower bound on the size of the later.
+\Cref{thm_dnf_to_cnf_blowup} assumes the existence of two equivalent formulas $\isaAp{\cst{dual}}{F_n}$ (in disjunctive normal form) and $\bigwedge_{i = 0}^{\listLength{Cs}} \listNth{Cs}{i}$ (in conjunctive normal form) and proves a lower bound on the size of the later.
 We now prove that such equivalent formulas do exist and that the exponential blowup holds for all of them.
 
 \begin{theorem}[Exponential Blowup from DNF to CNF]
@@ -609,10 +608,10 @@ This allowed us to prove the size equalities in \cref{thm_sizef_BigOr_undnf_BigA
 Using the original functions would have been possible, but it would have resulted in \cref{thm_cnf_to_dnf_blowup_math,thm_dnf_to_cnf_blowup_math} stating that the size $\left|\psi\right| + 2 \ge n \cdot 2^n$ instead of $\left|\psi\right| \ge n \cdot 2^n$.
 To keep the statements close to their mathematical counterparts, we therefore chose to introduce the functions $\cst{BigAnd'}$ and $\cst{BigOr'}$.
 
-Finally we introduced the function $\cstSizef$ to be able to prove the equality of \cref{thm_sizef_dualize}.
-Without $\cstSizef$, we could only prove the inequality $\left|\isaAp{\cst{dualize}}{\phi}\right| \le 2 \cdot \left|\phi\right|$ because $\cst{dualize}$ adds and removes negations depending on the formula.
+Finally we introduced the function $\cstSizef$ to be able to prove the equality of \cref{thm_sizef_dual}.
+Without $\cstSizef$, we could only prove the inequality $\left|\isaAp{\cst{dual}}{\phi}\right| \le 2 \cdot \left|\phi\right|$ because $\cst{dual}$ adds and removes negations depending on the formula.
 It would be possible to restate and prove the statement of \cref{thm_cnf_to_dnf_blowup} in terms of $\left|\cdot\right|$.
-However, if we tried to restate and prove the statement of \cref{thm_dnf_to_cnf_blowup} in terms of $\left|\cdot\right|$, we would prove $\left|\isaAp{\cst{dualize}}{G}\right| < 2 \cdot n \cdot 2^n$ in step~1 and $\left|\isaAp{\cst{dualize}}{G}\right| \ge n \cdot 2^n$ in step~4, and we would not be able to derive a contradiction in step~5.
+However, if we tried to restate and prove the statement of \cref{thm_dnf_to_cnf_blowup} in terms of $\left|\cdot\right|$, we would prove $\left|\isaAp{\cst{dual}}{G}\right| < 2 \cdot n \cdot 2^n$ in step~1 and $\left|\isaAp{\cst{dual}}{G}\right| \ge n \cdot 2^n$ in step~4, and we would not be able to derive a contradiction in step~5.
 
 
 \section{Conclusion}
