@@ -112,17 +112,17 @@ In this paper, we first briefly cover the necessary mathematical background (\cr
 We start by presenting a few preliminary definitions and lemmas (\cref{sec_preliminaries}).
 
 We then prove the exponential blowup when converting a formula from conjunctive to disjunctive normal form (\cref{sec_CNF_to_DNF}).
-We achieve this in two steps:
-First, we prove the low-level \cref{thm_cnf_to_dnf_blowup} that assumes the existence of two equivalent formulas fulfilling some assumptions and that exhibits the exponential lower bound on the formula size.
-Second, we use this \lcnamecref{thm_cnf_to_dnf_blowup} to prove in the desired \cref{thm_cnf_to_dnf_blowup_math} that such formulas always exist.
+Our formalization splits the paper proof into a low-level \cref{thm_cnf_to_dnf_blowup} and a high-level \cref{thm_cnf_to_dnf_blowup_math}.
+The low-level \lcnamecref{thm_cnf_to_dnf_blowup} exhibits the exponential blowup for concrete formulas with specific shapes and properties.
+The high-level \lcnamecref{thm_cnf_to_dnf_blowup_math} corresponds to the expected mathematical result (e.g., with alternating existential and universal quantifiers) and proves that formulas expected by the low-level \lcnamecref{thm_cnf_to_dnf_blowup} can always be obtained.
 
-We analogously prove the same exponential blowup when converting a formula from disjunctive to conjunctive normal form (\cref{sec_DNF_to_CNF}).
-We do this again in two steps:
-First, the low-level \Cref{thm_dnf_to_cnf_blowup} assumes the existence of two equivalent formulas fulfilling some assumptions and exhibits the exponential lower bound on the formula size;
-the proof uses \cref{thm_cnf_to_dnf_blowup}.
-Second, we use \cref{thm_dnf_to_cnf_blowup} to prove in the desired \cref{thm_dnf_to_cnf_blowup_math} that such formulas always exist.
+We analogously prove the exponential blowup when converting a formula from disjunctive to conjunctive normal form (\cref{sec_DNF_to_CNF}).
+Our formalization splits the paper proof into a low-level \cref{thm_dnf_to_cnf_blowup} and a high-level \cref{thm_dnf_to_cnf_blowup_math}.
+The low-level \lcnamecref{thm_dnf_to_cnf_blowup} exhibits the exponential blowup for concrete formulas with specific shapes and properties;
+its proof uses \cref{thm_cnf_to_dnf_blowup}.
+The high-level \lcnamecref{thm_dnf_to_cnf_blowup_math} corresponds to the expected mathematical result and proves that formulas expected by the low-level \lcnamecref{thm_dnf_to_cnf_blowup} can always be obtained.
 
-Finally, we discuss (\cref{sec_discussion}) some of the challenges we encountered when proving statements about the size of formulas.
+Finally, we discuss some of the challenges we encountered when proving statements about the size of formulas (\cref{sec_discussion}).
 
 Our work is part of the IsaFoL (Isabelle Formalization of Logic) effort \cite{Blanchette_CPP2019_IsaFoL}.
 Our formalization consists of approximately 1100 nonempty lines
@@ -180,7 +180,7 @@ exponential increase in the formula size in the worst case (see, e.g., Kleine B\
 
 \begin{theorem} \label{dnfblowup}
   For all sufficiently large $n\in\Nat$, there exist formulas $F_n$ in
-  CNF with $|F_n| = O(n)$ such that every equivalent formula $G_n$ in
+  CNF with $|F_n| = \mathcal{O}(n)$ such that every equivalent formula $G_n$ in
   DNF is of size $|G_n| \geq n \cdot 2^n$.
 \end{theorem}
 \begin{proof}
@@ -204,7 +204,7 @@ It follows that $G_n$ has at least $m \geq 2^n$ many terms.
 
 \begin{theorem} \label{cnfblowup}
   For all sufficiently large $n\in\Nat$, there exist formulas $F'_n$ in
-  DNF with $|F'_n| = O(n)$ such that every equivalent formula $G_n$
+  DNF with $|F'_n| = \mathcal{O}(n)$ such that every equivalent formula $G_n$
   in CNF is of size $|G_n| \geq n \cdot 2^n$.
 \end{theorem}
 
@@ -307,18 +307,31 @@ We will also need to construct formulas of a very specific family and define a f
 Finally, we provide two different definitions for the size of a formula.
 
 \begin{definitionx}
-  \label{def_size}
-  The function $\tyAnnot{\cstSize}{\tyFormula{\yA} \Rightarrow \tyNat}$ counts the number of atoms, $\bot$, negations, disjunctions, conjunctions, and implications in a formula.
+  \label{def_size_sizef}
+  The functions $\tyAnnot{\cstSize}{\tyFormula{\yA} \Rightarrow \tyNat}$ and $\tyAnnot{\cstSizef}{\tyFormula{\yA} \Rightarrow \tyNat}$ provide two metrics of formula size:
+  $\cstSize$ counts the number of logical symbols, and
+  $\cstSizef$ counts the number of logical symbols that are not negations.
+  \begin{align*}
+    \isaAp{\cstSize}{x} =\; & 1 &
+    \isaAp{\cstSizef}{x} =\; & 1 \\
+    \isaAp{\cstSize}{\bot} =\; & 1 &
+    \isaAp{\cstSizef}{\bot} =\; & 1 \\
+    \isaAp{\cstSize}{\neg\phi} =\; & \isaAp{\cstSize}{\phi} + 1 &
+    \isaAp{\cstSizef}{\neg\phi} =\; & \isaAp{\cstSizef}{\phi} \\
+    \isaAp{\cstSize}{\phi \lor \psi} =\; & \isaAp{\cstSize}{\phi} + \isaAp{\cstSize}{\psi} + 1 &
+    \isaAp{\cstSizef}{\phi \lor \psi} =\; & \isaAp{\cstSizef}{\phi} + \isaAp{\cstSizef}{\psi} + 1 \\
+    \isaAp{\cstSize}{\phi \land \psi} =\; & \isaAp{\cstSize}{\phi} + \isaAp{\cstSize}{\psi} + 1 &
+    \isaAp{\cstSizef}{\phi \land \psi} =\; & \isaAp{\cstSizef}{\phi} + \isaAp{\cstSizef}{\psi} + 1 \\
+    \isaAp{\cstSize}{\phi \rightarrow \psi} =\; & \isaAp{\cstSize}{\phi} + \isaAp{\cstSize}{\psi} + 1 &
+    \isaAp{\cstSizef}{\phi \rightarrow \psi} =\; & \isaAp{\cstSizef}{\phi} + \isaAp{\cstSizef}{\psi} + 1 \\
+  \end{align*}
   In the rest of this paper, we write $|\phi|$ for $\isaAp{\cstSize}{\phi}$.
 \end{definitionx}
 
-\begin{definitionx}
-  \label{def_sizef}
-  The function $\tyAnnot{\cstSizef}{\tyFormula{\yA} \Rightarrow \tyNat}$ counts the number of atoms, $\bot$, disjunctions, conjunctions, and implications in a formula;
-  the negations are ignored.
-\end{definitionx}
+The function $\left|\cdot\right|$ corresponds to the intuitive notion of formula size while the function $\cstSizef$ is an artefact of the formalization:
+Intuitively, for formulas in negation normal form, $\cstSizef$ represents the number of logical symbols if one considers literals as basic unit instead of atoms and falsehood.
 
-Because $\cst{sizef}$ ignores negations, it always evaluates to a smaller than or equal to number than $\left|\cdot\right|$.
+Because $\cstSizef$ ignores negations, it always evaluates to a number smaller than or equal to the number of $\left|\cdot\right|$.
 
 \begin{lemma}
   \label{thm_sizef_le_size}
@@ -326,14 +339,7 @@ Because $\cst{sizef}$ ignores negations, it always evaluates to a smaller than o
   $\isaAp{\cstSizef}{\phi} \le \left|\phi\right|$.
 \end{lemma}
 
-We can observe the difference and similarity between the two definitions by looking at the sizes of the $F_n$ formula and the conjunction and disjunction of lists of formulas.
-
-\begin{lemma}
-  \label{thm_sizef_Fn}
-  Let $n$ be a natural number.
-  $\isaAp{\cstSizef}{F_n} = 8 \cdot n + 1$ and
-  $\left|F_n\right| = 10 \cdot n + 2$.
-\end{lemma}
+We will need to know the size of formulas built using the functions seen so far.
 
 \begin{lemma}
   \label{thm_sizef_BigOr_undnf_BigAnd_unconj}
@@ -348,9 +354,14 @@ We can observe the difference and similarity between the two definitions by look
   \end{align*}
 \end{lemma}
 
-Most of the statements about the size of formulas are expressed in terms of $\cstSizef$ but, luckily, \cref{thm_sizef_le_size} will allow us to remove $\cstSizef$ entirely from the statements of \cref{thm_cnf_to_dnf_blowup_math,thm_dnf_to_cnf_blowup_math}.
-TODO: Polish this explanation.
-For formulas in NNF, sizef represents the number of logical symbols if one considers the literals as a unit.
+\begin{lemma}
+  \label{thm_sizef_Fn}
+  Let $n$ be a natural number.
+  $\isaAp{\cstSizef}{F_n} = 8 \cdot n + 1$ and
+  $\left|F_n\right| = 10 \cdot n + 2$.
+\end{lemma}
+
+Most of the statements about the size of formulas are expressed in terms of $\cstSizef$ but, fortunately, \cref{thm_sizef_le_size} will allow us to express the statements of \cref{thm_cnf_to_dnf_blowup_math,thm_dnf_to_cnf_blowup_math} entirely in terms of the more intuitive $\left|\cdot\right|$.
 
 
 \section{CNF to DNF}
