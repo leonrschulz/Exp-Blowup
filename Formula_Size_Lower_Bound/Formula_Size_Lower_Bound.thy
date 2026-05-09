@@ -680,10 +680,10 @@ primrec dual :: "'a formula \<Rightarrow> 'a formula" where
   "dual (Or F G) = And (dual F) (dual G)" |
   "dual (Imp F G) = And F (dual G)"
 
-lemma sizef_duald_Fn: "sizef (dual (Fn n)) = 8 * n + 1"
+lemma sizef_dual_Fn: "sizef (dual (Fn n)) = 8 * n + 1"
   by (induction n) simp_all
 
-lemma size_duald_Fn: "size (dual (Fn n)) = 10 * n + 1"
+lemma size_dual_Fn: "size (dual (Fn n)) = 10 * n + 1"
   by (induction n) simp_all
 
 lemma is_dnf_dual_Fn: "is_dnf (dual (Fn n))"
@@ -745,7 +745,7 @@ next
     using disj_is_cnf is_disj_dual_if_is_conj is_dnf.simps(5) by blast
 qed auto
 
-lemma duald_disj_not_taut_impl_sat: "is_disj F \<Longrightarrow> \<exists>Val. \<not> Val \<Turnstile> F \<Longrightarrow> \<exists>Val. Val \<Turnstile> dual F"
+lemma dual_disj_not_taut_impl_sat: "is_disj F \<Longrightarrow> \<exists>Val. \<not> Val \<Turnstile> F \<Longrightarrow> \<exists>Val. Val \<Turnstile> dual F"
 proof (induction F)
   case (Or F1 F2)
   have F_is_nnf: "is_nnf (F1 \<^bold>\<or> F2)" 
@@ -1168,7 +1168,7 @@ proof -
   note def_Fprime = Fprime_def
   note def_G = G_def G_spec
   have size_Fprime: "sizef Fprime = 8*n+1" 
-    using def_Fprime by (simp add: sizef_duald_Fn)
+    using def_Fprime by (simp add: sizef_dual_Fn)
   have Fprime_in_dnf: "is_dnf Fprime" 
     by (simp add: def_Fprime is_dnf_dual_Fn)
   have G_in_cnf: "is_cnf G" 
@@ -1256,7 +1256,7 @@ theorem exp_blowup_from_DNF_to_CNF:
 proof (cases n)
   case 0
   then show ?thesis
-    using is_dnf_dual_Fn size_duald_Fn
+    using is_dnf_dual_Fn size_dual_Fn
     by fastforce
 next
   case (Suc n')
@@ -1270,7 +1270,7 @@ next
       using is_dnf_dual_Fn .
   next
     show "size (dual (Fn n)) = 10 * n + 1"
-      using size_duald_Fn .
+      using size_dual_Fn .
   next
     fix G\<^sub>n :: "var formula"
     assume "equiv (dual (Fn n)) G\<^sub>n"
