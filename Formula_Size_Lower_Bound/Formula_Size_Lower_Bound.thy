@@ -670,35 +670,35 @@ next
 qed
 
 
-subsection \<open>Dualize Function\<close>
+subsection \<open>Dual Function\<close>
 
-primrec dualize :: "'a formula \<Rightarrow> 'a formula" where
-  "dualize Bot = Not Bot" |
-  "dualize (Atom v) = Not (Atom v)" |
-  "dualize (Not v) = v" |
-  "dualize (And F G) = Or (dualize F) (dualize G)" |
-  "dualize (Or F G) = And (dualize F) (dualize G)" |
-  "dualize (Imp F G) = And F (dualize G)"
+primrec dual :: "'a formula \<Rightarrow> 'a formula" where
+  "dual Bot = Not Bot" |
+  "dual (Atom v) = Not (Atom v)" |
+  "dual (Not v) = v" |
+  "dual (And F G) = Or (dual F) (dual G)" |
+  "dual (Or F G) = And (dual F) (dual G)" |
+  "dual (Imp F G) = And F (dual G)"
 
-lemma sizef_dualized_Fn: "sizef (dualize (Fn n)) = 8 * n + 1"
+lemma sizef_duald_Fn: "sizef (dual (Fn n)) = 8 * n + 1"
   by (induction n) simp_all
 
-lemma size_dualized_Fn: "size (dualize (Fn n)) = 10 * n + 1"
+lemma size_duald_Fn: "size (dual (Fn n)) = 10 * n + 1"
   by (induction n) simp_all
 
-lemma is_dnf_dualize_Fn: "is_dnf (dualize (Fn n))"
+lemma is_dnf_dual_Fn: "is_dnf (dual (Fn n))"
   by (induction n) simp_all
 
-lemma sizef_dualize: "sizef (dualize F) = sizef F"
+lemma sizef_dual: "sizef (dual F) = sizef F"
   by (induction F) simp_all
 
-lemma size_dualize_le: "size (dualize F) \<le> 2 * size F"
+lemma size_dual_le: "size (dual F) \<le> 2 * size F"
   by (induction F) simp_all
 
-lemma equiv_dualize: "equiv (dualize F) (Not F)"
+lemma equiv_dual: "equiv (dual F) (Not F)"
   by (induction F) (simp_all add: equiv_def)
 
-lemma dualized_cnf_in_dnf: "is_cnf F \<Longrightarrow> is_dnf (dualize F)"
+lemma duald_cnf_in_dnf: "is_cnf F \<Longrightarrow> is_dnf (dual F)"
 proof (induction F)
   case (Not F)
   have "is_lit_plus (Not F)" 
@@ -712,78 +712,78 @@ next
   case (Or F1 F2)
   then have a: "is_lit_plus F1 \<and> is_disj F2" 
     by simp
-  have 1: "is_lit_plus (dualize F1)" 
+  have 1: "is_lit_plus (dual F1)"
     using a is_lit_plus.elims(2) by fastforce
-  have 2: "is_conj (dualize F2)" 
+  have 2: "is_conj (dual F2)"
     using a
     by (smt (verit) Or.IH(2) formula.distinct(3) is_cnf.simps(5) is_conj.simps(2,3,4)
         is_disj.elims(2) is_disj.simps(4) is_dnf.simps(5) is_lit_plus.elims(2)
-        is_lit_plus.simps(1,11,2,3,4,9) dualize.simps(1,2,3,5))
+        is_lit_plus.simps(1,11,2,3,4,9) dual.simps(1,2,3,5))
   show ?case 
     using 1 2 by simp
 qed simp_all
 
-lemma dualized_conj_is_disj: "is_conj F \<Longrightarrow> is_disj (dualize F)"
+lemma duald_conj_is_disj: "is_conj F \<Longrightarrow> is_disj (dual F)"
 proof (induction F)
   case (Not F)
   then show ?case 
     by (metis is_conj.simps(4) is_disj.simps(2,3) is_lit_plus.simps(1,3)
-        is_nnf.simps(6) is_nnf_NotD dualize.simps(3))
+        is_nnf.simps(6) is_nnf_NotD dual.simps(3))
 next
   case (And F1 F2)
   then show ?case
     by (metis is_cnf.simps(5) is_conj.simps(1) is_disj.simps(1) is_dnf.simps(5)
-        dualize.simps(4,5) dualized_cnf_in_dnf)
+        dual.simps(4,5) duald_cnf_in_dnf)
 qed simp_all
 
-lemma dualized_dnf_in_cnf: "is_dnf F \<Longrightarrow> is_cnf (dualize F)"
+lemma duald_dnf_in_cnf: "is_dnf F \<Longrightarrow> is_cnf (dual F)"
 proof (induction F)
   case (Not F)
   then show ?case 
     by (metis is_cnf.simps(2,3) is_conj.simps(4) is_disj.simps(2,3) is_dnf.simps(4)
-        is_lit_plus.simps(1,3) is_nnf.simps(6) is_nnf_NotD dualize.simps(3))
+        is_lit_plus.simps(1,3) is_nnf.simps(6) is_nnf_NotD dual.simps(3))
 next
   case (And F1 F2)
   have "is_conj (And F1 F2)" 
     using \<open>is_dnf (F1 \<^bold>\<and> F2)\<close> by simp
   then have "is_lit_plus F1" and "is_conj F2" 
     by auto
-  have 1: "is_lit_plus (dualize F1)" 
+  have 1: "is_lit_plus (dual F1)"
     using \<open>is_lit_plus F1\<close> 
-    by (metis is_lit_plus.elims(2) is_lit_plus.simps(1,2,3,4) dualize.simps(1,2,3))
-  have 2: "is_disj (dualize F2)" 
-    using \<open>is_conj F2\<close> by (simp add: dualized_conj_is_disj)
-  have "is_lit_plus (dualize F1) \<and> is_disj (dualize F2)" 
+    by (metis is_lit_plus.elims(2) is_lit_plus.simps(1,2,3,4) dual.simps(1,2,3))
+  have 2: "is_disj (dual F2)"
+    using \<open>is_conj F2\<close> by (simp add: duald_conj_is_disj)
+  have "is_lit_plus (dual F1) \<and> is_disj (dual F2)"
     using 1 2 by simp
   then show ?case 
     by simp
 qed auto
 
-lemma dualized_disj_not_taut_impl_sat: "is_disj F \<Longrightarrow> \<exists>Val. \<not> Val \<Turnstile> F \<Longrightarrow> \<exists>Val. Val \<Turnstile> dualize F"
+lemma duald_disj_not_taut_impl_sat: "is_disj F \<Longrightarrow> \<exists>Val. \<not> Val \<Turnstile> F \<Longrightarrow> \<exists>Val. Val \<Turnstile> dual F"
 proof (induction F)
   case (Or F1 F2)
   have F_is_nnf: "is_nnf (F1 \<^bold>\<or> F2)" 
     using Or.prems(1) disj_is_nnf by blast
-  then have equiv: "equiv (Not (F1 \<^bold>\<or> F2))(dualize (F1 \<^bold>\<or> F2))" 
-    using equiv_dualize equiv_def by blast
+  then have equiv: "equiv (Not (F1 \<^bold>\<or> F2))(dual (F1 \<^bold>\<or> F2))"
+    using equiv_dual equiv_def by blast
   obtain Val where Val_def: "\<not> Val \<Turnstile> F1 \<^bold>\<or> F2" 
     using Or.prems(2) by auto
   then have "Val \<Turnstile> Not (F1 \<^bold>\<or> F2)" 
     by auto
-  then have "Val \<Turnstile> dualize (F1 \<^bold>\<or> F2)" 
+  then have "Val \<Turnstile> dual (F1 \<^bold>\<or> F2)"
     using equiv by (simp add: equiv_def)
   then show ?case 
     by auto
 qed auto
 
-lemma dualized_conj_of_disjs_is_disj_of_conjs: 
+lemma duald_conj_of_disjs_is_disj_of_conjs:
   "(\<forall> C \<in> set Cs. is_disj C \<and> (\<exists> Val. \<not>(Val \<Turnstile> C))) \<Longrightarrow> 
-   \<exists> Ts. (dualize (BigAnd' Cs)) = BigOr' Ts \<and> (\<forall>T\<in>set Ts. is_conj T \<and> (\<exists> Val. Val \<Turnstile> T))"
-  \<comment> \<open>TODO: try to prove the lemma for \<^term>\<open>Ts = map dualize Cs\<close>\<close>
+   \<exists> Ts. (dual (BigAnd' Cs)) = BigOr' Ts \<and> (\<forall>T\<in>set Ts. is_conj T \<and> (\<exists> Val. Val \<Turnstile> T))"
+  \<comment> \<open>TODO: try to prove the lemma for \<^term>\<open>Ts = map dual Cs\<close>\<close>
 proof (induction Cs)
   case Nil
   then show ?case
-    by (metis BigAnd'.simps(1) BigOr'.simps(1) dualize.simps(3) empty_iff list.set(1))
+    by (metis BigAnd'.simps(1) BigOr'.simps(1) dual.simps(3) empty_iff list.set(1))
 next
   case (Cons C Cs)
   have is_disj_C: "is_disj C" 
@@ -791,33 +791,33 @@ next
   have is_no_taut_C: "\<exists>\<alpha>. \<not> \<alpha> \<Turnstile> C" 
     using Cons.prems by simp
   then obtain TsCs where 
-    def_TsCs: "dualize (BigAnd' Cs) = BigOr' TsCs" "\<forall>T\<in>set TsCs. is_conj T \<and> (\<exists>Val. Val \<Turnstile> T)"
+    def_TsCs: "dual (BigAnd' Cs) = BigOr' TsCs" "\<forall>T\<in>set TsCs. is_conj T \<and> (\<exists>Val. Val \<Turnstile> T)"
     by atomize_elim (auto simp add: Cons.IH Cons.prems)
   define Ts where 
-    "Ts = [dualize C] @ TsCs"
-  then have 1: "BigOr' Ts = Or (dualize C) (dualize (BigAnd' Cs))" if "Cs \<noteq> []"
+    "Ts = [dual C] @ TsCs"
+  then have 1: "BigOr' Ts = Or (dual C) (dual (BigAnd' Cs))" if "Cs \<noteq> []"
     by (metis BigAnd'.simps(2,3) BigOr'.simps(1,3) Cons.prems append_Cons append_Nil def_TsCs(1)
-        dualize.simps(4) dualized_disj_not_taut_impl_sat formula.distinct(15)
+        dual.simps(4) duald_disj_not_taut_impl_sat formula.distinct(15)
         formula_semantics.simps(2) list.exhaust list.set_intros(1,2) that)
-  have a2: "is_conj (dualize C)"
+  have a2: "is_conj (dual C)"
     using is_disj_C
     by (metis disj_is_cnf is_conj.simps(1) is_disj.simps(1) is_dnf.simps(5) 
-        is_lit_plus.simps(2) dualize.simps(5) dualized_cnf_in_dnf)
+        is_lit_plus.simps(2) dual.simps(5) duald_cnf_in_dnf)
   have b2: "\<forall>T\<in>set TsCs. is_conj T" 
     using def_TsCs by auto
   have 2: "(\<forall>T\<in>set Ts. is_conj T)" 
     using Ts_def a2 b2 by auto
-  have a3: "\<exists>\<alpha>. \<alpha> \<Turnstile> dualize C" 
-    using is_disj_C is_no_taut_C dualized_disj_not_taut_impl_sat by auto
+  have a3: "\<exists>\<alpha>. \<alpha> \<Turnstile> dual C"
+    using is_disj_C is_no_taut_C duald_disj_not_taut_impl_sat by auto
   have b3: "\<forall>T\<in>set TsCs. (\<exists>Val. Val \<Turnstile> T)" 
     using def_TsCs by auto
   have 3: "\<forall>T\<in>set Ts. (\<exists>Val. Val \<Turnstile> T)" 
     using Ts_def a3 b3 by auto
   show ?case
   proof (intro exI[of _ Ts] conjI ballI)
-    show "dualize (BigAnd' (C # Cs)) = BigOr' Ts"
+    show "dual (BigAnd' (C # Cs)) = BigOr' Ts"
       by (metis (no_types, lifting) "1" BigAnd'.cases BigAnd'.simps(1,2,3) BigOr'.simps(2,3) Ts_def
-          append.left_neutral append_Cons def_TsCs(1,2) dualize.simps(3,4) formula.distinct(15)
+          append.left_neutral append_Cons def_TsCs(1,2) dual.simps(3,4) formula.distinct(15)
           formula_semantics.simps(2) list.set_intros(1))
   next
     show "\<And>T. T \<in> set Ts \<Longrightarrow> is_conj T"
@@ -1182,9 +1182,9 @@ qed
 
 section \<open>DNF to CNF\<close>
 
-proposition exp_blowup_from_dualize_Fn_to_BigAdn':
+proposition exp_blowup_from_dual_Fn_to_BigAdn':
   fixes n :: nat and Cs :: "var formula list"
-  defines "Fprime \<equiv> dualize (Fn n)" and "G \<equiv> BigAnd' Cs"
+  defines "Fprime \<equiv> dual (Fn n)" and "G \<equiv> BigAnd' Cs"
   assumes
     n_greater_0: "n > 0" and
     G_spec: "(\<forall> C \<in> set Cs. is_disj C \<and> \<not>(\<forall> Val. Val \<Turnstile> C))" and
@@ -1194,9 +1194,9 @@ proof -
   note def_Fprime = Fprime_def
   note def_G = G_def G_spec
   have size_Fprime: "sizef Fprime = 8*n+1" 
-    using def_Fprime by (simp add: sizef_dualized_Fn)
+    using def_Fprime by (simp add: sizef_duald_Fn)
   have Fprime_in_dnf: "is_dnf Fprime" 
-    by (simp add: def_Fprime is_dnf_dualize_Fn)
+    by (simp add: def_Fprime is_dnf_dual_Fn)
   have G_in_cnf: "is_cnf G" 
     using def_G is_cnf_BigAnd' by auto
   have G_in_nnf: "is_nnf G" 
@@ -1207,23 +1207,23 @@ proof -
     assume "\<not> n*2^n \<le> sizef G"
     then have "sizef G < n*2^n"
       by presburger
-    then have "sizef (dualize G) < n*2^n"
-      using sizef_dualize[of G] by presburger
+    then have "sizef (dual G) < n*2^n"
+      using sizef_dual[of G] by presburger
 
     obtain Ts where
-      "dualize G = BigOr' Ts" "\<forall>T\<in>set Ts. is_conj T \<and> (\<exists> Val. Val \<Turnstile> T)"
-      using def_G dualized_conj_of_disjs_is_disj_of_conjs by metis
+      "dual G = BigOr' Ts" "\<forall>T\<in>set Ts. is_conj T \<and> (\<exists> Val. Val \<Turnstile> T)"
+      using def_G duald_conj_of_disjs_is_disj_of_conjs by metis
 
-    moreover have "equiv (Fn n) (dualize G)"
+    moreover have "equiv (Fn n) (dual G)"
     proof -
-      have "equiv (dualize G) (Not G)"
-        using equiv_dualize .
-      also have "equiv \<dots> (Not (dualize (Fn n)))"
+      have "equiv (dual G) (Not G)"
+        using equiv_dual .
+      also have "equiv \<dots> (Not (dual (Fn n)))"
         unfolding equiv_Not_left_Not_right
         using equiv_Fprime_G[symmetric, unfolded Fprime_def] .
       also have "equiv \<dots> (Not (Not (Fn n)))"
         unfolding equiv_Not_left_Not_right
-        using equiv_dualize .
+        using equiv_dual .
       also have "equiv \<dots> (Fn n)"
         unfolding equiv_Not_Not_left
         using equiv_reflexive .
@@ -1231,10 +1231,10 @@ proof -
         by (rule equiv_symmetric)
     qed
 
-    ultimately have "n * 2 ^ n \<le> sizef (dualize G)"
+    ultimately have "n * 2 ^ n \<le> sizef (dual G)"
       using exp_blowup_from_Fn_to_BigOr'[of n Ts] by force
     then show False
-      using \<open>sizef (dualize G) < n*2^n\<close> by presburger
+      using \<open>sizef (dual G) < n*2^n\<close> by presburger
   qed
 qed
 
@@ -1282,7 +1282,7 @@ theorem exp_blowup_from_DNF_to_CNF:
 proof (cases n)
   case 0
   then show ?thesis
-    using is_dnf_dualize_Fn size_dualized_Fn
+    using is_dnf_dual_Fn size_duald_Fn
     by fastforce
 next
   case (Suc n')
@@ -1292,14 +1292,14 @@ next
 
   show ?thesis
   proof (intro exI conjI allI impI)
-    show "is_dnf (dualize (Fn n))"
-      using is_dnf_dualize_Fn .
+    show "is_dnf (dual (Fn n))"
+      using is_dnf_dual_Fn .
   next
-    show "size (dualize (Fn n)) = 10 * n + 1"
-      using size_dualized_Fn .
+    show "size (dual (Fn n)) = 10 * n + 1"
+      using size_duald_Fn .
   next
     fix G\<^sub>n :: "var formula"
-    assume "equiv (dualize (Fn n)) G\<^sub>n"
+    assume "equiv (dual (Fn n)) G\<^sub>n"
     assume "is_cnf G\<^sub>n"
 
     then obtain Cs :: "var formula list" where
@@ -1309,11 +1309,11 @@ next
       sizef: "sizef (BigAnd' Cs) \<le> sizef G\<^sub>n"
       using ex_equiv_conj_list_if_is_cnf[of G\<^sub>n] by metis
 
-    moreover have "equiv (dualize (Fn n)) (BigAnd' Cs)"
-      using equiv_transitive[OF \<open>equiv (dualize (Fn n)) G\<^sub>n\<close> \<open>equiv G\<^sub>n (BigAnd' Cs)\<close>] .
+    moreover have "equiv (dual (Fn n)) (BigAnd' Cs)"
+      using equiv_transitive[OF \<open>equiv (dual (Fn n)) G\<^sub>n\<close> \<open>equiv G\<^sub>n (BigAnd' Cs)\<close>] .
 
     ultimately have "n * 2 ^ n \<le> sizef (BigAnd' Cs)"
-      using exp_blowup_from_dualize_Fn_to_BigAdn'[OF \<open>0 < n\<close>, of Cs] by metis
+      using exp_blowup_from_dual_Fn_to_BigAdn'[OF \<open>0 < n\<close>, of Cs] by metis
 
     then show "n * 2 ^ n \<le> size G\<^sub>n"
       using sizef sizef_le_size[of G\<^sub>n] by presburger
