@@ -891,9 +891,9 @@ lemma sat_conj_val_cont_ident:
   by (induction F) (auto elim: cont_neg.elims is_lit_plus.elims)
 
 
-section \<open>Proposition 4\<close>
+section \<open>CNF to DNF\<close>
 
-proposition proposition4:
+proposition exp_blowup_from_Fn_to_BigOr':
   fixes n :: nat and Ts :: "var formula list"
   defines "F \<equiv> Fn n" and "G \<equiv> BigOr' Ts"
   assumes
@@ -1093,41 +1093,6 @@ qed
 
 lemma ex_equiv_disj_list_if_is_dnf:
   fixes \<phi> :: "'a formula"
-  assumes dnf: "is_dnf \<phi>"
-  shows "\<exists>(Ts :: 'a formula list). equiv \<phi> (BigOr' Ts) \<and>
-    sizef (BigOr' Ts) \<le> sizef \<phi> \<and>
-    (\<forall>T \<in> set Ts. is_conj T) \<and>
-    (\<forall>T \<in> set Ts. \<exists>\<alpha>. \<alpha> \<Turnstile> T)"
-proof -
-  define Ts :: "'a formula list" where
-    "Ts = filter (\<lambda>T. \<exists>\<alpha>. \<alpha> \<Turnstile> T) (undisj \<phi>)"
-
-  show ?thesis
-  proof (intro exI[of _ Ts] conjI ballI)
-    have "equiv \<phi> (BigOr' (undisj \<phi>))"
-      using equiv_BigOr'_undisj_if_dnf[symmetric] .
-    then show "equiv \<phi> (BigOr' Ts)"
-      unfolding Ts_def
-      by (smt (verit) BigOr'_semantics equiv_def mem_Collect_eq set_filter)
-  next
-    have "sizef (BigOr' (undisj \<phi>)) = sizef \<phi>"
-      using sizef_BigOr'_undisj .
-    then show "sizef (BigOr' Ts) \<le> sizef \<phi>"
-      unfolding Ts_def
-      using sizef_BigOr'_filter_le[of "\<lambda>T. \<exists>\<alpha>. \<alpha> \<Turnstile> T" "undisj \<phi>"]
-      by presburger
-  next
-    show "\<And>T. T \<in> set Ts \<Longrightarrow> is_conj T"
-      using ball_undisj_is_conj[OF dnf]
-      by (simp add: Ts_def)
-  next
-    show "\<And>T. T \<in> set Ts \<Longrightarrow> \<exists>\<alpha>. \<alpha> \<Turnstile> T"
-      by (simp add: Ts_def)
-  qed
-qed
-
-lemma ex_equiv_disj_list_if_is_dnf':
-  fixes \<phi> :: "'a formula"
   assumes dnf: "is_dnf \<phi>" and sat: "\<exists>\<alpha>. \<alpha> \<Turnstile> \<phi>"
   shows "\<exists>(Ts :: 'a formula list). equiv \<phi> (BigOr' Ts) \<and>
     size (BigOr' Ts) \<le> size \<phi> \<and>
@@ -1165,7 +1130,7 @@ proof -
   qed
 qed
 
-lemma proposition4':
+theorem exp_blowup_from_CNF_to_DNF:
   fixes n :: nat
   shows "\<exists>(F\<^sub>n :: var formula).
     is_cnf F\<^sub>n \<and>
@@ -1200,24 +1165,24 @@ next
       "\<forall>T \<in> set Ts. is_conj T" and
       "\<forall>T \<in> set Ts. \<exists>\<alpha>. \<alpha> \<Turnstile> T" and
       "equiv G\<^sub>n (BigOr' Ts)" and
-      sizef: "size (BigOr' Ts) \<le> size G\<^sub>n"
-      using ex_equiv_disj_list_if_is_dnf'[OF _ sat_G\<^sub>n] by metis
+      size: "size (BigOr' Ts) \<le> size G\<^sub>n"
+      using ex_equiv_disj_list_if_is_dnf[OF _ sat_G\<^sub>n] by metis
 
     moreover have "equiv (Fn n) (BigOr' Ts)"
       using equiv_transitive[OF \<open>equiv (Fn n) G\<^sub>n\<close> \<open>equiv G\<^sub>n (BigOr' Ts)\<close>] .
 
     ultimately have "n * 2 ^ n \<le> sizef (BigOr' Ts)"
-      using proposition4[OF \<open>0 < n\<close>, of Ts] by metis
+      using exp_blowup_from_Fn_to_BigOr'[OF \<open>0 < n\<close>, of Ts] by metis
 
     then show "n * 2 ^ n \<le> size G\<^sub>n"
-      using sizef sizef_le_size[of "BigOr' Ts"] by presburger
+      using size sizef_le_size[of "BigOr' Ts"] by presburger
   qed
 qed
 
 
-section \<open>Corollary 5\<close>
+section \<open>DNF to CNF\<close>
 
-corollary corollary5:
+proposition exp_blowup_from_dualize_Fn_to_BigAdn':
   fixes n :: nat and Cs :: "var formula list"
   defines "Fprime \<equiv> dualize (Fn n)" and "G \<equiv> BigAnd' Cs"
   assumes
@@ -1267,7 +1232,7 @@ proof -
     qed
 
     ultimately have "n * 2 ^ n \<le> sizef (dualize G)"
-      using proposition4[of n Ts] by force
+      using exp_blowup_from_Fn_to_BigOr'[of n Ts] by force
     then show False
       using \<open>sizef (dualize G) < n*2^n\<close> by presburger
   qed
@@ -1308,7 +1273,7 @@ proof -
   qed
 qed
 
-lemma corollary5':
+theorem exp_blowup_from_DNF_to_CNF:
   fixes n :: nat
   shows "\<exists>(F\<^sub>n :: var formula).
     is_dnf F\<^sub>n \<and>
@@ -1348,7 +1313,7 @@ next
       using equiv_transitive[OF \<open>equiv (dualize (Fn n)) G\<^sub>n\<close> \<open>equiv G\<^sub>n (BigAnd' Cs)\<close>] .
 
     ultimately have "n * 2 ^ n \<le> sizef (BigAnd' Cs)"
-      using corollary5[OF \<open>0 < n\<close>, of Cs] by metis
+      using exp_blowup_from_dualize_Fn_to_BigAdn'[OF \<open>0 < n\<close>, of Cs] by metis
 
     then show "n * 2 ^ n \<le> size G\<^sub>n"
       using sizef sizef_le_size[of G\<^sub>n] by presburger
