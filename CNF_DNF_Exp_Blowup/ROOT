@@ -5,6 +5,6 @@ session CNF_DNF_Exp_Blowup = HOL +
   sessions
     Propositional_Proof_Systems
   theories
-    Formula_Size_Lower_Bound
+    CNF_DNF_Exp_Blowup
   document_files
     "root.tex"

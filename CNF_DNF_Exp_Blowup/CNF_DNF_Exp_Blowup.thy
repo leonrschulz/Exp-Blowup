@@ -1,9 +1,9 @@
-theory Formula_Size_Lower_Bound
+theory CNF_DNF_Exp_Blowup
 imports
   Main
   Propositional_Proof_Systems.Formulas
   Propositional_Proof_Systems.Sema
-  Propositional_Proof_Systems.CNF_Formulas     
+  Propositional_Proof_Systems.CNF_Formulas
 begin
 
 section \<open>Moved to \<^session>\<open>HOL\<close>\<close>
@@ -222,7 +222,7 @@ fun sizef :: "'a formula \<Rightarrow> nat" where
   "sizef (Not F) = sizef F" |
   "sizef (And F G) = sizef F + sizef G + 1" |
   "sizef (Or F G) = sizef F + sizef G + 1" |
-  "sizef (Imp F G) = sizef F + sizef G + 1" 
+  "sizef (Imp F G) = sizef F + sizef G + 1"
 
 lemma Suc_0_le_sizef[simp]: "Suc 0 \<le> sizef F"
   by (induction F) simp_all
@@ -299,9 +299,9 @@ next
   case (3 T T' Ts')
   define Ts where
     "Ts = T' # Ts'"
-  have "2 ^ n \<le> length Ts \<or> 2 ^ n = Suc (length Ts)" 
+  have "2 ^ n \<le> length Ts \<or> 2 ^ n = Suc (length Ts)"
     unfolding Ts_def using "3.prems" by auto
-  then have "2 ^ n * m \<le> Suc (sizef T + sizef (BigOr' Ts))" 
+  then have "2 ^ n * m \<le> Suc (sizef T + sizef (BigOr' Ts))"
   proof (elim disjE)
     assume asm1: "2 ^ n \<le> length Ts"
 
@@ -324,7 +324,7 @@ next
   next
     assume "2 ^ n = Suc (length Ts)"
 
-    then have "2 ^ n = length (T # Ts)" 
+    then have "2 ^ n = length (T # Ts)"
       by simp
 
     moreover have "\<forall> T \<in> set (T # Ts). sizef T \<ge> m"
@@ -630,9 +630,9 @@ lemma is_nnf_Fn: "is_nnf (Fn n)"
 lemma Fn_sat: "\<exists>Val. Val \<Turnstile> Fn n"
 proof -
   define Val where "Val = (\<lambda>x. case x of (Var i b) \<Rightarrow> b)"
-  then have "Val \<Turnstile> Fn n" 
+  then have "Val \<Turnstile> Fn n"
     by (induction n; simp)
-  then show ?thesis 
+  then show ?thesis
     by auto
 qed
 
@@ -701,7 +701,7 @@ lemma equiv_dual: "equiv (dual F) (Not F)"
 lemma is_disj_dual_if_is_conj: "is_conj F \<Longrightarrow> is_disj (dual F)"
 proof (induction F)
   case (Not F)
-  then show ?case 
+  then show ?case
     by (metis is_conj.simps(4) is_disj.simps(2,3) is_lit_plus.simps(1,3)
         is_nnf.simps(6) is_nnf_NotD dual.simps(3))
 next
@@ -748,17 +748,17 @@ qed auto
 lemma dual_disj_not_taut_impl_sat: "is_disj F \<Longrightarrow> \<exists>Val. \<not> Val \<Turnstile> F \<Longrightarrow> \<exists>Val. Val \<Turnstile> dual F"
 proof (induction F)
   case (Or F1 F2)
-  have F_is_nnf: "is_nnf (F1 \<^bold>\<or> F2)" 
+  have F_is_nnf: "is_nnf (F1 \<^bold>\<or> F2)"
     using Or.prems(1) disj_is_nnf by blast
   then have equiv: "equiv (Not (F1 \<^bold>\<or> F2))(dual (F1 \<^bold>\<or> F2))"
     using equiv_dual equiv_def by blast
-  obtain Val where Val_def: "\<not> Val \<Turnstile> F1 \<^bold>\<or> F2" 
+  obtain Val where Val_def: "\<not> Val \<Turnstile> F1 \<^bold>\<or> F2"
     using Or.prems(2) by auto
-  then have "Val \<Turnstile> Not (F1 \<^bold>\<or> F2)" 
+  then have "Val \<Turnstile> Not (F1 \<^bold>\<or> F2)"
     by auto
   then have "Val \<Turnstile> dual (F1 \<^bold>\<or> F2)"
     using equiv by (simp add: equiv_def)
-  then show ?case 
+  then show ?case
     by auto
 qed auto
 
@@ -936,7 +936,7 @@ proof -
   proof (rule ccontr)
     assume assm: "\<not> (\<exists>T \<in> set Ts. \<forall>i \<in> {1..n}. cont_pos T (Var i (nth eps (i-1))))"
 
-    define Val where 
+    define Val where
       "Val = (\<lambda>x. case x of (Var i b) \<Rightarrow> b = nth eps (i-1))"
 
     have "Val \<Turnstile> F"
@@ -1007,9 +1007,9 @@ proof -
 
         have "cont_pos (conj_of_eps xs) (Var (Suc i) (xs ! i))"
         proof -
-          have "conj_of_eps xs \<in> set Ts \<and> 
+          have "conj_of_eps xs \<in> set Ts \<and>
                 (\<forall>i\<in>{1..n}. cont_pos (conj_of_eps xs) (Var i (xs ! (i - 1))))"
-            by (smt (verit, ccfv_SIG) \<open>length xs = n\<close> conj_of_eps_def 
+            by (smt (verit, ccfv_SIG) \<open>length xs = n\<close> conj_of_eps_def
                 ex_T_cont_pos_var_eps someI_ex)
           then show ?thesis
             using \<open>i < n\<close> by force
@@ -1017,9 +1017,9 @@ proof -
 
         moreover have "cont_pos (conj_of_eps ys) (Var (Suc i) (ys ! i))"
         proof -
-          have "conj_of_eps ys \<in> set Ts \<and> 
+          have "conj_of_eps ys \<in> set Ts \<and>
                 (\<forall>i\<in>{1..n}. cont_pos (conj_of_eps ys) (Var i (ys ! (i - 1))))"
-            by (smt (verit, ccfv_SIG) \<open>length ys = n\<close> conj_of_eps_def 
+            by (smt (verit, ccfv_SIG) \<open>length ys = n\<close> conj_of_eps_def
                 ex_T_cont_pos_var_eps someI_ex)
           then show ?thesis
             using \<open>i < n\<close> by force
@@ -1052,7 +1052,7 @@ proof -
   moreover have "\<forall>T \<in> set Ts. sizef T \<ge> n"
     using n_le_card_atoms card_atoms_le_sizef
     using le_trans by blast
-  
+
   ultimately show ?thesis
     unfolding G_def
     using exp_sizef[OF n_greater_0]
@@ -1161,9 +1161,9 @@ proposition exp_blowup_from_dual_Fn_to_BigAnd':
 proof -
   note def_Fprime = Fprime_def
   note def_G = G_def G_spec
-  have G_in_cnf: "is_cnf G" 
+  have G_in_cnf: "is_cnf G"
     using def_G is_cnf_BigAnd' by auto
-  have G_in_nnf: "is_nnf G" 
+  have G_in_nnf: "is_nnf G"
     using G_in_cnf cnf_in_nnf by auto
 
   show ?thesis
