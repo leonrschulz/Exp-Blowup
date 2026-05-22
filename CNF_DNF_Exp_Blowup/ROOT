@@ -1,0 +1,10 @@
+chapter AFP
+
+session CNF_DNF_Exp_Blowup = HOL +
+  options [timeout = 600]
+  sessions
+    Propositional_Proof_Systems
+  theories
+    Formula_Size_Lower_Bound
+  document_files
+    "root.tex"
