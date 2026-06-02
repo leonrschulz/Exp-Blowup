@@ -6,7 +6,7 @@ imports
   Propositional_Proof_Systems.CNF_Formulas
 begin
 
-section \<open>Moved to \<^session>\<open>HOL\<close>\<close>
+section \<open>Move to \<^session>\<open>HOL\<close>\<close>
 
 (*TODO: Delete when a new Isabelle version is released. *)
 lemma card_Domain_le:
@@ -66,7 +66,7 @@ section \<open>Functions, Predicates, and Datatypes\<close>
 subsection \<open>Formula Equivalence\<close>
 
 definition equiv :: "'a formula \<Rightarrow> 'a formula \<Rightarrow> bool" where
-  "equiv F G \<longleftrightarrow> (\<forall>\<alpha>. (\<alpha> \<Turnstile> F) \<longleftrightarrow> (\<alpha> \<Turnstile> G))"
+  "equiv \<phi> \<psi> \<longleftrightarrow> (\<forall>\<alpha>. (\<alpha> \<Turnstile> \<phi>) \<longleftrightarrow> (\<alpha> \<Turnstile> \<psi>))"
 
 lemma equiv_reflexive: "\<And>\<phi>. equiv \<phi> \<phi>"
   unfolding equiv_def by simp
@@ -158,7 +158,7 @@ lemma atoms_BigAnd'[simp]: "atoms (BigAnd' Fs) = \<Union>(atoms ` set Fs)"
 lemma BigAnd'_semantics[simp]: "A \<Turnstile> BigAnd' Ts \<longleftrightarrow> (\<forall>f \<in> set Ts. A \<Turnstile> f)"
   by (induction Ts rule: BigAnd'.induct) simp_all
 
-lemma is_cnf_BigAnd':  "(\<forall>C \<in> set Cs. is_disj C \<and> \<not>(\<forall> Val. Val \<Turnstile> C)) \<Longrightarrow> is_cnf (BigAnd' Cs)"
+lemma is_cnf_BigAnd':  "(\<forall>C \<in> set Cs. is_disj C \<and> \<not>(\<forall> \<alpha>. \<alpha> \<Turnstile> C)) \<Longrightarrow> is_cnf (BigAnd' Cs)"
   by (induction Cs rule: BigAnd'.induct) (simp_all add: disj_is_cnf)
 
 lemma equiv_BigAnd'_append: "equiv (BigAnd' (xs @ ys)) (And (BigAnd' xs) (BigAnd' ys))"
@@ -178,7 +178,7 @@ lemma atoms_BigOr'[simp]: "atoms (BigOr' Fs) = \<Union>(atoms ` set Fs)"
 lemma BigOr'_semantics[simp]: "A \<Turnstile> BigOr' Ts \<longleftrightarrow> (\<exists>f \<in> set Ts. A \<Turnstile> f)"
   by (induction Ts rule: BigOr'.induct) simp_all
 
-lemma is_dnf_BigOr':  "(\<forall>T \<in> set Ts. is_conj T \<and> (\<exists> Val. Val \<Turnstile> T)) \<Longrightarrow> is_dnf (BigOr' Ts)"
+lemma is_dnf_BigOr':  "(\<forall>T \<in> set Ts. is_conj T \<and> (\<exists> \<alpha>. \<alpha> \<Turnstile> T)) \<Longrightarrow> is_dnf (BigOr' Ts)"
 proof (induction Ts)
   case Nil
   then show ?case by simp
@@ -195,20 +195,17 @@ lemma equiv_BigOr'_append: "equiv (BigOr' (xs @ ys)) (Or (BigOr' xs) (BigOr' ys)
 lemma equiv_BigOr'_undisj_if_dnf:
   fixes \<phi> :: "'a formula"
   shows "equiv (BigOr' (undisj \<phi>)) \<phi>"
-proof (induction \<phi> rule: is_dnf.induct)
-  case (1 F G)
-  then show ?case
-    using equiv_BigOr'_append
-    by (smt (verit) equiv_def formula_semantics.simps(5) undisj.simps(1))
-qed (simp_all add: equiv_def)
+  using equiv_BigOr'_append
+  by (induction \<phi> rule: is_dnf.induct) (auto simp add: equiv_def)
 
 lemma equiv_BigAnd'_unconj_if_cnf:
   fixes \<phi> :: "'a formula"
   shows "equiv (BigAnd' (unconj \<phi>)) \<phi>"
 proof (induction \<phi> rule: unconj.induct)
-  case (1 F G)
+  case (1 \<phi> \<psi>)
   then show ?case
-    by (smt (verit) equiv_def equiv_BigAnd'_append formula_semantics.simps(4) unconj.simps(1))
+    using equiv_BigAnd'_append
+    by (auto simp add: equiv_def)
 qed (simp_all add: equiv_def)
 
 
@@ -219,19 +216,24 @@ text \<open>Similar to @{const size}, but ignores @{term "\<^bold>\<not>"} when 
 fun sizef :: "'a formula \<Rightarrow> nat" where
   "sizef Bot = 1" |
   "sizef (Atom a) = 1" |
-  "sizef (Not F) = sizef F" |
-  "sizef (And F G) = sizef F + sizef G + 1" |
-  "sizef (Or F G) = sizef F + sizef G + 1" |
-  "sizef (Imp F G) = sizef F + sizef G + 1"
+  "sizef (Not \<phi>) = sizef \<phi>" |
+  "sizef (And \<phi> \<psi>) = sizef \<phi> + sizef \<psi> + 1" |
+  "sizef (Or \<phi> \<psi>) = sizef \<phi> + sizef \<psi> + 1" |
+  "sizef (Imp \<phi> \<psi>) = sizef \<phi> + sizef \<psi> + 1"
 
-lemma Suc_0_le_sizef[simp]: "Suc 0 \<le> sizef F"
-  by (induction F) simp_all
+lemma Suc_0_le_sizef[simp]: "Suc 0 \<le> sizef \<phi>"
+  by (induction \<phi>) simp_all
+
+lemma Suc_0_le_size[simp]:
+  fixes \<phi> :: "'a formula"
+  shows "Suc 0 \<le> size \<phi>"
+  by (induction \<phi>) simp_all
 
 lemma sizef_le_size: "sizef \<phi> \<le> size \<phi>"
   by (induction \<phi>) simp_all
 
-lemma card_atoms_le_sizef: "card (atoms F) \<le> sizef F"
-proof (induction F)
+lemma card_atoms_le_sizef: "card (atoms \<phi>) \<le> sizef \<phi>"
+proof (induction \<phi>)
   case (And F1 F2)
   have "card (atoms (F1 \<^bold>\<and> F2)) = card (atoms F1 \<union> atoms F2)"
     by simp
@@ -275,7 +277,7 @@ next
     by presburger
 qed simp_all
 
-lemma card_atoms_le_size: "card (atoms F) \<le> size F"
+lemma card_atoms_le_size: "card (atoms \<phi>) \<le> size \<phi>"
   by (metis card_atoms_le_sizef le_trans sizef_le_size)
 
 lemma aux_exp_sizef: "length Ts = n \<Longrightarrow> \<forall> T \<in> set Ts. sizef T \<ge> m \<Longrightarrow> sizef (BigOr' Ts) \<ge> n * m"
@@ -284,14 +286,16 @@ lemma aux_exp_sizef: "length Ts = n \<Longrightarrow> \<forall> T \<in> set Ts. 
 lemma aux_exp_size: "length Ts = n \<Longrightarrow> \<forall> T \<in> set Ts. size T \<ge> m \<Longrightarrow> size (BigOr' Ts) \<ge> n * m"
   by (induction Ts arbitrary: m n rule: BigOr'.induct; fastforce)
 
-lemma exp_sizef: "n > 0 \<Longrightarrow> length Ts \<ge> 2^n \<Longrightarrow> \<forall>T \<in> set Ts. sizef T \<ge> m \<Longrightarrow>
-  sizef (BigOr' Ts) \<ge> 2^n * m"
+lemma exp_sizef:
+  assumes "n > 0" and "length Ts \<ge> 2^n" and "\<forall>T \<in> set Ts. sizef T \<ge> m"
+  shows "sizef (BigOr' Ts) \<ge> 2^n * m"
+  using assms
 proof (induction Ts arbitrary: n m rule: BigOr'.induct)
   case 1
   then show ?case
     by simp
 next
-  case (2 F)
+  case (2 \<phi>)
   then have False
     by (metis list.size(3) One_nat_def length_Cons leD one_less_power less_2_cases_iff)
   then show ?case ..
@@ -336,15 +340,17 @@ next
   then show ?case
     by (simp add: Ts_def)
 qed
-
-lemma exp_size: "n > 0 \<Longrightarrow> length Ts \<ge> 2^n \<Longrightarrow> \<forall>T \<in> set Ts. size T \<ge> m \<Longrightarrow>
-  size (BigOr' Ts) \<ge> 2^n * m"
+                         
+lemma exp_size:
+  assumes "n > 0" and "length Ts \<ge> 2^n" and "\<forall>T \<in> set Ts. size T \<ge> m"
+  shows "size (BigOr' Ts) \<ge> 2^n * m"
+  using assms
 proof (induction Ts arbitrary: n m rule: BigOr'.induct)
   case 1
   then show ?case
     by simp
 next
-  case (2 F)
+  case (2 \<phi>)
   then have False
     by (metis list.size(3) One_nat_def length_Cons leD one_less_power less_2_cases_iff)
   then show ?case ..
@@ -488,7 +494,7 @@ proof (induction xs rule: BigOr'.induct)
   then show ?case
     by simp
 next
-  case (2 F)
+  case (2 \<phi>)
   then show ?case
     by simp
 next
@@ -502,11 +508,7 @@ next
   next
     case False
     then show ?thesis
-      by (metis (no_types, lifting) BigOr'.simps(1,3)
-          One_nat_def Suc_0_le_sizef add.commute
-          filter.simps(2) less_add_Suc1 less_or_eq_imp_le
-          list.exhaust plus_1_eq_Suc
-          sizef.simps(1,5))
+      by (cases "filter P (v # va)") simp_all
   qed
 
   also have "\<dots> \<le> sizef (BigOr' (F # v # va))"
@@ -554,9 +556,7 @@ next
   next
     case False
     then show ?thesis
-      by (metis (no_types, opaque_lifting) "3.prems" BigOr'.simps(3) add.commute
-          add.right_neutral empty_filter_conv filter.simps(2) formula.size(11) less_add_Suc1
-          neq_Nil_conv nle_le plus_1_eq_Suc verit_comp_simplify1(3))
+      by (cases "filter P (v # va)") simp_all
   qed
 
   also have "\<dots> \<le> size (BigOr' (F # v # va))"
@@ -601,7 +601,6 @@ datatype var = Var nat bool
 lemma inj_on_Var[simp]: "inj_on (\<lambda>(x, y). Var x y) A" for A
   by (rule inj_onI) (simp add: case_prod_beta prod_eq_iff)
 
-(* TODO: check if this could be replace by Fn (Suc 0) = ... and Fn (Suc (Suc n)) = ... *)
 fun Fn :: "nat \<Rightarrow> var formula" where
   "Fn 0 = (\<^bold>\<not>\<bottom>)"|
   "Fn (Suc n) =
@@ -627,10 +626,10 @@ lemma is_cnf_Fn: "is_cnf (Fn n)"
 lemma is_nnf_Fn: "is_nnf (Fn n)"
   using is_cnf_Fn[THEN cnf_in_nnf] .
 
-lemma Fn_sat: "\<exists>Val. Val \<Turnstile> Fn n"
+lemma Fn_sat: "\<exists>\<alpha>. \<alpha> \<Turnstile> Fn n"
 proof -
-  define Val where "Val = (\<lambda>x. case x of (Var i b) \<Rightarrow> b)"
-  then have "Val \<Turnstile> Fn n"
+  define \<alpha> where "\<alpha> = (\<lambda>x. case x of (Var i b) \<Rightarrow> b)"
+  then have "\<alpha> \<Turnstile> Fn n"
     by (induction n; simp)
   then show ?thesis
     by auto
@@ -676,9 +675,9 @@ primrec dual :: "'a formula \<Rightarrow> 'a formula" where
   "dual Bot = Not Bot" |
   "dual (Atom v) = Not (Atom v)" |
   "dual (Not v) = v" |
-  "dual (And F G) = Or (dual F) (dual G)" |
-  "dual (Or F G) = And (dual F) (dual G)" |
-  "dual (Imp F G) = And F (dual G)"
+  "dual (And \<phi> \<psi>) = Or (dual \<phi>) (dual \<psi>)" |
+  "dual (Or \<phi> \<psi>) = And (dual \<phi>) (dual \<psi>)" |
+  "dual (Imp \<phi> \<psi>) = And \<phi> (dual \<psi>)"
 
 lemma sizef_dual_Fn: "sizef (dual (Fn n)) = 8 * n + 1"
   by (induction n) simp_all
@@ -689,18 +688,18 @@ lemma size_dual_Fn: "size (dual (Fn n)) = 10 * n + 1"
 lemma is_dnf_dual_Fn: "is_dnf (dual (Fn n))"
   by (induction n) simp_all
 
-lemma sizef_dual: "sizef (dual F) = sizef F"
-  by (induction F) simp_all
+lemma sizef_dual: "sizef (dual \<phi>) = sizef \<phi>"
+  by (induction \<phi>) simp_all
 
-lemma size_dual_le: "size (dual F) \<le> 2 * size F"
-  by (induction F) simp_all
+lemma size_dual_le: "size (dual \<phi>) \<le> 2 * size \<phi>"
+  by (induction \<phi>) simp_all
 
-lemma equiv_dual: "equiv (dual F) (Not F)"
-  by (induction F) (simp_all add: equiv_def)
+lemma equiv_dual: "equiv (dual \<phi>) (Not \<phi>)"
+  by (induction \<phi>) (simp_all add: equiv_def)
 
-lemma is_disj_dual_if_is_conj: "is_conj F \<Longrightarrow> is_disj (dual F)"
-proof (induction F)
-  case (Not F)
+lemma is_disj_dual_if_is_conj: "is_conj \<phi> \<Longrightarrow> is_disj (dual \<phi>)"
+proof (induction \<phi>)
+  case (Not \<phi>)
   then show ?case
     by (metis is_conj.simps(4) is_disj.simps(2,3) is_lit_plus.simps(1,3)
         is_nnf.simps(6) is_nnf_NotD dual.simps(3))
@@ -711,9 +710,9 @@ next
     by (metis dual.simps(1,2,3) is_lit_plus.elims(2) is_lit_plus.simps(1,2,3,4))
 qed simp_all
 
-lemma is_conj_dual_if_is_disj: "is_disj F \<Longrightarrow> is_conj (dual F)"
-proof (induction F)
-  case (Not F)
+lemma is_conj_dual_if_is_disj: "is_disj \<phi> \<Longrightarrow> is_conj (dual \<phi>)"
+proof (induction \<phi>)
+  case (Not \<phi>)
   then show ?case
     using is_nnf_NotD by force
 next
@@ -723,9 +722,9 @@ next
     by (metis dual.simps(1,2,3) is_lit_plus.elims(2) is_lit_plus.simps(1,2,3,4))
 qed simp_all
 
-lemma is_dnf_dual_if_is_cnf: "is_cnf F \<Longrightarrow> is_dnf (dual F)"
-proof (induction F)
-  case (Not F)
+lemma is_dnf_dual_if_is_cnf: "is_cnf \<phi> \<Longrightarrow> is_dnf (dual \<phi>)"
+proof (induction \<phi>)
+  case (Not \<phi>)
   then show ?case
     using conj_is_dnf is_cnf.simps(4) is_conj_dual_if_is_disj by blast
 next
@@ -734,9 +733,9 @@ next
     using conj_is_dnf is_cnf.simps(5) is_conj_dual_if_is_disj by blast
 qed simp_all
 
-lemma is_cnf_dual_if_is_dnf: "is_dnf F \<Longrightarrow> is_cnf (dual F)"
-proof (induction F)
-  case (Not F)
+lemma is_cnf_dual_if_is_dnf: "is_dnf \<phi> \<Longrightarrow> is_cnf (dual \<phi>)"
+proof (induction \<phi>)
+  case (Not \<phi>)
   then show ?case
     using disj_is_cnf is_disj_dual_if_is_conj is_dnf.simps(4) by blast
 next
@@ -745,18 +744,18 @@ next
     using disj_is_cnf is_disj_dual_if_is_conj is_dnf.simps(5) by blast
 qed auto
 
-lemma dual_disj_not_taut_impl_sat: "is_disj F \<Longrightarrow> \<exists>Val. \<not> Val \<Turnstile> F \<Longrightarrow> \<exists>Val. Val \<Turnstile> dual F"
-proof (induction F)
+lemma dual_disj_not_taut_impl_sat: "is_disj \<phi> \<Longrightarrow> \<exists>\<alpha>. \<not> \<alpha> \<Turnstile> \<phi> \<Longrightarrow> \<exists>\<alpha>. \<alpha> \<Turnstile> dual \<phi>"
+proof (induction \<phi>)
   case (Or F1 F2)
   have F_is_nnf: "is_nnf (F1 \<^bold>\<or> F2)"
     using Or.prems(1) disj_is_nnf by blast
   then have equiv: "equiv (Not (F1 \<^bold>\<or> F2))(dual (F1 \<^bold>\<or> F2))"
     using equiv_dual equiv_def by blast
-  obtain Val where Val_def: "\<not> Val \<Turnstile> F1 \<^bold>\<or> F2"
+  obtain \<alpha> where \<alpha>_def: "\<not> \<alpha> \<Turnstile> F1 \<^bold>\<or> F2"
     using Or.prems(2) by auto
-  then have "Val \<Turnstile> Not (F1 \<^bold>\<or> F2)"
+  then have "\<alpha> \<Turnstile> Not (F1 \<^bold>\<or> F2)"
     by auto
-  then have "Val \<Turnstile> dual (F1 \<^bold>\<or> F2)"
+  then have "\<alpha> \<Turnstile> dual (F1 \<^bold>\<or> F2)"
     using equiv by (simp add: equiv_def)
   then show ?case
     by auto
@@ -764,9 +763,9 @@ qed auto
 
 lemma dual_conj_of_disjs_is_disj_of_conjs:
   fixes Cs
-  assumes "\<forall> C \<in> set Cs. is_disj C \<and> (\<exists> Val. \<not>(Val \<Turnstile> C))"
+  assumes "\<forall> C \<in> set Cs. is_disj C \<and> (\<exists> \<alpha>. \<not>(\<alpha> \<Turnstile> C))"
   defines "Ts \<equiv> map dual Cs"
-  shows "dual (BigAnd' Cs) = BigOr' Ts" "\<forall>T\<in>set Ts. is_conj T \<and> (\<exists> Val. Val \<Turnstile> T)"
+  shows "dual (BigAnd' Cs) = BigOr' Ts" "\<forall>T\<in>set Ts. is_conj T \<and> (\<exists> \<alpha>. \<alpha> \<Turnstile> T)"
   unfolding atomize_conj Ts_def
   using assms(1)
 proof (induction Cs)
@@ -778,7 +777,7 @@ next
 
   then have IH:
       "dual (BigAnd' Cs) = BigOr' (map dual Cs)"
-      "(\<forall>T\<in>set (map dual Cs). is_conj T \<and> (\<exists>Val. Val \<Turnstile> T))"
+      "(\<forall>T\<in>set (map dual Cs). is_conj T \<and> (\<exists>\<alpha>. \<alpha> \<Turnstile> T))"
     by (auto simp add: Cons.IH Cons.prems)
 
   show ?case
@@ -797,7 +796,7 @@ next
       using Cons.prems by simp
     then have "\<exists>\<alpha>. \<alpha> \<Turnstile> dual C"
       using equiv_dual[of C, unfolded equiv_def] by simp
-    then show "\<And>T. T \<in> set (map dual (C # Cs)) \<Longrightarrow> \<exists>Val. Val \<Turnstile> T"
+    then show "\<And>T. T \<in> set (map dual (C # Cs)) \<Longrightarrow> \<exists>\<alpha>. \<alpha> \<Turnstile> T"
       using IH(2) by auto
   qed
 qed
@@ -811,10 +810,10 @@ fun cont_pos :: "'a formula \<Rightarrow> 'a \<Rightarrow> bool" where
   "cont_pos Bot l = False" |
   "cont_pos (Atom v) l = (v = l)" |
   "cont_pos (Not (Atom v)) l = False" |
-  "cont_pos (Not F) l = False" |
-  "cont_pos (And F G) l = (cont_pos F l \<or> cont_pos G l)" |
-  "cont_pos (Or F G) l = (cont_pos F l \<or> cont_pos G l)" |
-  "cont_pos (Imp F G) l = False"
+  "cont_pos (Not \<phi>) l = False" |
+  "cont_pos (And \<phi> \<psi>) l = (cont_pos \<phi> l \<or> cont_pos \<psi> l)" |
+  "cont_pos (Or \<phi> \<psi>) l = (cont_pos \<phi> l \<or> cont_pos \<psi> l)" |
+  "cont_pos (Imp \<phi> \<psi>) l = False"
 
 text \<open>Should only be applied to a formula for which @{const is_nnf} holds.\<close>
 
@@ -822,10 +821,10 @@ fun cont_neg :: "'a formula \<Rightarrow> 'a \<Rightarrow> bool" where
   "cont_neg Bot l = False" |
   "cont_neg (Atom v) l = False" |
   "cont_neg (Not (Atom v)) l = (v = l)" |
-  "cont_neg (Not F) l = False" |
-  "cont_neg (And F G) l = (cont_neg F l \<or> cont_neg G l)" |
-  "cont_neg (Or F G) l = (cont_neg F l \<or> cont_neg G l)" |
-  "cont_neg (Imp F G) l = False"
+  "cont_neg (Not \<phi>) l = False" |
+  "cont_neg (And \<phi> \<psi>) l = (cont_neg \<phi> l \<or> cont_neg \<psi> l)" |
+  "cont_neg (Or \<phi> \<psi>) l = (cont_neg \<phi> l \<or> cont_neg \<psi> l)" |
+  "cont_neg (Imp \<phi> \<psi>) l = False"
 
 text \<open>Should only be applied to a formula for which @{const is_nnf} holds.\<close>
 
@@ -833,52 +832,48 @@ fun cont :: "'a formula \<Rightarrow> 'a \<Rightarrow> bool" where
   "cont Bot l = False" |
   "cont (Atom v) l = (v = l)" |
   "cont (Not (Atom v)) l = (v = l)" |
-  "cont (Not F) l = False" |
-  "cont (And F G) l = (cont F l \<or> cont G l)" |
-  "cont (Or F G) l = (cont F l \<or> cont G l)" |
-  "cont (Imp F G) l = False"
+  "cont (Not \<phi>) l = False" |
+  "cont (And \<phi> \<psi>) l = (cont \<phi> l \<or> cont \<psi> l)" |
+  "cont (Or \<phi> \<psi>) l = (cont \<phi> l \<or> cont \<psi> l)" |
+  "cont (Imp \<phi> \<psi>) l = False"
 
-lemma impl_not_cont_pos: "\<not> cont_pos F v \<Longrightarrow> cont_neg F v \<or> \<not> (cont F v)"
-  by (induction F) (auto elim: cont.elims)
+lemma impl_not_cont_pos: "\<not> cont_pos \<phi> v \<Longrightarrow> cont_neg \<phi> v \<or> \<not> (cont \<phi> v)"
+  by (induction \<phi>) (auto elim: cont.elims)
 
-lemma impl_not_cont: "\<not> cont F v \<Longrightarrow> \<not> cont_pos F v \<and> \<not> cont_neg F v"
-  by (induction F) (auto elim: cont.elims)
+lemma impl_not_cont: "\<not> cont \<phi> v \<Longrightarrow> \<not> cont_pos \<phi> v \<and> \<not> cont_neg \<phi> v"
+  by (induction \<phi>) (auto elim: cont.elims)
 
 lemma mem_atoms_if_cont_pos:
   assumes "cont_pos T v"
   shows "v \<in> atoms T"
   using assms by (induction T v rule: cont_pos.induct) auto
 
-
 lemma
-  assumes "is_conj F"
+  assumes "is_conj \<phi>"
   shows
-    not_sat_conj_neg_true: "\<exists>v. cont_neg F v \<and> Val v \<Longrightarrow> \<not>(Val \<Turnstile> F)" and
-    not_sat_conj_pos_false: "\<exists>v. cont_pos F v \<and> \<not>(Val v) \<Longrightarrow> \<not>(Val \<Turnstile> F)"
+    not_sat_conj_neg_true: "\<exists>v. cont_neg \<phi> v \<and> \<alpha> v \<Longrightarrow> \<not>(\<alpha> \<Turnstile> \<phi>)" and
+    not_sat_conj_pos_false: "\<exists>v. cont_pos \<phi> v \<and> \<not>(\<alpha> v) \<Longrightarrow> \<not>(\<alpha> \<Turnstile> \<phi>)"
   using assms
-  by (induction F) (auto elim: cont_pos.elims is_lit_plus.elims)
+  by (induction \<phi>) (auto elim: cont_pos.elims is_lit_plus.elims)
 
 lemma sat_conj_val_cont_ident:
-  assumes "Val1 \<Turnstile> F" and "\<forall> v \<in> {v. cont F v}. Val1 v = Val2 v" and "is_conj F"
-  shows "Val2 \<Turnstile> F"
+  assumes "Val1 \<Turnstile> \<phi>" and "\<forall> v \<in> {v. cont \<phi> v}. Val1 v = Val2 v" and "is_conj \<phi>"
+  shows "Val2 \<Turnstile> \<phi>"
   using assms
-  by (induction F) (auto elim: cont_neg.elims is_lit_plus.elims)
+  by (induction \<phi>) (auto elim: cont_neg.elims is_lit_plus.elims)
 
 
 section \<open>CNF to DNF\<close>
 
 proposition exp_blowup_from_Fn_to_BigOr':
   fixes n :: nat and Ts :: "var formula list"
-  defines "F \<equiv> Fn n" and "G \<equiv> BigOr' Ts"
+  defines "\<phi> \<equiv> Fn n" and "\<psi> \<equiv> BigOr' Ts"
   assumes
     n_greater_0: "n > 0" and
-    G_spec: "(\<forall>T\<in>set Ts. is_conj T \<and> (\<exists>Val. Val \<Turnstile> T))" and
-    equiv_F_G: "equiv F G"
-  shows "sizef G \<ge> n*2^n"
+    Ts_spec: "(\<forall>T\<in>set Ts. is_conj T \<and> (\<exists>\<alpha>. \<alpha> \<Turnstile> T))" and
+    "equiv \<phi> \<psi>"
+  shows "sizef \<psi> \<ge> n*2^n"
 proof -
-  note def_F = F_def
-  note def_G = G_def G_spec
-
   have occ_var_bool_diff: "cont_pos T (Var i False) \<noteq> cont_pos T (Var i True)"
     if "T \<in> set Ts" and "i \<in> {1..n}"
     for T :: "var formula" and i :: nat
@@ -893,41 +888,41 @@ proof -
     then show False
     proof cases
       case both_absent
-      then have "\<exists> Val. Val \<Turnstile> T"
-        by (simp add: \<open>T \<in> set Ts\<close> def_G)
+      then have "\<exists> \<alpha>. \<alpha> \<Turnstile> T"
+        by (simp add: \<open>T \<in> set Ts\<close> Ts_spec)
       then obtain ValsatT where Valsat: "ValsatT \<Turnstile> T"
         by auto
 
-      define Val where
-        "Val = (\<lambda> v. (if v = Var i False \<or> v = Var i True then False else ValsatT v))"
+      define \<alpha> where
+        "\<alpha> = (\<lambda> v. (if v = Var i False \<or> v = Var i True then False else ValsatT v))"
 
-      have "\<forall> v \<in> {v. cont_pos T v}. ValsatT v = Val v"
-        by (simp add: Val_def both_absent)
-      then have "Val \<Turnstile> T"
+      have "\<forall> v \<in> {v. cont_pos T v}. ValsatT v = \<alpha> v"
+        by (simp add: \<alpha>_def both_absent)
+      then have "\<alpha> \<Turnstile> T"
         using not_sat_conj_neg_true impl_not_cont_pos sat_conj_val_cont_ident
-        by (metis \<open>T \<in> set Ts\<close> Val_def def_G(2) mem_Collect_eq Valsat)
-      then have "\<exists> Val. Val \<Turnstile> T \<and> Val (Var i False) = False \<and> Val (Var i True) = False"
-        unfolding Val_def by auto
-      then have "\<exists> Val. Val \<Turnstile> G \<and> \<not>(Val \<Turnstile> F)"
-        unfolding G_def F_def
+        by (metis \<open>T \<in> set Ts\<close> \<alpha>_def Ts_spec mem_Collect_eq Valsat)
+      then have "\<exists> \<alpha>. \<alpha> \<Turnstile> T \<and> \<alpha> (Var i False) = False \<and> \<alpha> (Var i True) = False"
+        unfolding \<alpha>_def by auto
+      then have "\<exists> \<alpha>. \<alpha> \<Turnstile> \<psi> \<and> \<not>(\<alpha> \<Turnstile> \<phi>)"
+        unfolding \<psi>_def \<phi>_def
         using BigOr'_semantics \<open>T \<in> set Ts\<close> \<open>i \<in> {1..n}\<close> semantics_Fn_iff by metis
-      then have "\<not> equiv F G"
+      then have "\<not> equiv \<phi> \<psi>"
         unfolding equiv_def by auto
       then show False
-        using equiv_F_G by contradiction
+        using \<open>equiv \<phi> \<psi>\<close> by contradiction
     next
       case both_present
-      then have "\<exists> Val. Val \<Turnstile> T"
-        by (simp add: \<open>T \<in> set Ts\<close> def_G)
-      then have "\<exists> Val. Val \<Turnstile> T \<and> Val (Var i False) = True \<and> Val (Var i True) = True"
-        using \<open>T \<in> set Ts\<close> both_present not_sat_conj_pos_false def_G by blast
-      then have "\<exists> Val. Val \<Turnstile> G \<and> \<not>(Val \<Turnstile> F)"
-        unfolding G_def F_def
+      then have "\<exists> \<alpha>. \<alpha> \<Turnstile> T"
+        by (simp add: \<open>T \<in> set Ts\<close> Ts_spec)
+      then have "\<exists> \<alpha>. \<alpha> \<Turnstile> T \<and> \<alpha> (Var i False) = True \<and> \<alpha> (Var i True) = True"
+        using \<open>T \<in> set Ts\<close> both_present not_sat_conj_pos_false Ts_spec by blast
+      then have "\<exists> \<alpha>. \<alpha> \<Turnstile> \<psi> \<and> \<not>(\<alpha> \<Turnstile> \<phi>)"
+        unfolding \<psi>_def \<phi>_def
         using BigOr'_semantics \<open>T \<in> set Ts\<close> \<open>i \<in> {1..n}\<close> semantics_Fn_iff by metis
-      then have "\<not> equiv F G"
+      then have "\<not> equiv \<phi> \<psi>"
         unfolding equiv_def by auto
       then show False
-        using equiv_F_G by contradiction
+        using \<open>equiv \<phi> \<psi>\<close> by contradiction
     qed
   qed
 
@@ -936,32 +931,32 @@ proof -
   proof (rule ccontr)
     assume assm: "\<not> (\<exists>T \<in> set Ts. \<forall>i \<in> {1..n}. cont_pos T (Var i (nth eps (i-1))))"
 
-    define Val where
-      "Val = (\<lambda>x. case x of (Var i b) \<Rightarrow> b = nth eps (i-1))"
+    define \<alpha> where
+      "\<alpha> = (\<lambda>x. case x of (Var i b) \<Rightarrow> b = nth eps (i-1))"
 
-    have "Val \<Turnstile> F"
+    have "\<alpha> \<Turnstile> \<phi>"
     proof -
-      have "Val \<Turnstile> Fn n"
-        using Val_def by (induction n) simp_all
+      have "\<alpha> \<Turnstile> Fn n"
+        using \<alpha>_def by (induction n) simp_all
       then show ?thesis
-        by (simp add: def_F)
+        by (simp add: \<phi>_def)
     qed
 
-    moreover have "\<not>(Val \<Turnstile> G)"
+    moreover have "\<not>(\<alpha> \<Turnstile> \<psi>)"
     proof -
       have "\<forall>T \<in> set Ts. \<exists> i \<in> {1..n}. cont_pos T (Var i (\<not>(nth eps (i-1))))"
         using assm occ_var_bool_diff by (metis (full_types))
-      then have "\<forall> T \<in> set Ts. \<not>(Val \<Turnstile> T)"
-        by (metis (mono_tags, lifting) G_spec Val_def not_sat_conj_pos_false var.case)
+      then have "\<forall> T \<in> set Ts. \<not>(\<alpha> \<Turnstile> T)"
+        by (metis (mono_tags, lifting) Ts_spec \<alpha>_def not_sat_conj_pos_false var.case)
       then show ?thesis
-        unfolding G_def by auto
+        unfolding \<psi>_def by auto
     qed
 
-    ultimately have "\<not> equiv F G"
+    ultimately have "\<not> equiv \<phi> \<psi>"
       by (auto simp add: equiv_def)
 
     then show False
-      using equiv_F_G by contradiction
+      using \<open>equiv \<phi> \<psi>\<close> by contradiction
   qed
 
   have n_le_card_atoms: "n \<le> card (atoms T)" if T_in: "T \<in> set Ts" for T
@@ -969,7 +964,7 @@ proof -
     using occ_var_bool_diff[rule_format, OF T_in]
     by (metis One_nat_def atLeastAtMost_iff mem_atoms_if_cont_pos)
 
-  define conj_of_eps where
+  define conj_of_eps :: "bool list \<Rightarrow> var formula" where
     "conj_of_eps = (\<lambda>eps.
       (SOME T. T \<in> set Ts \<and> (\<forall>i \<in> {1..(length eps)}. cont_pos T (Var i (nth eps (i - 1))))))"
 
@@ -1054,7 +1049,7 @@ proof -
     using le_trans by blast
 
   ultimately show ?thesis
-    unfolding G_def
+    unfolding \<psi>_def
     using exp_sizef[OF n_greater_0]
     by (metis mult.commute)
 qed
@@ -1080,7 +1075,7 @@ proof -
       using equiv_BigOr'_undisj_if_dnf[symmetric] .
     then show "equiv \<phi> (BigOr' Ts)"
       unfolding Ts_def
-      by (smt (verit) BigOr'_semantics equiv_def mem_Collect_eq set_filter)
+      by (auto simp add: equiv_def)
   next
     have "size (BigOr' (undisj \<phi>)) = size \<phi>"
       using size_BigOr'_undisj .
@@ -1152,39 +1147,37 @@ section \<open>DNF to CNF\<close>
 
 proposition exp_blowup_from_dual_Fn_to_BigAnd':
   fixes n :: nat and Cs :: "var formula list"
-  defines "Fprime \<equiv> dual (Fn n)" and "G \<equiv> BigAnd' Cs"
+  defines "\<phi> \<equiv> dual (Fn n)" and "\<psi> \<equiv> BigAnd' Cs"
   assumes
     n_greater_0: "n > 0" and
-    G_spec: "(\<forall> C \<in> set Cs. is_disj C \<and> \<not>(\<forall> Val. Val \<Turnstile> C))" and
-    equiv_Fprime_G: "equiv Fprime G"
-  shows "sizef G \<ge> n*2^n"
+    Cs_spec: "(\<forall> C \<in> set Cs. is_disj C \<and> \<not>(\<forall> \<alpha>. \<alpha> \<Turnstile> C))" and
+    "equiv \<phi> \<psi>"
+  shows "sizef \<psi> \<ge> n*2^n"
 proof -
-  note def_Fprime = Fprime_def
-  note def_G = G_def G_spec
-  have G_in_cnf: "is_cnf G"
-    using def_G is_cnf_BigAnd' by auto
-  have G_in_nnf: "is_nnf G"
+  have G_in_cnf: "is_cnf \<psi>"
+    using \<psi>_def Cs_spec is_cnf_BigAnd' by auto
+  have G_in_nnf: "is_nnf \<psi>"
     using G_in_cnf cnf_in_nnf by auto
 
   show ?thesis
   proof (rule ccontr)
-    assume "\<not> n*2^n \<le> sizef G"
-    then have "sizef G < n*2^n"
+    assume "\<not> n*2^n \<le> sizef \<psi>"
+    then have "sizef \<psi> < n*2^n"
       by presburger
-    then have "sizef (dual G) < n*2^n"
-      using sizef_dual[of G] by presburger
+    then have "sizef (dual \<psi>) < n*2^n"
+      using sizef_dual[of \<psi>] by presburger
 
     obtain Ts where
-      "dual G = BigOr' Ts" "\<forall>T\<in>set Ts. is_conj T \<and> (\<exists> Val. Val \<Turnstile> T)"
-      using def_G dual_conj_of_disjs_is_disj_of_conjs by metis
+      "dual \<psi> = BigOr' Ts" "\<forall>T\<in>set Ts. is_conj T \<and> (\<exists> \<alpha>. \<alpha> \<Turnstile> T)"
+      using \<psi>_def Cs_spec dual_conj_of_disjs_is_disj_of_conjs by metis
 
-    moreover have "equiv (Fn n) (dual G)"
+    moreover have "equiv (Fn n) (dual \<psi>)"
     proof -
-      have "equiv (dual G) (Not G)"
+      have "equiv (dual \<psi>) (Not \<psi>)"
         using equiv_dual .
       also have "equiv \<dots> (Not (dual (Fn n)))"
         unfolding equiv_Not_left_Not_right
-        using equiv_Fprime_G[symmetric, unfolded Fprime_def] .
+        using \<open>equiv \<phi> \<psi>\<close>[symmetric, unfolded \<phi>_def] .
       also have "equiv \<dots> (Not (Not (Fn n)))"
         unfolding equiv_Not_left_Not_right
         using equiv_dual .
@@ -1195,10 +1188,10 @@ proof -
         by (rule equiv_symmetric)
     qed
 
-    ultimately have "n * 2 ^ n \<le> sizef (dual G)"
+    ultimately have "n * 2 ^ n \<le> sizef (dual \<psi>)"
       using exp_blowup_from_Fn_to_BigOr'[of n Ts] by force
     then show False
-      using \<open>sizef (dual G) < n*2^n\<close> by presburger
+      using \<open>sizef (dual \<psi>) < n*2^n\<close> by presburger
   qed
 qed
 
@@ -1219,7 +1212,7 @@ proof -
       using equiv_BigAnd'_unconj_if_cnf[symmetric] .
     then show "equiv \<phi> (BigAnd' Cs)"
       unfolding Cs_def
-      by (smt (verit, del_insts) BigAnd'_semantics equiv_def mem_Collect_eq set_filter)
+      by (auto simp add: equiv_def)
   next
     have "sizef (BigAnd' (unconj \<phi>)) = sizef \<phi>"
       using sizef_BigAnd'_unconj .
