@@ -15,7 +15,6 @@ lemma card_Domain_le:
   using assms by (metis card_image_le fst_eq_Domain)
 
 (*TODO: Delete when a new Isabelle version is released. *)
-thm card_le_card_if_mem_imp_ex_mem
 lemma card_le_card_if_mem_imp_ex_mem:
   fixes f :: "'a \<Rightarrow> 'b \<Rightarrow> 'c" and \<X> :: "'a set" and \<Y> :: "'c set"
   defines "XY \<equiv> {(x, y). x \<in> \<X> \<and> f x y \<in> \<Y>}"
@@ -341,7 +340,7 @@ next
   then show ?case
     by (simp add: Ts_def)
 qed
-                         
+
 lemma exp_size:
   assumes "n > 0" and "length Ts \<ge> 2^n" and "\<forall>T \<in> set Ts. size T \<ge> m"
   shows "size (BigOr' Ts) \<ge> 2^n * m"
