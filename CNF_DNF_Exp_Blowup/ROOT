@@ -7,4 +7,5 @@ session CNF_DNF_Exp_Blowup = HOL +
   theories
     CNF_DNF_Exp_Blowup
   document_files
+    "root.bib"
     "root.tex"
