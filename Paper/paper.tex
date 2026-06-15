@@ -409,10 +409,10 @@ We can now prove that some specific formulas equivalent to $F_n$ (\cref{def_Fn})
   \label{thm_cnf_to_dnf_blowup}
   Let $n > 0$ be a natural number.
   Let $Ts$ be a list of formulas.
-  Let $G = \bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$.
+  Let $\psi = \bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$.
   If all formulas in $Ts$ are conjunctive and satisfiable, and
-  if $F_n$ is equivalent to $G$,
-  then $\isaAp{\cstSizef}{G} \ge n \cdot 2^n$.
+  if $F_n$ is equivalent to $\psi$,
+  then $\isaAp{\cstSizef}{\psi} \ge n \cdot 2^n$.
 \end{proposition}
 \begin{proof}
   We proceed in five steps:
@@ -420,22 +420,22 @@ We can now prove that some specific formulas equivalent to $F_n$ (\cref{def_Fn})
     \item First, we show that every conjunctive formula $T \in \isaAp{\cst{set}}{Ts}$ contains for all $i \in \{1,\ldots,n\}$ either the variable $x_{i,\cstFalse}$ or $x_{i,\cstTrue}$ positively.
     We prove this step by contradiction, where we must derive false for two cases:
     Either the variables $x_{i,\cstFalse}$ and $x_{i,\cstTrue}$ are both positively contained in $T$ or they are both not positively contained.
-    In both cases, we proceed by defining a valuation that satisfies $G$ but not $F_n$.
+    In both cases, we proceed by defining a valuation that satisfies $\psi$ but not $F_n$.
     For instance, in the second case, we find a valuation that satisfies $T$ and change the assignment of the variables $x_{i,\cstFalse}$ and $x_{i,\cstTrue}$ to false.
-    We then show using \cref{aux_lemma_prop4_step1,aux_lemma_prop4_step3,thm_semantics_Fn_iff} that this modified valuation satisfies $T$ (and thus $G$) but does not satisfy $F_n$.
-    This means that $F_n$ is not equivalent to $G$, which contradicts the \lcnamecref{thm_cnf_to_dnf_blowup}'s assumption.
+    We then show using \cref{aux_lemma_prop4_step1,aux_lemma_prop4_step3,thm_semantics_Fn_iff} that this modified valuation satisfies $T$ (and thus $\psi$) but does not satisfy $F_n$.
+    This means that $F_n$ is not equivalent to $\psi$, which contradicts the \lcnamecref{thm_cnf_to_dnf_blowup}'s assumption.
 
     \item From step~1, we derive that every $T \in \isaAp{\cst{set}}{Ts}$ has $\isaAp{\cstSizef}{T} \ge n$.
 
     \item Furthermore, we prove that for every Boolean list $\epsilon = [\epsilon_1,\ldots,\epsilon_n]$ there exists a $T \in \isaAp{\cst{set}}{Ts}$ that contains the corresponding variables $x_{1,\epsilon_1},\ldots,x_{n,\epsilon_n}$ positively.
     If this is not the case for a specific list $\epsilon$, we show using step~1 that every $T$ must contain one of the variables $x_{1,\neg\epsilon_1},\ldots,x_{n,\neg\epsilon_n}$ positively.
     We then define a valuation that maps all variables $x_{i,\epsilon_i}$ to true and $x_{i,\neg\epsilon_i}$ to false for $i \in \{1,\ldots,n\}$.
-    We show using \cref{aux_lemma_prop4_step3} that this valuation satisfies $F_n$ but not $G$.
-    This means that $F_n$ is not equivalent to $G$, which contradicts the \lcnamecref{thm_cnf_to_dnf_blowup}'s assumption.
+    We show using \cref{aux_lemma_prop4_step3} that this valuation satisfies $F_n$ but not $\psi$.
+    This means that $F_n$ is not equivalent to $\psi$, which contradicts the \lcnamecref{thm_cnf_to_dnf_blowup}'s assumption.
 
     \item We then prove that the number of Boolean lists of length $n$ is $2^n \le \setCard{\isaAp{\cst{set}}{Ts}} \le \listLength{Ts}$ using steps~1 and~3.
 
-    \item Finally, we show that $\isaAp{\cstSizef}{G} \ge n \cdot 2^n$ by combining the results from steps~2 and~4 to discharge the assumptions of \cref{thm_exp_size}. \qedhere
+    \item Finally, we show that $\isaAp{\cstSizef}{\psi} \ge n \cdot 2^n$ by combining the results from steps~2 and~4 to discharge the assumptions of \cref{thm_exp_size}. \qedhere
   \end{enumerate}
 \end{proof}
 
@@ -530,21 +530,21 @@ We can now prove that some specific formulas equivalent to the dual of $F_n$ (\c
   \label{thm_dnf_to_cnf_blowup}
   Let $n > 0$ be a natural number.
   Let $Cs$ be a list of formulas.
-  Let $G = \bigwedge_{i = 0}^{\listLength{Cs}} \listNth{Cs}{i}$.
-  If all formulas in $Cs$ are disjunctive and not tautological, and $\isaAp{\cst{dual}}{F_n}$ is equivalent to $G$,
-  then $\isaAp{\cstSizef}{G} \ge n \cdot 2^n$.
+  Let $\psi = \bigwedge_{i = 0}^{\listLength{Cs}} \listNth{Cs}{i}$.
+  If all formulas in $Cs$ are disjunctive and not tautological, and $\isaAp{\cst{dual}}{F_n}$ is equivalent to $\psi$,
+  then $\isaAp{\cstSizef}{\psi} \ge n \cdot 2^n$.
 \end{proposition}
 \begin{proof}
   We prove this by contradiction using \cref{thm_cnf_to_dnf_blowup}.
-  We assume $\isaAp{\cstSizef}{G} < n \cdot 2^n$ and from that derive false in five steps:
+  We assume $\isaAp{\cstSizef}{\psi} < n \cdot 2^n$ and from that derive false in five steps:
   \begin{enumerate}
-    \item First, we know from \cref{thm_sizef_dual} that $\isaAp{\cstSizef}{(\isaAp{\cst{dual}}{G})} = \isaAp{\cstSizef}{G}$, thus $\isaAp{\cstSizef}{(\isaAp{\cst{dual}}{G})} < n \cdot 2^n$.
+    \item First, we know from \cref{thm_sizef_dual} that $\isaAp{\cstSizef}{(\isaAp{\cst{dual}}{\psi})} = \isaAp{\cstSizef}{\psi}$, thus $\isaAp{\cstSizef}{(\isaAp{\cst{dual}}{\psi})} < n \cdot 2^n$.
 
-    \item Moreover, we show that $\isaAp{\cst{dual}}{G}$ is equivalent to $F_n$ using, among others, \cref{thm_equiv_dual}.
+    \item Moreover, we show that $\isaAp{\cst{dual}}{\psi}$ is equivalent to $F_n$ using, among others, \cref{thm_equiv_dual}.
 
-    \item Also, we prove using \cref{thm_dual_conj_of_disjs_is_disj_of_conjs} that there exists a list $Ts$ such that every formula contained in $Ts$ is both conjunctive and satisfiable and such that $\isaAp{\cst{dual}}{G}$ is syntactically equal to $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$.
+    \item Also, we prove using \cref{thm_dual_conj_of_disjs_is_disj_of_conjs} that there exists a list $Ts$ such that every formula contained in $Ts$ is both conjunctive and satisfiable and such that $\isaAp{\cst{dual}}{\psi}$ is syntactically equal to $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$.
 
-    \item From steps~2 and~3, we can discharge the assumptions of \cref{thm_cnf_to_dnf_blowup} for $F_n$ and $\isaAp{\cst{dual}}{G}$ and thus show that $\isaAp{\cstSizef}{(\isaAp{\cst{dual}}{G})} \ge n \cdot 2^n$.
+    \item From steps~2 and~3, we can discharge the assumptions of \cref{thm_cnf_to_dnf_blowup} for $F_n$ and $\isaAp{\cst{dual}}{\psi}$ and thus show that $\isaAp{\cstSizef}{(\isaAp{\cst{dual}}{\psi})} \ge n \cdot 2^n$.
 
     \item The result of step~1 contradicts the result of step~4, completing the proof. \qedhere
   \end{enumerate}
@@ -614,7 +614,7 @@ To keep the statements close to their mathematical counterparts, we therefore ch
 Finally we introduced the function $\cstSizef$ to be able to prove the equality of \cref{thm_sizef_dual}.
 Without $\cstSizef$, we could only prove the inequality $\left|\isaAp{\cst{dual}}{\phi}\right| \le 2 \cdot \left|\phi\right|$ because $\cst{dual}$ adds and removes negations depending on the formula.
 It would be possible to restate and prove the statement of \cref{thm_cnf_to_dnf_blowup} in terms of $\left|\cdot\right|$.
-However, if we tried to restate and prove the statement of \cref{thm_dnf_to_cnf_blowup} in terms of $\left|\cdot\right|$, we would prove $\left|\isaAp{\cst{dual}}{G}\right| < 2 \cdot n \cdot 2^n$ in step~1 and $\left|\isaAp{\cst{dual}}{G}\right| \ge n \cdot 2^n$ in step~4, and we would not be able to derive a contradiction in step~5.
+However, if we tried to restate and prove the statement of \cref{thm_dnf_to_cnf_blowup} in terms of $\left|\cdot\right|$, we would prove $\left|\isaAp{\cst{dual}}{\psi}\right| < 2 \cdot n \cdot 2^n$ in step~1 and $\left|\isaAp{\cst{dual}}{\psi}\right| \ge n \cdot 2^n$ in step~4, and we would not be able to derive a contradiction in step~5.
 
 
 \section{Conclusion}
