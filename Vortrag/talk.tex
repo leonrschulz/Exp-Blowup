@@ -1,0 +1,244 @@
+\documentclass[aspectratio=169,11pt,usenames,dvipsnames]{beamer}
+
+\usepackage{amsmath}
+\usepackage{appendixnumberbeamer}
+\usepackage{graphicx}
+\usepackage{mathpartir}
+\usepackage{setspace}
+\usepackage[overlay]{textpos}
+\usepackage{booktabs}
+\usepackage{pgfplots}
+\usepackage[super]{nth}
+\usepackage{tikz}
+\usepackage{booktabs}
+\usepackage[group-separator = {\,}, detect-all]{siunitx}
+\usepackage{etoolbox} % For `\ifbool`, `\ifnumcomp`.
+\usepackage{svg}
+
+% Load after all math package
+\usepackage{fontspec}
+
+\pgfplotsset{compat=1.17}
+\usetikzlibrary{backgrounds}
+\usetikzlibrary{calc}
+\usetikzlibrary{fit}
+\usetikzlibrary{graphs.standard}
+\usetikzlibrary{positioning}
+\usetikzlibrary{shapes}
+
+\graphicspath{{./img/}}
+
+\definecolor{LMU_green}{HTML}{00883a}
+\definecolor{LMU_black}{HTML}{232323}
+\definecolor{LMU_white}{HTML}{ffffff}
+\definecolor{LMU_darkgrey}{HTML}{626468}
+\definecolor{LMU_grey}{HTML}{c0c1c3}
+\definecolor{LMU_lightgrey}{HTML}{e6e6e7}
+\definecolor{LMU_lightlightgrey}{HTML}{f5f5f5}
+\definecolor{LMU_orange}{HTML}{f18700}
+\definecolor{LMU_red}{HTML}{d71919}
+\definecolor{LMU_violet}{HTML}{8c4091}
+\definecolor{LMU_cyan}{HTML}{009fe3}
+\definecolor{LMU_blue}{HTML}{0f1987}
+
+\definecolor{lgbt-red}{HTML}{FF0018}
+\definecolor{lgbt-orange}{HTML}{FFA52C}
+\definecolor{lgbt-yellow}{HTML}{ffec41}
+\definecolor{lgbt-green}{HTML}{008018}
+\definecolor{lgbt-blue}{HTML}{0000F9}
+\definecolor{lgbt-violet}{HTML}{86007D}
+
+\pgfplotscreateplotcyclelist{lgbt-rainbow}{
+  {ultra thick, solid, mark=*, lgbt-red},
+  {ultra thick, solid, mark=*, lgbt-orange},
+  {ultra thick, solid, mark=*, lgbt-yellow},
+  {ultra thick, solid, mark=*, lgbt-green},
+  {ultra thick, solid, mark=*, lgbt-blue},
+  {ultra thick, solid, mark=*, lgbt-violet}% <-- don't add a comma here
+}
+
+
+\def\parenthetical#1{{\color{LMU_darkgrey}(#1)}}
+
+\title{Formalizing the Exponential Blowup \\ in the Transformations between CNF and DNF}
+\author{Leon Raffael Schulz \\ joint work with \and Martin Desharnais-Schäfer \and Jan Johannsen}
+
+\institute{
+  \vspace{1em}
+  \includegraphics[height=1.5cm]{img/LMU_Logo_RGB_FlaechigGruen.png}
+  \vspace{1em}
+}
+
+\date{Isabelle Workshop 2026}
+
+\usetheme{moloch}
+
+\setbeamercolor{normal text}{fg=black}
+\setbeamercolor{example text}{fg=LMU_green}
+\setbeamercolor{alerted text}{fg=LMU_orange}
+\setbeamercolor{titlelike}{fg=LMU_green}
+\setbeamercolor{structure}{fg=LMU_green}
+\setbeamercolor{palette primary}{fg=white, bg=LMU_green}
+\setbeamercolor{block title}{fg=white, bg=LMU_green}
+\setbeamercolor{block title example}{fg=white, bg=LMU_green}
+\setbeamercolor{block body}{use={normal text,block title}, bg=LMU_lightgrey, fg=normal text.fg}
+
+\setbeamercovered{again covered={\opaqueness<1->{15}}}
+
+\setbeamerfont{page number in head/foot}{size=\normalsize}
+
+%\setbeamercovered{transparent}
+
+%\setsansfont{Concourse OT}[
+%  Ligatures = TeX,
+%  %UprightFeatures = { SmallCapsFont = {Concourse C4} },
+%  %BoldFeatures = { SmallCapsFont = {Concourse C4 Bold} },
+%]
+%\setmathrm{Concourse OT}[
+%  Ligatures = TeX,
+%  %UprightFeatures = { SmallCapsFont = {Concourse C4} },
+%  %BoldFeatures = { SmallCapsFont = {Concourse C4 Bold} },
+%]
+%\setmathsf{Concourse OT}[
+%  Ligatures = TeX,
+%  UprightFeatures = { SmallCapsFont = {Concourse OT} },
+%  %BoldFeatures = { SmallCapsFont = {Concourse C4 Bold} },
+%]
+%\setmonofont[Ligatures=TeX]{Triplicate OT}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Motivation}{}
+  Few to no formalization of quantitative results about proposition logic
+
+  First steps...
+
+  \begin{block}{CNF to DNF}
+    Bla
+  \end{block}
+
+  \begin{block}{DNF to CNF}
+    Bla
+  \end{block}
+\end{frame}
+
+\def\nneegg#1{\neg #1}
+\begin{frame}{Example}{}
+  Conjuncton of 3 xor = x1 xor y1 and x2 xor y2 and x3 xor y3
+
+  $F_3 =
+    \overbrace{(x_1 \lor y_1) \land (\nneegg{x_1} \lor \nneegg{y_1})}^{x_1 \mathop{\oplus} y_1} \land
+    \overbrace{(x_2 \lor y_2) \land (\nneegg{x_2} \lor \nneegg{y_2})}^{x_2 \mathop{\oplus} y_2} \land
+    \overbrace{(x_3 \lor y_3) \land (\nneegg{x_3} \lor \nneegg{y_3})}^{x_3 \mathop{\oplus} y_3}$
+
+  $F_3$ is in CNF and can be transformed in an equivalent formula in DNF:
+
+  \begin{align*}
+    & (x_1 \land \nneegg{y_1} \land x_2 \land \nneegg{y_2} \land x_3 \land \nneegg{y_3}) \mathrel{\lor}
+      (x_1 \land \nneegg{y_1} \land x_2 \land \nneegg{y_2} \land \nneegg{x_3} \land y_3) \mathrel{\lor} \\
+    & (x_1 \land \nneegg{y_1} \land \nneegg{x_2} \land y_2 \land x_3 \land \nneegg{y_3}) \mathrel{\lor}
+      (x_1 \land \nneegg{y_1} \land \nneegg{x_2} \land y_2 \land \nneegg{x_3} \land y_3) \mathrel{\lor} \\
+    & (\nneegg{x_1} \land y_1 \land x_2 \land \nneegg{y_2} \land x_3 \land \nneegg{y_3}) \mathrel{\lor}
+      (\nneegg{x_1} \land y_1 \land x_2 \land \nneegg{y_2} \land \nneegg{x_3} \land y_3) \mathrel{\lor} \\
+    & (\nneegg{x_1} \land y_1 \land \nneegg{x_2} \land y_2 \land x_3 \land \nneegg{y_3}) \mathrel{\lor}
+      (\nneegg{x_1} \land y_1 \land \nneegg{x_2} \land y_2 \land \nneegg{x_3} \land y_3)
+  \end{align*}
+
+  Through the transformation, the formula's size increased from 29 to 119.
+\end{frame}
+
+\begin{frame}{Formalization Preliminaries}{}
+  Based on \textsf{Propositional\_Proof\_Systems} (Michaelis and Nipkow)
+  Plus?
+
+  \begin{itemize}
+    \item Fn (Fn): Creates a formula in CNF for some given n (analogously to F3)
+    \item size (|.|), sizef: Count the number of logical symbols (sizef does not consider negations)
+    \item BigAnd‘ ($\bigwedge$), BigOr‘ ($\bigvee$): Build the conjunction and disjunction of all formulas in a list
+    \item dual: Dual of a formula
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{CNF to DNF}{Low-level}
+  \begin{block}{Proposition (Exponential Blowup from $F_n$ to $BigOr'$)}
+    Let n > 0 be a natural number.
+    Let Ts be a list of formulas.
+    Let ψ= \/ |Ts| i=0 Ts[i].
+    If all formulas in Ts are conjunctive and satisfiable, and if Fn is equivalent to ψ, then sizef ψ ≥ n·2n.
+  \end{block}
+  Proof:
+  \begin{enumerate}
+    \item Every T ∈ set Ts contains for all i = {1,...,n} either the variable xi,False or xi,True positively.
+    \item Every T ∈ set Ts has sizef T ≥ n (using step 1).
+    \item For every Boolean list ϵ = [ϵ1,...,ϵn] there exists a T ∈ set Ts that contains the corresponding variables x1,ϵ1 ,..., xn,ϵn positively.
+    \item The number of Boolean lists of length n is 2n ≤ |Ts| (using step 1,3).
+    \item Finally sizef ψ ≥ n·2n (using step 2,4).
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{CNF to DNF}{High-level}
+  \begin{theorem}[Exponential Blowup from CNF to DNF]
+    Let n be a natural number.
+    There exists a formula ϕ in CNF with size |ϕ| = 10·n+2 such that every equivalent formula ψ in DNF has size |ψ| ≥ n·2n.
+  \end{theorem}
+  Proof:
+  \begin{enumerate}
+    \item Case analysis on n gives us n > 0 (case n = 0 can be proven directly).
+    \item Instantiate ϕ = Fn and then prove that ϕ is in CNF and |ϕ|=10·n+2.
+    \item Assume an equivalent formula ψ in DNF and obtain a list Ts of conjunctive and satisfiable formulas in ψ and show sizef ψ ≥ sizef (\/ |Ts| i=0Ts[i]) and the equivalence of \/ |Ts| i=0Ts[i] and ϕ and thus Fn.
+    \item Prove |ψ|≥ sizef ψ ≥ sizef (\/ |Ts| i=0 Ts [i]) ≥ n·2n (using proposition 1 to show the last inequality).
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{DNF to CNF}{Low-level}
+  \begin{block}{Proposition (Exponential Blowup from $dual F_n$ to $BigAnd'$)}
+   Let n > 0 be a natural number.
+   Let Cs be a list of formulas.
+   Let ψ= /\ |Cs| i=0 Cs[i].
+   If all formulas in Cs are disjunctive and not tautological, and dual Fn is equivalent to ψ, then sizef ψ ≥ n·2n.
+  \end{block}
+  Proof:
+  \begin{enumerate}
+    \item Sizef (dual ψ) < n·2n.
+    \item Dual ψ is equivalent to Fn.
+    \item There exists a list Ts such that every formula contained in Ts is both conjunctive and satisfiable and such that dual ψ is syntactically equal to \/ |Ts| i=0Ts[i].
+    \item Sizef (dual ψ) ≥ n·2n  (using steps 2, 3 and proposition 1).
+  \end{enumerate}
+  => The result of step 1 contradicts the result of step 4.
+\end{frame}
+
+\begin{frame}{DNF to CNF}{High-level}
+  \begin{theorem}[Exponential Blowup from DNF to CNF]
+    Let n be a natural number.
+    There exists a formula ϕ in DNF with size |ϕ| = 10·n+1 such that every equivalent formula ψ in CNF has size |ψ| ≥ n·2n.
+  \end{theorem}
+  Proof:
+    Analogous to the proof of theorem 1.
+\end{frame}
+
+\begin{frame}{Discussion}{}
+We defined new versions of BigOr and BigAnd from Michaelis and Nipkow, where we handle the base case differently to be able to prove |ψ| ≥ n· 2n (instead of |ψ| + 2 ≥ n · 2n).
+
+We introduced the additional size function sizef to be able to prove sizef (dual ϕ) = sizef ϕ (instead of |dual ϕ| ≤ 2 · |ϕ|), what we need to derive a contradiction in the proof of proposition 2.
+\end{frame}
+
+\begin{frame}{Conclusion}{}
+  We formalized the exponential blowup of the formula size when transforming a formula into DNF or CNF in Isabelle/HOL.
+
+  Our formalization may serve as a basis for further formalizations of quantitative results in propositional logic.
+
+  Future work: Proof complexity lower bounds (e.g., for resolution proofs of the pidgeonhole principle)
+
+  \pause
+
+  Thank you
+\end{frame}
+
+% \begin{frame}[plain,standout]
+% \end{frame}
+
+\end{document}
