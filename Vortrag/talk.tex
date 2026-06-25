@@ -106,6 +106,8 @@
 %]
 %\setmonofont[Ligatures=TeX]{Triplicate OT}
 
+\input{def.tex}
+
 \begin{document}
 
 \begin{frame}
@@ -132,7 +134,7 @@
 
 \def\nneegg#1{\neg #1}
 \begin{frame}{Example}{}
-  Conjuncton of 3 xor = x1 xor y1 and x2 xor y2 and x3 xor y3
+  Conjunction of 3 xor = x1 xor y1 and x2 xor y2 and x3 xor y3
 
   $F_3 =
     \overbrace{(x_1 \lor y_1) \land (\nneegg{x_1} \lor \nneegg{y_1})}^{x_1 \mathop{\oplus} y_1} \land
@@ -160,7 +162,7 @@
   Plus?
 
   \begin{itemize}
-    \item Fn (Fn): Creates a formula in CNF for some given n (analogously to F3)
+    \item Fn ($F_n$): Creates a formula in CNF for some given n (analogously to $F_3$)
     \item size (|.|), sizef: Count the number of logical symbols (sizef does not consider negations)
     \item BigAnd‘ ($\bigwedge$), BigOr‘ ($\bigvee$): Build the conjunction and disjunction of all formulas in a list
     \item dual: Dual of a formula
@@ -169,10 +171,12 @@
 
 \begin{frame}{CNF to DNF}{Low-level}
   \begin{block}{Proposition (Blowup from $F_n$ to $BigOr'$)}
-    Let n > 0 be a natural number.
-    Let Ts be a list of formulas.
-    Let ψ= \/ |Ts| i=0 Ts[i].
-    If all formulas in Ts are conjunctive and satisfiable, and if Fn is equivalent to ψ, then sizef ψ ≥ n·2n.
+    Let $n > 0$ be a natural number.
+    Let $Ts$ be a list of formulas.
+    Let $\psi = \bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$.
+    If all formulas in $Ts$ are conjunctive and satisfiable, and
+    if $F_n$ is equivalent to $\psi$,
+    then $\isaAp{\cstSizef}{\psi} \ge n \cdot 2^n$.
   \end{block}
 
   \pause
@@ -203,10 +207,11 @@
 
 \begin{frame}{DNF to CNF}{Low-level}
   \begin{block}{Proposition (Blowup from $dual F_n$ to $BigAnd'$)}
-   Let n > 0 be a natural number.
-   Let Cs be a list of formulas.
-   Let ψ= /\ |Cs| i=0 Cs[i].
-   If all formulas in Cs are disjunctive and not tautological, and dual Fn is equivalent to ψ, then sizef ψ ≥ n·2n.
+   Let $n > 0$ be a natural number.
+   Let $Cs$ be a list of formulas.
+   Let $\psi = \bigwedge_{i = 0}^{\listLength{Cs}} \listNth{Cs}{i}$.
+   If all formulas in $Cs$ are disjunctive and not tautological, and $\isaAp{\cst{dual}}{F_n}$ is equivalent to $\psi$,
+   then $\isaAp{\cstSizef}{\psi} \ge n \cdot 2^n$.
   \end{block}
   Proof:
   \begin{enumerate}
