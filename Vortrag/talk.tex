@@ -163,7 +163,7 @@
 
   \begin{itemize}
     \item Fn ($F_n$): Creates a formula in CNF for some given n (analogously to $F_3$)
-    \item size (|.|), sizef: Count the number of logical symbols (sizef does not consider negations)
+    \item size ($\left|.\right|$), sizef: Count the number of logical symbols (sizef does not consider negations)
     \item BigAnd‘ ($\bigwedge$), BigOr‘ ($\bigvee$): Build the conjunction and disjunction of all formulas in a list
     \item dual: Dual of a formula
   \end{itemize}
@@ -233,9 +233,9 @@
 \end{frame}
 
 \begin{frame}{Discussion}{}
-  We defined new versions of BigOr and BigAnd from Michaelis and Nipkow, where we handle the base case differently to be able to prove |ψ| ≥ n· 2n (instead of |ψ| + 2 ≥ n · 2n).
+  We defined new versions of BigOr and BigAnd from Michaelis and Nipkow, where we handle the base case differently to be able to prove $\left|\psi\right| \ge n \cdot 2^n$ (instead of $\left|\psi\right| + 2 \ge n \cdot 2^n$).
 
-  We introduced the additional size function sizef to be able to prove sizef (dual ϕ) = sizef ϕ (instead of |dual ϕ| ≤ 2 · |ϕ|), what we need to derive a contradiction in the proof of proposition 2.
+  We introduced the additional size function sizef to be able to prove $\isaAp{\cstSizef}{(\isaAp{\cst{dual}}{\phi})} = \isaAp{\cstSizef}{\phi}$ (instead of $\left|\isaAp{\cst{dual}}{\phi}\right| \le 2 \cdot \left|\phi\right|$), what we need to derive a contradiction in the proof of proposition 2.
 \end{frame}
 
 \begin{frame}{Conclusion}{}
