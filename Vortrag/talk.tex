@@ -183,11 +183,11 @@
 
   Proof:
   \begin{enumerate}
-    \item<+-> Every T ∈ set Ts contains for all i = {1,...,n} either the variable xi,False or xi,True positively.
-    \item<+-> Every T ∈ set Ts has sizef T ≥ n (using step 1).
-    \item<+-> For every Boolean list ϵ = [ϵ1,...,ϵn] there exists a T ∈ set Ts that contains the corresponding variables x1,ϵ1 ,..., xn,ϵn positively.
-    \item<+-> The number of Boolean lists of length n is 2n ≤ |Ts| (using step 1,3).
-    \item<+-> Finally sizef ψ ≥ n·2n (using step 2,4).
+    \item<+-> Every $T \in \isaAp{\cst{set}}{Ts}$ contains for all $i \in \{1,\ldots,n\}$ either the variable $x_{i,\cstFalse}$ or $x_{i,\cstTrue}$ positively.
+    \item<+-> Every $T \in \isaAp{\cst{set}}{Ts}$ has $\isaAp{\cstSizef}{T} \ge n$.
+    \item<+-> For every Boolean list $\epsilon = [\epsilon_1,\ldots,\epsilon_n]$ there exists a $T \in \isaAp{\cst{set}}{Ts}$ that contains the corresponding variables $x_{1,\epsilon_1},\ldots,x_{n,\epsilon_n}$ positively.
+    \item<+-> The number of Boolean lists of length $n$ is $2^n \le \listLength{Ts}$ (using steps 1,3).
+    \item<+-> Finally $\isaAp{\cstSizef}{\psi} \ge n \cdot 2^n$ (using step 2,4).
   \end{enumerate}
 \end{frame}
 
