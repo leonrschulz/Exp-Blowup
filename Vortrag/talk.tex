@@ -117,7 +117,7 @@
 \begin{frame}{Motivation}{}
   Few to no formalization of quantitative results about propositional logic
 
-  We formalize these two well-known mathematical theorems:
+  We formalize two well-known mathematical theorems:
 
   \begin{block}{CNF to DNF}
     For all sufficiently large $n\in \mathbb{N}$, there exist formulas $F_n$ in
@@ -159,13 +159,15 @@
 
 \begin{frame}{Formalization Preliminaries}{}
   Based on \textsf{Propositional\_Proof\_Systems} (Michaelis and Nipkow)
-  Plus?
+  
+  Additionally required functions:
 
   \begin{itemize}
-    \item Fn ($F_n$): Creates a formula in CNF for some given n (analogously to $F_3$)
-    \item size ($\left|.\right|$), sizef: Count the number of logical symbols (sizef does not consider negations)
-    \item BigAnd‘ ($\bigwedge$), BigOr‘ ($\bigvee$): Build the conjunction and disjunction of all formulas in a list
-    \item dual: Dual of a formula
+    \item Fn ($F_n$): Creates formula in CNF for given n (analogously to $F_3$)
+    \item size ($\left|.\right|$), sizef: Count number of logical symbols (sizef not considering negations)
+    \item BigAnd‘ ($\bigwedge$), BigOr‘ ($\bigvee$): Build conjunction and disjunction of formulas in a list
+    \item dual: Dualizes formula
+    \item ...
   \end{itemize}
 \end{frame}
 
@@ -229,7 +231,7 @@
     There exists a formula $\phi$ in DNF with size $\left|\phi\right| = 10 \cdot n + 1$ such that every equivalent formula $\psi$ in CNF has size $\left|\psi\right| \ge n \cdot 2^n$.
   \end{theorem}
   Proof:
-    Analogous to the proof of theorem 1.
+    Analogous to theorem 1.
 \end{frame}
 
 \begin{frame}{Discussion}{}
@@ -243,7 +245,7 @@
 
   Our formalization may serve as a basis for further formalizations of quantitative results in propositional logic.
 
-  Future work: Proof complexity lower bounds (e.g., for resolution proofs of the pidgeonhole principle)
+  Future work: Proof complexity lower bounds (e.g., for resolution proofs of the pigeonhole principle)
 
   \pause
 
