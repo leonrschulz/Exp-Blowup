@@ -198,10 +198,10 @@
   \end{theorem}
   Proof:
   \begin{enumerate}
-    \item Case analysis on n gives us n > 0 (case n = 0 can be proven directly).
-    \item Instantiate ϕ = Fn and then prove that ϕ is in CNF and |ϕ|=10·n+2.
-    \item Assume an equivalent formula ψ in DNF and obtain a list Ts of conjunctive and satisfiable formulas in ψ and show sizef ψ ≥ sizef (\/ |Ts| i=0Ts[i]) and the equivalence of \/ |Ts| i=0Ts[i] and ϕ and thus Fn.
-    \item Prove |ψ|≥ sizef ψ ≥ sizef (\/ |Ts| i=0 Ts [i]) ≥ n·2n (using proposition 1 to show the last inequality).
+    \item Case analysis on n gives us $n > 0$ (case $n = 0$ can be proven directly).
+    \item Instantiate $\phi = F_n$ and then prove that $\phi$ is in CNF and $\left|\phi\right| = 10 \cdot n + 2$.
+    \item Assume an equivalent formula $\psi$ in DNF and obtain a list $Ts$ of conjunctive and satisfiable formulas in $\psi$ and show $\isaAp{\cstSizef}{\psi} \ge \isaAp{\cstSizef}{(\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i})}$ and the equivalence of $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$ and $\psi$ and thus $F_n$.
+    \item Prove $\left|\psi\right| \ge \isaAp{\cstSizef}{\psi} \ge \isaAp{\cstSizef}{(\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i})} \ge n \cdot 2^n$ (using proposition 1 to show the last inequality).
   \end{enumerate}
 \end{frame}
 
