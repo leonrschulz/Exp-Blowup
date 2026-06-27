@@ -215,10 +215,10 @@
   \end{block}
   Proof:
   \begin{enumerate}
-    \item Sizef (dual ψ) < n·2n.
-    \item Dual ψ is equivalent to Fn.
-    \item There exists a list Ts such that every formula contained in Ts is both conjunctive and satisfiable and such that dual ψ is syntactically equal to \/ |Ts| i=0Ts[i].
-    \item Sizef (dual ψ) ≥ n·2n  (using steps 2, 3 and proposition 1).
+    \item $\isaAp{\cstSizef}{(\isaAp{\cst{dual}}{\psi})} < n \cdot 2^n$.
+    \item $\isaAp{\cst{dual}}{\psi}$ is equivalent to $F_n$.
+    \item There exists a list $Ts$ such that every formula contained in $Ts$ is both conjunctive and satisfiable and such that $\isaAp{\cst{dual}}{\psi}$ is syntactically equal to $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$.
+    \item $\isaAp{\cstSizef}{(\isaAp{\cst{dual}}{\psi})} \ge n \cdot 2^n$ (using steps 2, 3 and proposition 1).
   \end{enumerate}
   => The result of step 1 contradicts the result of step 4.
 \end{frame}
