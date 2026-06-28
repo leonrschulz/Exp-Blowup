@@ -193,11 +193,11 @@
 
   Proof:
   \begin{enumerate}
-    \item<+-> Every $T \in \isaAp{\cst{set}}{Ts}$ contains for all $i \in \{1,\ldots,n\}$ either the variable $x_{i,\cstFalse}$ or $x_{i,\cstTrue}$ positively.
+    \item<+-> Every $T \in \isaAp{\cst{set}}{Ts}$ contains for all $i \in \{1,\ldots,n\}$ either $x_{i,\cstFalse}$ or $x_{i,\cstTrue}$ positively.
     \item<+-> Every $T \in \isaAp{\cst{set}}{Ts}$ has $\isaAp{\cstSizef}{T} \ge n$.
-    \item<+-> For every Boolean list $\epsilon = [\epsilon_1,\ldots,\epsilon_n]$ there exists a $T \in \isaAp{\cst{set}}{Ts}$ that contains the corresponding variables $x_{1,\epsilon_1},\ldots,x_{n,\epsilon_n}$ positively.
-    \item<+-> The number of Boolean lists of length $n$ is $2^n \le \listLength{Ts}$ (using steps 1,3).
-    \item<+-> Finally $\isaAp{\cstSizef}{\psi} \ge n \cdot 2^n$ (using step 2,4).
+    \item<+-> For every Boolean list $\epsilon = [\epsilon_1,\ldots,\epsilon_n]$ there exists $T \in \isaAp{\cst{set}}{Ts}$ that contains $x_{1,\epsilon_1},\ldots,x_{n,\epsilon_n}$ positively.
+    \item<+-> Number of Boolean lists of length $n$ is $2^n \le \setCard{\isaAp{\cst{set}}{Ts}} \le \listLength{Ts}$ (using steps 1 \& 3).
+    \item<+-> Finally $\isaAp{\cstSizef}{\psi} \ge n \cdot 2^n$ (using step 2 \& 4).
   \end{enumerate}
 \end{frame}
 
