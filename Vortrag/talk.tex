@@ -118,12 +118,16 @@
   Few to no formalization of quantitative results about propositional logic
 
   We formalize two well-known mathematical theorems:
+  
+  \pause
 
   \begin{block}{CNF to DNF}
     For all sufficiently large $n\in \mathbb{N}$, there exist formulas $F_n$ in
     CNF with $|F_n| = \mathcal{O}(n)$ such that every equivalent formula $G_n$ in
     DNF is of size $|G_n| \geq n \cdot 2^n$.
   \end{block}
+  
+  \pause
 
   \begin{block}{DNF to CNF}
     For all sufficiently large $n\in \mathbb{N}$, there exist formulas $F'_n$ in
@@ -140,6 +144,8 @@
     \overbrace{(x_1 \lor y_1) \land (\nneegg{x_1} \lor \nneegg{y_1})}^{x_1 \mathop{\oplus} y_1} \land
     \overbrace{(x_2 \lor y_2) \land (\nneegg{x_2} \lor \nneegg{y_2})}^{x_2 \mathop{\oplus} y_2} \land
     \overbrace{(x_3 \lor y_3) \land (\nneegg{x_3} \lor \nneegg{y_3})}^{x_3 \mathop{\oplus} y_3}$
+
+  \pause
 
   $F_3$ is in CNF and can be transformed in an equivalent formula in DNF:
 
@@ -159,15 +165,17 @@
 
 \begin{frame}{Formalization Preliminaries}{}
   Based on \textsf{Propositional\_Proof\_Systems} (Michaelis and Nipkow)
-  
-  Additionally required functions:
+    
+  Additionally required functions: 
+
+  \pause
 
   \begin{itemize}
-    \item Fn ($F_n$): Creates formula in CNF for given n (analogously to $F_3$)
-    \item size ($\left|.\right|$), sizef: Count number of logical symbols (sizef not considering negations)
-    \item BigAnd‘ ($\bigwedge$), BigOr‘ ($\bigvee$): Build conjunction and disjunction of formulas in a list
-    \item dual: Dualizes formula
-    \item ...
+    \item<+-> Fn ($F_n$): Creates formula in CNF for given n (analogously to $F_3$)
+    \item<+-> size ($\left|.\right|$), sizef: Count number of logical symbols (sizef not considering negations)
+    \item<+-> BigAnd‘ ($\bigwedge$), BigOr‘ ($\bigvee$): Build conjunction and disjunction of formulas in a list
+    \item<+-> dual: Dualizes formula
+    \item<+-> ...
   \end{itemize}
 \end{frame}
 
@@ -198,12 +206,15 @@
     Let $n$ be a natural number.
     There exists a formula $\phi$ in CNF with size $\left|\phi\right| = 10 \cdot n + 2$ such that every equivalent formula $\psi$ in DNF has size $\left|\psi\right| \ge n \cdot 2^n$.
   \end{theorem}
+  
+  \pause
+  
   Proof:
   \begin{enumerate}
-    \item Case analysis on n gives us $n > 0$ (case $n = 0$ can be proven directly).
-    \item Instantiate $\phi = F_n$ and then prove that $\phi$ is in CNF and $\left|\phi\right| = 10 \cdot n + 2$.
-    \item Assume an equivalent formula $\psi$ in DNF and obtain a list $Ts$ of conjunctive and satisfiable formulas in $\psi$ and show $\isaAp{\cstSizef}{\psi} \ge \isaAp{\cstSizef}{(\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i})}$ and the equivalence of $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$ and $\psi$ and thus $F_n$.
-    \item Prove $\left|\psi\right| \ge \isaAp{\cstSizef}{\psi} \ge \isaAp{\cstSizef}{(\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i})} \ge n \cdot 2^n$ (using proposition 1 to show the last inequality).
+    \item<+-> Case analysis on n gives us $n > 0$ (case $n = 0$ can be proven directly).
+    \item<+-> Instantiate $\phi = F_n$ and then prove that $\phi$ is in CNF and $\left|\phi\right| = 10 \cdot n + 2$.
+    \item<+-> Assume an equivalent formula $\psi$ in DNF and obtain a list $Ts$ of conjunctive and satisfiable formulas in $\psi$ and show $\isaAp{\cstSizef}{\psi} \ge \isaAp{\cstSizef}{(\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i})}$ and the equivalence of $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$ and $\psi$ and thus $F_n$.
+    \item<+-> Prove $\left|\psi\right| \ge \isaAp{\cstSizef}{\psi} \ge \isaAp{\cstSizef}{(\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i})} \ge n \cdot 2^n$ (using proposition 1 to show the last inequality).
   \end{enumerate}
 \end{frame}
 
@@ -215,14 +226,18 @@
    If all formulas in $Cs$ are disjunctive and not tautological, and $\isaAp{\cst{dual}}{F_n}$ is equivalent to $\psi$,
    then $\isaAp{\cstSizef}{\psi} \ge n \cdot 2^n$.
   \end{block}
+    
+  \pause
+  
   Proof:
   \begin{enumerate}
-    \item $\isaAp{\cstSizef}{(\isaAp{\cst{dual}}{\psi})} < n \cdot 2^n$.
-    \item $\isaAp{\cst{dual}}{\psi}$ is equivalent to $F_n$.
-    \item There exists a list $Ts$ such that every formula contained in $Ts$ is both conjunctive and satisfiable and such that $\isaAp{\cst{dual}}{\psi}$ is syntactically equal to $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$.
-    \item $\isaAp{\cstSizef}{(\isaAp{\cst{dual}}{\psi})} \ge n \cdot 2^n$ (using steps 2, 3 and proposition 1).
+    \item<+-> $\isaAp{\cstSizef}{(\isaAp{\cst{dual}}{\psi})} < n \cdot 2^n$.
+    \item<+-> $\isaAp{\cst{dual}}{\psi}$ is equivalent to $F_n$.
+    \item<+-> There exists a list $Ts$ such that every formula contained in $Ts$ is both conjunctive and satisfiable and such that $\isaAp{\cst{dual}}{\psi}$ is syntactically equal to $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$.
+    \item<+-> $\isaAp{\cstSizef}{(\isaAp{\cst{dual}}{\psi})} \ge n \cdot 2^n$ (using steps 2, 3 and proposition 1).
   \end{enumerate}
-  => The result of step 1 contradicts the result of step 4.
+  
+  \uncover<+->{=> The result of step 1 contradicts the result of step 4.}
 \end{frame}
 
 \begin{frame}{DNF to CNF}{High-level}
@@ -230,6 +245,9 @@
     Let $n$ be a natural number.
     There exists a formula $\phi$ in DNF with size $\left|\phi\right| = 10 \cdot n + 1$ such that every equivalent formula $\psi$ in CNF has size $\left|\psi\right| \ge n \cdot 2^n$.
   \end{theorem}
+  
+  \pause
+  
   Proof:
     Analogous to theorem 1.
 \end{frame}
@@ -237,6 +255,8 @@
 \begin{frame}{Discussion}{}
   We defined new versions of BigOr and BigAnd from Michaelis and Nipkow, where we handle the base case differently to be able to prove $\left|\psi\right| \ge n \cdot 2^n$ (instead of $\left|\psi\right| + 2 \ge n \cdot 2^n$).
 
+  \pause
+  
   We introduced the additional size function sizef to be able to prove $\isaAp{\cstSizef}{(\isaAp{\cst{dual}}{\phi})} = \isaAp{\cstSizef}{\phi}$ (instead of $\left|\isaAp{\cst{dual}}{\phi}\right| \le 2 \cdot \left|\phi\right|$), what we need to derive a contradiction in the proof of proposition 2.
 \end{frame}
 
