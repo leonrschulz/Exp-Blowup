@@ -159,8 +159,10 @@
     & (\nneegg{x_1} \land y_1 \land \nneegg{x_2} \land y_2 \land x_3 \land \nneegg{y_3}) \mathrel{\lor}
       (\nneegg{x_1} \land y_1 \land \nneegg{x_2} \land y_2 \land \nneegg{x_3} \land y_3)
   \end{align*}
+  
+  => DNF minimal (since minterms differ in more than one literal, no absorption or combination possible)
 
-  Through the transformation, the formula's size increased from 29 to 119.
+  => Through the transformation, the formula's size increased from 29 to 119.
 \end{frame}
 
 \begin{frame}{Formalization Preliminaries}{}
@@ -271,7 +273,7 @@
   
   => Allows proving $\isaAp{\cstSizef}{(\isaAp{\cst{dual}}{\phi})} = \isaAp{\cstSizef}{\phi}$ (instead of $\left|\isaAp{\cst{dual}}{\phi}\right| \le 2 \cdot \left|\phi\right|$), 
   
-  => Useful to derive a contradiction in the proof of proposition 2.
+  => Useful to derive a contradiction in the proof of proposition 2
   
   => Interestingly, we can later discard sizef and show the theorems using size
 \end{frame}
