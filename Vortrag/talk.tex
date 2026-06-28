@@ -260,11 +260,20 @@
 \end{frame}
 
 \begin{frame}{Discussion}{}
-  We defined new versions of BigOr and BigAnd from Michaelis and Nipkow, where we handle the base case differently to be able to prove $\left|\psi\right| \ge n \cdot 2^n$ (instead of $\left|\psi\right| + 2 \ge n \cdot 2^n$).
+  We defined new versions of BigOr and BigAnd from Michaelis and Nipkow: 
+  
+  => Different base case handling allows proving $\left|\psi\right| \ge n \cdot 2^n$ (instead of $\left|\psi\right| + 2 \ge n \cdot 2^n$).
 
   \pause
+  \bigskip
   
-  We introduced the additional size function sizef to be able to prove $\isaAp{\cstSizef}{(\isaAp{\cst{dual}}{\phi})} = \isaAp{\cstSizef}{\phi}$ (instead of $\left|\isaAp{\cst{dual}}{\phi}\right| \le 2 \cdot \left|\phi\right|$), what we need to derive a contradiction in the proof of proposition 2.
+  We introduced the additional size function sizef:
+  
+  => Allows proving $\isaAp{\cstSizef}{(\isaAp{\cst{dual}}{\phi})} = \isaAp{\cstSizef}{\phi}$ (instead of $\left|\isaAp{\cst{dual}}{\phi}\right| \le 2 \cdot \left|\phi\right|$), 
+  
+  => Useful to derive a contradiction in the proof of proposition 2.
+  
+  => Interestingly, we can later discard sizef and show the theorems using size
 \end{frame}
 
 \begin{frame}{Conclusion}{}
