@@ -219,7 +219,7 @@
   
   Case $n > 0$:
   \begin{enumerate}
-    \item<+-> Instantiate $\phi = F_n$ and then prove that $\phi$ is in CNF and $\left|\phi\right| = 10 \cdot n + 2$.
+    \item<+-> Instantiate $\phi = F_n$ and prove $\phi$ is in CNF and $\left|\phi\right| = 10 \cdot n + 2$.
     \item<+-> Assume an equivalent formula $\psi$ in DNF and obtain a list $Ts$ of conjunctive and satisfiable formulas in $\psi$ and show $\isaAp{\cstSizef}{\psi} \ge \isaAp{\cstSizef}{(\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i})}$ and the equivalence of $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$ and $\psi$ and thus $F_n$.
     \item<+-> Prove $\left|\psi\right| \ge \isaAp{\cstSizef}{\psi} \ge \isaAp{\cstSizef}{(\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i})} \ge n \cdot 2^n$ (using proposition 1 to show the last inequality).
   \end{enumerate}
@@ -239,12 +239,12 @@
   Proof:
   \begin{enumerate}
     \item<+-> $\isaAp{\cstSizef}{(\isaAp{\cst{dual}}{\psi})} < n \cdot 2^n$.
-    \item<+-> $\isaAp{\cst{dual}}{\psi}$ is equivalent to $F_n$.
-    \item<+-> There exists a list $Ts$ such that every formula contained in $Ts$ is both conjunctive and satisfiable and such that $\isaAp{\cst{dual}}{\psi}$ is syntactically equal to $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$.
-    \item<+-> $\isaAp{\cstSizef}{(\isaAp{\cst{dual}}{\psi})} \ge n \cdot 2^n$ (using steps 2, 3 and proposition 1).
+    \item<+-> $\isaAp{\cst{dual}}{\psi}$ equivalent to $F_n$.
+    \item<+-> There exists a list $Ts$ such that every formula in $Ts$ is conjunctive and satisfiable and such that $\isaAp{\cst{dual}}{\psi}$ is syntactically equal to $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$.
+    \item<+-> $\isaAp{\cstSizef}{(\isaAp{\cst{dual}}{\psi})} \ge n \cdot 2^n$ (using steps 2, 3 \& proposition 1).
   \end{enumerate}
   
-  \uncover<+->{=> The result of step 1 contradicts the result of step 4.}
+  \uncover<+->{=> Result of step 1 contradicts result of step 4.}
 \end{frame}
 
 \begin{frame}{DNF to CNF}{High-level}
