@@ -209,9 +209,16 @@
   
   \pause
   
-  Proof:
+  Proof (Cases):
+  
+  \pause
+  
+  Case $n = 0$: trivial
+  
+  \pause
+  
+  Case $n > 0$:
   \begin{enumerate}
-    \item<+-> Case analysis on n gives us $n > 0$ (case $n = 0$ can be proven directly).
     \item<+-> Instantiate $\phi = F_n$ and then prove that $\phi$ is in CNF and $\left|\phi\right| = 10 \cdot n + 2$.
     \item<+-> Assume an equivalent formula $\psi$ in DNF and obtain a list $Ts$ of conjunctive and satisfiable formulas in $\psi$ and show $\isaAp{\cstSizef}{\psi} \ge \isaAp{\cstSizef}{(\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i})}$ and the equivalence of $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$ and $\psi$ and thus $F_n$.
     \item<+-> Prove $\left|\psi\right| \ge \isaAp{\cstSizef}{\psi} \ge \isaAp{\cstSizef}{(\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i})} \ge n \cdot 2^n$ (using proposition 1 to show the last inequality).
