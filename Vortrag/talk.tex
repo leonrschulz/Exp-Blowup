@@ -168,9 +168,7 @@
 \def\nneegg#1{\neg #1}
 \begin{frame}{Example}{}
   Consider the conjunction of $n = 3$ xors.
-
   \onslide<2->
-
   \[F_3 =
     \overbrace{\strut\highlightMath<3-4>{(x_1 \lor y_1) \land (\nneegg{x_1} \lor \nneegg{y_1})}}^{x_1 \mathop{\oplus} y_1}
     \highlightMath<5>{\land\strut}
@@ -184,14 +182,14 @@
   % TODO: Add some highlighting to visualize the components of the formulas.
   \begin{align*}
     G_3 = {}
-    & (x_1 \land \nneegg{y_1} \land x_2 \land \nneegg{y_2} \land x_3 \land \nneegg{y_3}) \mathrel{\lor}
-      (x_1 \land \nneegg{y_1} \land x_2 \land \nneegg{y_2} \land \nneegg{x_3} \land y_3) \mathrel{\lor} \\
-    & (x_1 \land \nneegg{y_1} \land \nneegg{x_2} \land y_2 \land x_3 \land \nneegg{y_3}) \mathrel{\lor}
-      (x_1 \land \nneegg{y_1} \land \nneegg{x_2} \land y_2 \land \nneegg{x_3} \land y_3) \mathrel{\lor} \\
-    & (\nneegg{x_1} \land y_1 \land x_2 \land \nneegg{y_2} \land x_3 \land \nneegg{y_3}) \mathrel{\lor}
-      (\nneegg{x_1} \land y_1 \land x_2 \land \nneegg{y_2} \land \nneegg{x_3} \land y_3) \mathrel{\lor} \\
-    & (\nneegg{x_1} \land y_1 \land \nneegg{x_2} \land y_2 \land x_3 \land \nneegg{y_3}) \mathrel{\lor}
-      (\nneegg{x_1} \land y_1 \land \nneegg{x_2} \land y_2 \land \nneegg{x_3} \land y_3)
+    & \highlightMath<7-8>{(x_1 \land \nneegg{y_1} \land x_2 \land \nneegg{y_2} \land x_3 \land \nneegg{y_3})} \highlightMath<9>{\mathrel{\lor}}
+      \highlightMath<8>{(x_1 \land \nneegg{y_1} \land x_2 \land \nneegg{y_2} \land \nneegg{x_3} \land y_3)} \highlightMath<9>{\mathrel{\lor}} \\
+    & \highlightMath<8>{(x_1 \land \nneegg{y_1} \land \nneegg{x_2} \land y_2 \land x_3 \land \nneegg{y_3})} \highlightMath<9>{\mathrel{\lor}}
+      \highlightMath<8>{(x_1 \land \nneegg{y_1} \land \nneegg{x_2} \land y_2 \land \nneegg{x_3} \land y_3)} \highlightMath<9>{\mathrel{\lor}} \\
+    & \highlightMath<8>{(\nneegg{x_1} \land y_1 \land x_2 \land \nneegg{y_2} \land x_3 \land \nneegg{y_3})} \highlightMath<9>{\mathrel{\lor}}
+      \highlightMath<8>{(\nneegg{x_1} \land y_1 \land x_2 \land \nneegg{y_2} \land \nneegg{x_3} \land y_3)} \highlightMath<9>{\mathrel{\lor}} \\
+    & \highlightMath<8>{(\nneegg{x_1} \land y_1 \land \nneegg{x_2} \land y_2 \land x_3 \land \nneegg{y_3})} \highlightMath<9>{\mathrel{\lor}}
+      \highlightMath<8>{(\nneegg{x_1} \land y_1 \land \nneegg{x_2} \land y_2 \land \nneegg{x_3} \land y_3)}
   \end{align*}
 
   $G_3$ is equivalent to $F_3$, is in DNF, and has size
