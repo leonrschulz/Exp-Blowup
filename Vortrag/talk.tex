@@ -115,41 +115,37 @@
 \end{frame}
 
 \begin{frame}{Motivation}{}
-  Few to no formalization of quantitative results about propositional logic
+  There are few to no formalization of quantitative results about propositional logic.
 
-  We formalize two well-known mathematical theorems:
-  
+  \medskip
+
+  We formalize two well-known mathematical theorems about conjunctive and disjunctive normal forms (CNF and DNF).
+
   \pause
 
   \begin{block}{CNF to DNF}
-    For all sufficiently large $n\in \mathbb{N}$, there exist formulas $F_n$ in
-    CNF with $|F_n| = \mathcal{O}(n)$ such that every equivalent formula $G_n$ in
-    DNF is of size $|G_n| \geq n \cdot 2^n$.
+    Some CNF formulas of size $\mathcal{O}(n)$ only have equivalent DNF formulas of size $\geq n \cdot 2^n$.
   \end{block}
-  
+
   \pause
 
   \begin{block}{DNF to CNF}
-    For all sufficiently large $n\in \mathbb{N}$, there exist formulas $F'_n$ in
-    DNF with $|F'_n| = \mathcal{O}(n)$ such that every equivalent formula $G_n$
-    in CNF is of size $|G_n| \geq n \cdot 2^n$.
+    Some DNF formulas of size $\mathcal{O}(n)$ only have equivalent CNF formulas of size $\geq n \cdot 2^n$.
   \end{block}
 \end{frame}
 
 \def\nneegg#1{\neg #1}
 \begin{frame}{Example}{}
-  Conjunction of 3 xor = x1 xor y1 and x2 xor y2 and x3 xor y3
-
-  $F_3 =
+  % TODO: Add some highlighting to visualize the components of the formulas.
+  \[F_3 =
     \overbrace{(x_1 \lor y_1) \land (\nneegg{x_1} \lor \nneegg{y_1})}^{x_1 \mathop{\oplus} y_1} \land
     \overbrace{(x_2 \lor y_2) \land (\nneegg{x_2} \lor \nneegg{y_2})}^{x_2 \mathop{\oplus} y_2} \land
-    \overbrace{(x_3 \lor y_3) \land (\nneegg{x_3} \lor \nneegg{y_3})}^{x_3 \mathop{\oplus} y_3}$
+    \overbrace{(x_3 \lor y_3) \land (\nneegg{x_3} \lor \nneegg{y_3})}^{x_3 \mathop{\oplus} y_3}\]
 
+  $F_3$ is in CNF and has size $9 \cdot \text{xors} + \text{connectors} = 29$.
   \pause
-
-  $F_3$ is in CNF and can be transformed in an equivalent formula in DNF:
-
   \begin{align*}
+    G_3 = {}
     & (x_1 \land \nneegg{y_1} \land x_2 \land \nneegg{y_2} \land x_3 \land \nneegg{y_3}) \mathrel{\lor}
       (x_1 \land \nneegg{y_1} \land x_2 \land \nneegg{y_2} \land \nneegg{x_3} \land y_3) \mathrel{\lor} \\
     & (x_1 \land \nneegg{y_1} \land \nneegg{x_2} \land y_2 \land x_3 \land \nneegg{y_3}) \mathrel{\lor}
@@ -159,22 +155,26 @@
     & (\nneegg{x_1} \land y_1 \land \nneegg{x_2} \land y_2 \land x_3 \land \nneegg{y_3}) \mathrel{\lor}
       (\nneegg{x_1} \land y_1 \land \nneegg{x_2} \land y_2 \land \nneegg{x_3} \land y_3)
   \end{align*}
-  
-  => DNF minimal (since minterms differ in more than one literal, no absorption or combination possible)
 
-  => Through the transformation, the formula's size increased from 29 to 119.
+  $G_3$ is equivalent to $F_3$, is in DNF, and has size $(5 \cdot \text{xors} - 1) \cdot 2^\text{xors} + \text{connectors} = 119$.
+
+  \pause
+
+  $G_3$ is minimal (no absorption or combination possible because minterms differ in more than one literal).
+
 \end{frame}
 
 \begin{frame}{Formalization Preliminaries}{}
   Based on \textsf{Propositional\_Proof\_Systems} (Michaelis and Nipkow)
-    
-  Additionally required functions: 
+
+  Additionally required functions:
 
   \pause
 
   \begin{itemize}
     \item<+-> Fn ($F_n$): Creates formula in CNF for given n (analogously to $F_3$)
-    \item<+-> size ($\left|.\right|$), sizef: Count number of logical symbols (sizef not considering negations)
+    % TODO: search for an alternative symbol for sizef that is vertical but not as large
+    \item<+-> size ($\left|\cdot\right|$), sizef ($\formulaSizef{\cdot}$): Count number of logical symbols (sizef not considering negations)
     \item<+-> BigAnd‘ ($\bigwedge$), BigOr‘ ($\bigvee$): Build conjunction and disjunction of formulas in a list
     \item<+-> dual: Dualizes formula
     \item<+-> ...
@@ -182,13 +182,13 @@
 \end{frame}
 
 \begin{frame}{CNF to DNF}{Low-level}
-  \begin{block}{Proposition (Blowup from $F_n$ to $BigOr'$)}
-    Let $n > 0$ be a natural number.
-    Let $Ts$ be a list of formulas.
-    Let $\psi = \bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$.
+  \begin{block}{Proposition 1 (Blowup from $F_n$ to $\bigvee$)}
+    Let $n > 0$,
+    $Ts$ be a list of formula, and
+    $\psi = \bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$.
     If all formulas in $Ts$ are conjunctive and satisfiable, and
     if $F_n$ is equivalent to $\psi$,
-    then $\isaAp{\cstSizef}{\psi} \ge n \cdot 2^n$.
+    then $\formulaSizef{\psi} \ge n \cdot 2^n$.
   \end{block}
 
   \pause
@@ -196,34 +196,31 @@
   Proof:
   \begin{enumerate}
     \item<+-> Every $T \in \isaAp{\cst{set}}{Ts}$ contains for all $i \in \{1,\ldots,n\}$ either $x_{i,\cstFalse}$ or $x_{i,\cstTrue}$ positively.
-    \item<+-> Every $T \in \isaAp{\cst{set}}{Ts}$ has $\isaAp{\cstSizef}{T} \ge n$.
-    \item<+-> For every Boolean list $\epsilon = [\epsilon_1,\ldots,\epsilon_n]$ there exists $T \in \isaAp{\cst{set}}{Ts}$ that contains $x_{1,\epsilon_1},\ldots,x_{n,\epsilon_n}$ positively.
-    \item<+-> Number of Boolean lists of length $n$ is $2^n \le \setCard{\isaAp{\cst{set}}{Ts}} \le \listLength{Ts}$ (using steps 1 \& 3).
-    \item<+-> Finally $\isaAp{\cstSizef}{\psi} \ge n \cdot 2^n$ (using step 2 \& 4).
+    \item<+-> Every $T \in \isaAp{\cst{set}}{Ts}$ has $\formulaSizef{T} \ge n$.
+    \item<+-> For every Boolean list $[\epsilon_1,\ldots,\epsilon_n]$ there exists $T \in \isaAp{\cst{set}}{Ts}$ that contains $x_{1,\epsilon_1},\ldots,x_{n,\epsilon_n}$ positively.
+    \item<+-> $\listLength{Ts} \ge \setCard{\isaAp{\cst{set}}{Ts}} \ge 2^n$ (Boolean lists of length $n$) (using steps 1 \& 3).
+    \item<+-> Finally, $\formulaSizef{\psi} \ge n \cdot 2^n$ (using steps 2 \& 4).
   \end{enumerate}
 \end{frame}
 
 \begin{frame}{CNF to DNF}{High-level}
   \begin{theorem}[Blowup from CNF to DNF]
-    Let $n$ be a natural number.
     There exists a formula $\phi$ in CNF with size $\left|\phi\right| = 10 \cdot n + 2$ such that every equivalent formula $\psi$ in DNF has size $\left|\psi\right| \ge n \cdot 2^n$.
   \end{theorem}
-  
+
   \pause
-  
-  Proof (Cases):
-  
-  \pause
-  
+
+  Proof:
+
   Case $n = 0$: trivial
-  
-  \pause
-  
+
   Case $n > 0$:
   \begin{enumerate}
     \item<+-> Instantiate $\phi = F_n$ and prove $\phi$ is in CNF and $\left|\phi\right| = 10 \cdot n + 2$.
-    \item<+-> Assume an equivalent formula $\psi$ in DNF and obtain a list $Ts$ of conjunctive and satisfiable formulas in $\psi$ and show $\isaAp{\cstSizef}{\psi} \ge \isaAp{\cstSizef}{(\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i})}$ and the equivalence of $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$ and $\psi$ and thus $F_n$.
-    \item<+-> Prove $\left|\psi\right| \ge \isaAp{\cstSizef}{\psi} \ge \isaAp{\cstSizef}{(\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i})} \ge n \cdot 2^n$ (using proposition 1 to show the last inequality).
+    \item<+-> Assume an equivalent formula $\psi$ in DNF.
+    \item<+-> Obtain a list $Ts$ of conjunctive and satisfiable formulas in $\psi$.
+    \item<+-> Show $\formulaSizef{\psi} \ge \formulaSizef{(\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i})}$ and the equivalence of $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$ and $\psi$ and thus $F_n$.
+    \item<+-> Prove $\left|\psi\right| \ge \formulaSizef{\psi} \ge \formulaSizef{(\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i})} \ge n \cdot 2^n$ (using proposition 1).
   \end{enumerate}
 \end{frame}
 
@@ -233,19 +230,19 @@
    Let $Cs$ be a list of formulas.
    Let $\psi = \bigwedge_{i = 0}^{\listLength{Cs}} \listNth{Cs}{i}$.
    If all formulas in $Cs$ are disjunctive and not tautological, and $\isaAp{\cst{dual}}{F_n}$ is equivalent to $\psi$,
-   then $\isaAp{\cstSizef}{\psi} \ge n \cdot 2^n$.
+   then $\formulaSizef{\psi} \ge n \cdot 2^n$.
   \end{block}
-    
+
   \pause
-  
+
   Proof:
   \begin{enumerate}
-    \item<+-> $\isaAp{\cstSizef}{(\isaAp{\cst{dual}}{\psi})} < n \cdot 2^n$.
-    \item<+-> $\isaAp{\cst{dual}}{\psi}$ equivalent to $F_n$.
+    \item<+-> $\formulaSizef{(\isaAp{\cst{dual}}{\psi})} < n \cdot 2^n$.
+    \item<+-> $\isaAp{\cst{dual}}{\psi}$ is equivalent to $F_n$.
     \item<+-> There exists a list $Ts$ such that every formula in $Ts$ is conjunctive and satisfiable and such that $\isaAp{\cst{dual}}{\psi}$ is syntactically equal to $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$.
-    \item<+-> $\isaAp{\cstSizef}{(\isaAp{\cst{dual}}{\psi})} \ge n \cdot 2^n$ (using steps 2, 3 \& proposition 1).
+    \item<+-> $\formulaSizef{(\isaAp{\cst{dual}}{\psi})} \ge n \cdot 2^n$ (using steps 2, 3 \& proposition 1).
   \end{enumerate}
-  
+
   \uncover<+->{=> Result of step 1 contradicts result of step 4.}
 \end{frame}
 
@@ -254,27 +251,27 @@
     Let $n$ be a natural number.
     There exists a formula $\phi$ in DNF with size $\left|\phi\right| = 10 \cdot n + 1$ such that every equivalent formula $\psi$ in CNF has size $\left|\psi\right| \ge n \cdot 2^n$.
   \end{theorem}
-  
+
   \pause
-  
+
   Proof:
     Analogous to theorem 1.
 \end{frame}
 
 \begin{frame}{Discussion}{}
-  We defined new versions of BigOr and BigAnd from Michaelis and Nipkow: 
-  
+  We defined new versions of BigOr and BigAnd from Michaelis and Nipkow:
+
   => Different base case handling allows proving $\left|\psi\right| \ge n \cdot 2^n$ (instead of $\left|\psi\right| + 2 \ge n \cdot 2^n$).
 
   \pause
   \bigskip
-  
+
   We introduced the additional size function sizef:
-  
-  => Allows proving $\isaAp{\cstSizef}{(\isaAp{\cst{dual}}{\phi})} = \isaAp{\cstSizef}{\phi}$ (instead of $\left|\isaAp{\cst{dual}}{\phi}\right| \le 2 \cdot \left|\phi\right|$), 
-  
+
+  => Allows proving $\formulaSizef{(\isaAp{\cst{dual}}{\phi})} = \formulaSizef{\phi}$ (instead of $\left|\isaAp{\cst{dual}}{\phi}\right| \le 2 \cdot \left|\phi\right|$),
+
   => Useful to derive a contradiction in the proof of proposition 2
-  
+
   => Interestingly, we can later discard sizef and show the theorems using size
 \end{frame}
 
