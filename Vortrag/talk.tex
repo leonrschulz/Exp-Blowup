@@ -57,6 +57,37 @@
   {ultra thick, solid, mark=*, lgbt-violet}% <-- don't add a comma here
 }
 
+\def\highlightText<#1>#2{%
+\setlength{\fboxsep}{1.5pt}%
+\setlength{\fboxrule}{0pt}%
+\usebeamercolor{beamer color}%
+\hspace{-1pt}\alt<#1>%
+{\smash{\colorbox{LMU_orange}{\color{white}\strut{}#2}}}%
+{\smash{\fbox{#2}}}%
+\hspace{-3.5pt}
+}
+
+\def\colorboxMath#1#2{\mathchoice%
+{\colorbox{#1}{$\displaystyle#2$}}%
+{\colorbox{#1}{$\textstyle#2$}}%
+{\colorbox{#1}{$\scriptstyle#2$}}%
+{\colorbox{#1}{$\scriptscriptstyle#2$}}}%
+
+\def\fboxMath#1{\mathchoice%
+{\fbox{$\displaystyle#1$}}%
+{\fbox{$\textstyle#1$}}%
+{\fbox{$\scriptstyle#1$}}%
+{\fbox{$\scriptscriptstyle#1$}}}%
+
+\def\highlightMath<#1>#2{%
+\setlength{\fboxsep}{1.5pt}%
+\setlength{\fboxrule}{0pt}%
+\usebeamercolor{beamer color}%
+\hspace{-1pt}\alt<#1>%
+{\smash{\colorboxMath{LMU_orange}{\color{white}#2}}}%
+{\smash{\fboxMath{#2}}}%
+\hspace{-1pt}%
+}
 
 \def\parenthetical#1{{\color{LMU_darkgrey}(#1)}}
 
@@ -136,14 +167,16 @@
 
 \def\nneegg#1{\neg #1}
 \begin{frame}{Example}{}
-  % TODO: Add some highlighting to visualize the components of the formulas.
   \[F_3 =
-    \overbrace{(x_1 \lor y_1) \land (\nneegg{x_1} \lor \nneegg{y_1})}^{x_1 \mathop{\oplus} y_1} \land
-    \overbrace{(x_2 \lor y_2) \land (\nneegg{x_2} \lor \nneegg{y_2})}^{x_2 \mathop{\oplus} y_2} \land
-    \overbrace{(x_3 \lor y_3) \land (\nneegg{x_3} \lor \nneegg{y_3})}^{x_3 \mathop{\oplus} y_3}\]
+    \overbrace{\strut\highlightMath<2-3>{(x_1 \lor y_1) \land (\nneegg{x_1} \lor \nneegg{y_1})}}^{x_1 \mathop{\oplus} y_1}
+    \highlightMath<4>{\land\strut}
+    \overbrace{\strut\highlightMath<3>{(x_2 \lor y_2) \land (\nneegg{x_2} \lor \nneegg{y_2})}}^{x_2 \mathop{\oplus} y_2}
+    \highlightMath<4>{\land\strut}
+    \overbrace{\strut\highlightMath<3>{(x_3 \lor y_3) \land (\nneegg{x_3} \lor \nneegg{y_3})}}^{x_3 \mathop{\oplus} y_3}\]
 
-  $F_3$ is in CNF and has size $9 \cdot \text{xors} + \text{connectors} = 29$.
-  \pause
+  $F_3$ is in CNF and has size $\highlightMath<2-3>{9\strut}\highlightMath<3>{\cdot \text{xors\strut}} + \highlightMath<4>{\text{connectors\strut}} = 29$.
+  \onslide<5->
+  % TODO: Add some highlighting to visualize the components of the formulas.
   \begin{align*}
     G_3 = {}
     & (x_1 \land \nneegg{y_1} \land x_2 \land \nneegg{y_2} \land x_3 \land \nneegg{y_3}) \mathrel{\lor}
@@ -158,7 +191,7 @@
 
   $G_3$ is equivalent to $F_3$, is in DNF, and has size $(5 \cdot \text{xors} - 1) \cdot 2^\text{xors} + \text{connectors} = 119$.
 
-  \pause
+  \onslide<6->
 
   $G_3$ is minimal (no absorption or combination possible because minterms differ in more than one literal).
 
