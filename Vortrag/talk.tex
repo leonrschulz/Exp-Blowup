@@ -236,7 +236,7 @@
     \item<+-> Every $T \in \isaAp{\cst{set}}{Ts}$ has $\formulaSizef{T} \ge n$.
     \item<+-> For every Boolean list $[\epsilon_1,\ldots,\epsilon_n]$ there exists $T \in \isaAp{\cst{set}}{Ts}$ that contains $x_{1,\epsilon_1},\ldots,x_{n,\epsilon_n}$ positively.
     \item<+-> $\listLength{Ts} \ge \setCard{\isaAp{\cst{set}}{Ts}} \ge 2^n$ (Boolean lists of length $n$) (using steps 1 \& 3).
-    \item<+-> Finally, $\formulaSizef{\psi} \ge \sum_{i=0}^{\listLength{Ts}} \formulaSizef{\listNth{Ts}{i}} \ge n \cdot 2^n$ (using steps 2 \& 4).
+    \item<+-> Finally, $\formulaSizef{\psi} > \sum_{i=0}^{\listLength{Ts}} \formulaSizef{\listNth{Ts}{i}} \ge n \cdot 2^n$ (using steps 2 \& 4).
   \end{enumerate}
 \end{frame}
 
