@@ -1,0 +1,63 @@
+\newcommand\yA{{\thinspace'}{\kern-.175ex a}}
+\newcommand\yB{{\thinspace'}{\kern-.05ex b}}
+\newcommand\yC{{\thinspace'}{\kern-.175ex c}}
+\newcommand\yF{{\thinspace'}{\kern-.4ex f\kern-.3ex}}
+\newcommand\yG{{\thinspace'}{\kern-.4ex g}}
+\newcommand\yL{{\thinspace'}{\kern-.05ex l}}
+\newcommand\yQ{{\thinspace'}{\kern-.4ex q}}
+\newcommand\yS{{\thinspace'}{\kern-.3ex s}}
+\newcommand\yV{{\thinspace'}{\kern-.15ex v}}
+
+\newcommand\cst[1]{\mathsf{#1}}
+\newcommand\ty[1]{\mathit{#1}}
+\newcommand\var[1]{\mathit{#1}}
+\newcommand\syn[1]{\mathrm{#1}} %for if then else and such, maybe use the same font as for constants instead
+
+\def\cstTrue{\cst{True}}
+\def\cstFalse{\cst{False}}
+\def\cstSize{\cst{size}}
+\def\cstSizef{\cst{sizef}}
+
+\def\tyNat{\ty{nat}}
+\def\tyBool{\ty{bool}}
+\def\tyList#1{#1 \> \ty{list}}
+\def\tySet#1{#1 \> \ty{set}}
+\def\tyFormula#1{#1 \> \ty{formula}}
+
+\def\isaAp#1#2{#1 \> #2}
+\def\isaApAp#1#2#3{#1 \> #2 \> #3}
+\def\isaApApAp#1#2#3#4{#1 \> #2 \> #3 \> #4}
+
+\def\tyAnnot#1#2{#1 \mathrel{::} #2}
+
+\def\forallOne#1#2{\forall #1. ~ #2}
+\def\forallTwo#1#2#3{\forallOne{#1 \> #2}{#3}}
+\def\forallThree#1#2#3#4{\forallTwo{#1 \> #2}{#3}{#4}}
+\def\forallTyped#1#2#3{\forallOne{\tyAnnot{#1}{#2}}{#3}}
+\def\forallIn#1#2#3{\forallOne{#1 \in #2}{#3}}
+\def\forallSubseteq#1#2#3{\forallOne{#1 \subseteq #2}{#3}}
+\def\forallSubset#1#2#3{\forallOne{#1 \subset #2}{#3}}
+
+\def\existsOne#1#2{\exists #1. ~ #2}
+\def\existsTwo#1#2#3{\existsOne{#1 \> #2}{#3}}
+\def\existsTyped#1#2#3{\existsOne{\tyAnnot{#1}{#2}}{#3}}
+\def\existsIn#1#2#3{\existsOne{#1 \in #2}{#3}}
+\def\nexistsIn#1#2#3{\existsOne{#1 \in #2}{#3}}
+
+\def\setCard#1{\left|#1\right|}
+\def\setCompr#1#2{\{#1 \mid #2\}}
+\def\setImage#1#2#3{\setCompr{\isaAp{#2}{#1}}{#1 \in #3}}
+\def\setFilter#1#2#3{\setCompr{#1 \in #3}{\isaAp{#2}{#1}}}
+
+\def\pair#1#2{\langle{}#1, #2\rangle{}}
+\def\listLength#1{\left|#1\right|}
+\def\listNth#1#2{{#1}_{[#2]}}
+\def\listCons#1#2{#1 \mathop{\#} #2}
+
+
+%\def\formulaSizef#1{\isaAp{\cstSizef}{#1}}
+\def\formulaSizef#1{\left\|#1\right\|}
+
+\def\iff{\longleftrightarrow}
+
+\def\inlineshell#1{\texttt{#1}}
