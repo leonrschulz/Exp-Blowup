@@ -54,10 +54,16 @@
 \def\listNth#1#2{{#1}_{[#2]}}
 \def\listCons#1#2{#1 \mathop{\#} #2}
 
-\newcommand{\brokenbar}{\mathrel{\vcenter{\hbox{\textbrokenbar}}}}
+%\newcommand{\brokenbar}{\mathrel{\mathchar"00A6}}
+%\newcommand{\brokenbar}{\mathord{\vert\kern-0.15em\vert}}
+\newcommand{\brokenbar}{%
+	\mathrel{\kern-0.1em\vcenter{\hbox{\textbrokenbar}}\kern-0.1em}%
+}
+
+\def\formulaSizef#1{\brokenbar #1\brokenbar}
 
 %\def\formulaSizef#1{\isaAp{\cstSizef}{#1}}
-\def\formulaSizef#1{\brokenbar#1\brokenbar}
+
 
 \def\iff{\longleftrightarrow}
 
