@@ -215,8 +215,8 @@
     % TODO: search for an alternative symbol for sizef that is vertical but not as large
     \item<+-> size ($\left|\cdot\right|$), sizef ($\formulaSizef{\cdot}$): Count number of logical symbols (sizef not considering negations)
     \item<+-> BigAnd‘ ($\bigwedge$), BigOr‘ ($\bigvee$): Build conjunction and disjunction of formulas in a list
-    \item<+-> dual: Dualizes formula
-    \item<+-> ...
+    \item<5-> dual: Dualizes formula
+    \item<5-> ...
   \end{itemize}
 \end{frame}
 
@@ -281,7 +281,7 @@
     $\highlightMath<8>{ \formulaSizef{(\isaAp{\cst{dual}}{\psi})} \ge n \cdot 2^n}$ (using steps 2, 3 \& proposition 1).
   \end{enumerate}
 
-  \onslide<6->=> Result of step $\highlightMath<7>{1\strut}$ contradicts result of step $\highlightMath<8>{4\strut}$.
+  \onslide<6->Result of step $\highlightMath<7>{1\strut}$ contradicts result of step $\highlightMath<8>{4\strut}$.
 \end{frame}
 
 \begin{frame}{DNF to CNF}{High-level}
@@ -293,31 +293,40 @@
     Analogous to theorem 1.
 \end{frame}
 
+\setbeamertemplate{itemize item}{\textcolor{LMU_green}{$\blacktriangleright$}}
+
 \begin{frame}{Discussion}{}
   We defined new versions of BigOr and BigAnd from Michaelis and Nipkow:
 
-  => Different base case handling allows proving $\left|\psi\right| \ge n \cdot 2^n$ (instead of $\left|\psi\right| + 2 \ge n \cdot 2^n$).
+  \begin{itemize}
+  \item Different base case handling allows proving $\left|\psi\right| \ge n \cdot 2^n$ (instead of $\left|\psi\right| + 2 \ge n \cdot 2^n$).
+  \end{itemize}
 
   \pause
   \bigskip
 
   We introduced the additional size function sizef:
 
-  => Allows proving $\formulaSizef{(\isaAp{\cst{dual}}{\phi})} = \formulaSizef{\phi}$ (instead of $\left|\isaAp{\cst{dual}}{\phi}\right| \le 2 \cdot \left|\phi\right|$),
-
-  => Useful to derive a contradiction in the proof of proposition 2
-
-  => Interestingly, we can later discard sizef and show the theorems using size
+  \begin{itemize}
+  \item Allows proving $\formulaSizef{(\isaAp{\cst{dual}}{\phi})} = \formulaSizef{\phi}$ (instead of $\left|\isaAp{\cst{dual}}{\phi}\right| \le 2 \cdot \left|\phi\right|$),
+  \item Useful to derive a contradiction in the proof of proposition 2
+  \item Interestingly, we can later discard sizef and show the theorems using size
+  \end{itemize}
 \end{frame}
 
 \begin{frame}{Conclusion}{}
   We formalized the exponential blowup of the formula size when transforming a formula into DNF or CNF in Isabelle/HOL.
-
+  
+  \medskip
+  
   Our formalization may serve as a basis for further formalizations of quantitative results in propositional logic.
+  
+  \medskip
 
   Future work: Proof complexity lower bounds (e.g., for resolution proofs of the pigeonhole principle)
 
   \pause
+  \bigskip
 
   Thank you
 \end{frame}
