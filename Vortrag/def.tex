@@ -56,13 +56,15 @@
 
 %\newcommand{\brokenbar}{\mathrel{\mathchar"00A6}}
 %\newcommand{\brokenbar}{\mathord{\vert\kern-0.15em\vert}}
-\newcommand{\brokenbar}{%
-	\mathrel{\kern-0.1em\vcenter{\hbox{\textbrokenbar}}\kern-0.1em}%
-}
+%\newcommand{\brokenbar}{%
+%	\mathrel{\kern-0.1em\vcenter{\hbox{\textbrokenbar}}\kern-0.1em}%
+%}
 
-\def\formulaSizef#1{\brokenbar #1\brokenbar}
+%\def\formulaSizef#1{\brokenbar #1\brokenbar}
 
 %\def\formulaSizef#1{\isaAp{\cstSizef}{#1}}
+
+\def\formulaSizef#1{\left\|#1\right\|}
 
 
 \def\iff{\longleftrightarrow}
