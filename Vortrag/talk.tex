@@ -270,17 +270,18 @@
    then $\formulaSizef{\psi} \ge n \cdot 2^n$.
   \end{block}
 
-  \pause
+  \onslide<2->
 
   Proof (by contradiction):
   \begin{enumerate}
-    \item<+-> $\formulaSizef{(\isaAp{\cst{dual}}{\psi})} < n \cdot 2^n$.
-    \item<+-> $\isaAp{\cst{dual}}{\psi}$ is equivalent to $F_n$.
-    \item<+-> There exists a list $Ts$ such that every formula in $Ts$ is conjunctive and satisfiable and such that $\isaAp{\cst{dual}}{\psi}$ is syntactically equal to $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$.
-    \item<+-> $\formulaSizef{(\isaAp{\cst{dual}}{\psi})} \ge n \cdot 2^n$ (using steps 2, 3 \& proposition 1).
+    \item $\highlightMath<7>{\formulaSizef{(\isaAp{\cst{dual}}{\psi})} < n \cdot 2^n.}$
+    \onslide<3->\item $\isaAp{\cst{dual}}{\psi}$ is equivalent to $F_n$.
+    \onslide<4->\item There exists a list $Ts$ such that every formula in $Ts$ is conjunctive and satisfiable and such that $\isaAp{\cst{dual}}{\psi}$ is syntactically equal to $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$.
+    \onslide<5->\item
+    $\highlightMath<8>{ \formulaSizef{(\isaAp{\cst{dual}}{\psi})} \ge n \cdot 2^n}$ (using steps 2, 3 \& proposition 1).
   \end{enumerate}
 
-  \uncover<+->{=> Result of step 1 contradicts result of step 4.}
+  \onslide<6->=> Result of step $\highlightMath<7>{1\strut}$ contradicts result of step $\highlightMath<8>{4\strut}$.
 \end{frame}
 
 \begin{frame}{DNF to CNF}{High-level}
