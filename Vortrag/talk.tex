@@ -204,19 +204,19 @@
 \end{frame}
 
 \begin{frame}{Formalization Preliminaries}{}
-  Based on \textsf{Propositional\_Proof\_Systems} (Michaelis and Nipkow)
+  Based on \emph{Propositional Proof Systems} (Michaelis and Nipkow)
 
-  Additionally required functions:
-
+  \medskip
   \pause
 
+  Additionally required functions:
   \begin{itemize}
-    \item<+-> Fn ($F_n$): Creates formula in CNF for given n (analogously to $F_3$)
+    \item<+-> $F_n$: Creates a formula in CNF for $n$ xors (analogously to $F_3$)
     % TODO: search for an alternative symbol for sizef that is vertical but not as large
-    \item<+-> size ($\left|\cdot\right|$), sizef ($\formulaSizef{\cdot}$): Count number of logical symbols (sizef not considering negations)
-    \item<+-> BigAnd' ($\bigwedge$), BigOr' ($\bigvee$): Build conjunction and disjunction of formulas in a list
+    \item<+-> $\left|\cdot\right|$ and $\formulaSizef{\cdot}$: Count the number of logical symbols ($\formulaSizef{\cdot}$ ignores negations)
+    \item<+-> $\bigwedge$ and $\bigvee$: Build conjunction and disjunction of formulas in a list
     \item<5-> dual: Dualizes formula
-    \item<5-> ...
+    \item<6-> \dots: Other functions are used only in proofs
   \end{itemize}
 \end{frame}
 
@@ -258,13 +258,13 @@
     \item<+-> Instantiate $\phi = F_n$ and prove $\phi$ is in CNF and $\left|\phi\right| = 10 \cdot n + 2$.
     \item<+-> Assume an equivalent formula $\psi$ in DNF.
     \item<+-> Obtain a list $Ts$ of conjunctive and satisfiable formulas in $\psi$.
-    \item<+-> Show $\formulaSizef{\psi} \ge \formulaSizef{(\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i})}$ and the equivalence of $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$ and $\psi$ and thus $F_n$.
-    \item<+-> Prove $\left|\psi\right| \ge \formulaSizef{\psi} \ge \formulaSizef{(\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i})} \ge n \cdot 2^n$ (using proposition 1).
+    \item<+-> Show $\formulaSizef{\psi} \ge \formulaSizef{\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}}$ and the equivalence of $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$ and $\psi$ and thus $F_n$.
+    \item<+-> Prove $\left|\psi\right| \ge \formulaSizef{\psi} \ge \formulaSizef{\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}} \ge n \cdot 2^n$ (using proposition 1).
   \end{enumerate}
 \end{frame}
 
 \begin{frame}{DNF to CNF}{Low-level}
-  \begin{block}{Proposition (Blowup from $\isaAp{\cst{dual}}{F_n}$ to $\bigwedge$)}
+  \begin{block}{Proposition 2 (Blowup from $\isaAp{\cst{dual}}{F_n}$ to $\bigwedge$)}
    Let $n > 0$, $Cs$ be a list of formulas, and $\psi = \bigwedge_{i = 0}^{\listLength{Cs}} \listNth{Cs}{i}$.
    If all formulas in $Cs$ are disjunctive and not tautological, and $\isaAp{\cst{dual}}{F_n}$ is equivalent to $\psi$,
    then $\formulaSizef{\psi} \ge n \cdot 2^n$.
@@ -274,11 +274,11 @@
 
   Proof (by contradiction):
   \begin{enumerate}
-    \item $\highlightMath<7>{\formulaSizef{(\isaAp{\cst{dual}}{\psi})} < n \cdot 2^n.}$
+    \item $\highlightMath<7>{\formulaSizef{\isaAp{\cst{dual}}{\psi}} < n \cdot 2^n.}$
     \onslide<3->\item $\isaAp{\cst{dual}}{\psi}$ is equivalent to $F_n$.
     \onslide<4->\item There exists a list $Ts$ such that every formula in $Ts$ is conjunctive and satisfiable and such that $\isaAp{\cst{dual}}{\psi}$ is syntactically equal to $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$.
     \onslide<5->\item
-    $\highlightMath<8>{ \formulaSizef{(\isaAp{\cst{dual}}{\psi})} \ge n \cdot 2^n}$ (using steps 2, 3 \& proposition 1).
+    $\highlightMath<8>{ \formulaSizef{\isaAp{\cst{dual}}{\psi}} \ge n \cdot 2^n}$ (using steps 2, 3 \& proposition 1).
   \end{enumerate}
 
   \onslide<6->Result of step $\highlightMath<7>{1\strut}$ contradicts result of step $\highlightMath<8>{4\strut}$.
@@ -296,19 +296,19 @@
 \setbeamertemplate{itemize item}{\textcolor{LMU_green}{$\blacktriangleright$}}
 
 \begin{frame}{Discussion}{}
-  We defined new versions of BigOr and BigAnd from Michaelis and Nipkow:
+  We defined new versions of $\bigvee$ and $\bigwedge$ from Michaelis and Nipkow:
 
   \begin{itemize}
-  \item Different base case handling allows proving $\left|\psi\right| \ge n \cdot 2^n$ (instead of $\left|\psi\right| + 2 \ge n \cdot 2^n$).
+  \item Different base case handling allows proving $\left|\psi\right| \ge n \cdot 2^n$ \\ (instead of $\left|\psi\right| + 2 \ge n \cdot 2^n$).
   \end{itemize}
 
   \pause
   \bigskip
 
-  We introduced the additional size function sizef:
+  We introduced the additional size function $\formulaSizef{\cdot}$:
 
   \begin{itemize}
-  \item Allows proving $\formulaSizef{(\isaAp{\cst{dual}}{\phi})} = \formulaSizef{\phi}$ (instead of $\left|\isaAp{\cst{dual}}{\phi}\right| \le 2 \cdot \left|\phi\right|$),
+  \item Allows proving $\formulaSizef{\isaAp{\cst{dual}}{\phi}} = \formulaSizef{\phi}$ (instead of $\left|\isaAp{\cst{dual}}{\phi}\right| \le 2 \cdot \left|\phi\right|$)
   \item Useful to derive a contradiction in the proof of proposition 2
   \item Interestingly, we can later discard sizef and show the theorems using size
   \end{itemize}
