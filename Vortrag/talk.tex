@@ -148,7 +148,7 @@
 \end{frame}
 
 \begin{frame}{Motivation}{}
-  There are few to no formalization of quantitative results about propositional logic.
+  There are few to no formalizations of quantitative results about propositional logic.
 
   \medskip
 
@@ -204,18 +204,18 @@
 \end{frame}
 
 \begin{frame}{Formalization Preliminaries}{}
-  Based on \emph{Propositional Proof Systems} (Michaelis and Nipkow)
+  We reuse syntax and semantics from \emph{Propositional Proof Systems} (Michaelis and Nipkow).
 
   \medskip
   \pause
 
-  Additionally required functions:
+  We additionally define:
   \begin{itemize}
     \item<+-> $F_n$: Creates a formula in CNF for $n$ xors (analogously to $F_3$)
     % TODO: search for an alternative symbol for sizef that is vertical but not as large
     \item<+-> $\left|\cdot\right|$ and $\formulaSizef{\cdot}$: Count the number of logical symbols ($\formulaSizef{\cdot}$ ignores negations)
     \item<+-> $\bigwedge$ and $\bigvee$: Build conjunction and disjunction of formulas in a list
-    \item<5-> dual: Dualizes formula
+    \item<5-> dual: Dualizes formula ($\forall \psi$. $\isaAp{\cst{dual}}{\psi}$ is equivalent to $\lnot \psi$)
     \item<6-> \dots: Other functions are used only in proofs
   \end{itemize}
 \end{frame}
@@ -225,7 +225,7 @@
     \itshape
     Let $n > 0$,
     $Ts$ be a list of formulas, and
-    $\psi = \bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$.
+    $\psi = \bigvee_{i = 0}^{\listLength{Ts}-1} \listNth{Ts}{i}$.
     If all formulas in $Ts$ are conjunctive and satisfiable, and
     if $F_n$ is equivalent to $\psi$,
     then $\formulaSizef{\psi} \ge n \cdot 2^n$.
@@ -239,7 +239,7 @@
     \item<+-> For every $i < \listLength{Ts}$, \highlightText<9>{$\formulaSizef{\listNth{Ts}{i}} \ge n$}.
     \item<+-> For every Boolean list $[\epsilon_1,\ldots,\epsilon_n]$ there exists $T \in \isaAp{\cst{set}}{Ts}$ that contains $x_{1,\epsilon_1},\ldots,x_{n,\epsilon_n}$ positively.
     \item<+-> \highlightText<10>{$\listLength{Ts} \ge 2^n$} (Boolean lists of length $n$) (using steps 1 \& 3).
-    \item<+-> Finally, $\formulaSizef{\psi} \highlightMath<7>{>} \sum_{i=0}^{\listLength{Ts}} \formulaSizef{\listNth{Ts}{i}} \highlightMath<8-10>{\ge}\: n \cdot 2^n$ (using steps \highlightText<9>{2} \& \highlightText<10>{4}\kern -1.1pt).
+    \item<+-> Finally, $\formulaSizef{\psi} \highlightMath<7>{>} \sum_{i=0}^{\listLength{Ts}-1} \formulaSizef{\listNth{Ts}{i}} \highlightMath<8-10>{\ge}\: n \cdot 2^n$ (using steps \highlightText<9>{2} \& \highlightText<10>{4}\kern -1.1pt).
   \end{enumerate}
 \end{frame}
 
@@ -260,15 +260,15 @@
     \item<+-> Instantiate $\phi = F_n$ and prove $\phi$ is in CNF and $\left|\phi\right| = 10 \cdot n + 2$.
     \item<+-> Assume an equivalent formula $\psi$ in DNF.
     \item<+-> Obtain a list $Ts$ of conjunctive and satisfiable formulas in $\psi$.
-    \item<+-> Show $\formulaSizef{\psi} \ge \formulaSizef{\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}}$ and that $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$ is equivalent to $\psi$ and to $F_n$.
-    \item<+-> Finally, $\left|\psi\right| \highlightMath<7>{\ge} \formulaSizef{\psi} \highlightMath<8>{\ge} \formulaSizef{\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}} \highlightMath<9>{\ge}\: n \cdot 2^n$ (using steps 1,3,4 \& proposition 1).
+    \item<+-> Show $\formulaSizef{\psi} \ge \formulaSizef{\bigvee_{i = 0}^{\listLength{Ts}-1} \listNth{Ts}{i}}$ and that $\bigvee_{i = 0}^{\listLength{Ts}-1} \listNth{Ts}{i}$ is equivalent to $\psi$ and to $F_n$.
+    \item<+-> Finally, $\left|\psi\right| \highlightMath<7>{\ge} \formulaSizef{\psi} \highlightMath<8>{\ge} \formulaSizef{\bigvee_{i = 0}^{\listLength{Ts}-1} \listNth{Ts}{i}} \highlightMath<9>{\ge}\: n \cdot 2^n$ (using proposition from $F_n$ to $\bigvee$).
   \end{enumerate}
 \end{frame}
 
 \begin{frame}{DNF to CNF}{Low-level}
   \begin{block}{Proposition 3 (Blowup from $\isaAp{\cst{dual}}{F_n}$ to $\bigwedge$)}
     \itshape
-    Let $n > 0$, $Cs$ be a list of formulas, and $\psi = \bigwedge_{i = 0}^{\listLength{Cs}} \listNth{Cs}{i}$.
+    Let $n > 0$, $Cs$ be a list of formulas, and $\psi = \bigwedge_{i = 0}^{\listLength{Cs}-1} \listNth{Cs}{i}$.
     If all formulas in $Cs$ are disjunctive and nontautological, and $\isaAp{\cst{dual}}{F_n}$ is equivalent to $\psi$,
     then $\formulaSizef{\psi} \ge n \cdot 2^n$.
   \end{block}
@@ -279,9 +279,9 @@
   \begin{enumerate}
     \item $\highlightMath<7>{\formulaSizef{\isaAp{\cst{dual}}{\psi}} < n \cdot 2^n.}$
     \onslide<3->\item $\isaAp{\cst{dual}}{\psi}$ is equivalent to $F_n$.
-    \onslide<4->\item There exists a list $Ts$ such that every formula in $Ts$ is conjunctive and satisfiable and such that $\isaAp{\cst{dual}}{\psi}$ is syntactically equal to $\bigvee_{i = 0}^{\listLength{Ts}} \listNth{Ts}{i}$.
+    \onslide<4->\item There exists a list $Ts$ such that every formula in $Ts$ is conjunctive and satisfiable and such that $\isaAp{\cst{dual}}{\psi}$ is syntactically equal to $\bigvee_{i = 0}^{\listLength{Ts}-1} \listNth{Ts}{i}$.
     \onslide<5->\item
-    $\highlightMath<8>{ \formulaSizef{\isaAp{\cst{dual}}{\psi}} \ge n \cdot 2^n}$ (using steps 2,3 \& proposition 1).
+    $\highlightMath<8>{ \formulaSizef{\isaAp{\cst{dual}}{\psi}} \ge n \cdot 2^n}$ (using proposition from $F_n$ to $\bigvee$).
   \end{enumerate}
 
   \onslide<6->Result of step $\highlightMath<7>{1\strut}$ contradicts result of step $\highlightMath<8>{4\strut}$.
@@ -294,7 +294,7 @@
   \end{block}
 
   Proof:
-    Analogous to theorem 1.
+    Analogous to theorem from CNF to DNF.
 \end{frame}
 
 \setbeamertemplate{itemize item}{\textcolor{LMU_green}{$\blacktriangleright$}}
@@ -314,21 +314,25 @@
   \begin{itemize}
   \item Allows proving $\formulaSizef{\isaAp{\cst{dual}}{\phi}} = \formulaSizef{\phi}$ (instead of $\left|\isaAp{\cst{dual}}{\phi}\right| \le 2 \cdot \left|\phi\right|$)
   \item Useful to derive a contradiction in the proof of proposition 3
-  \item Interestingly, we can later discard $\formulaSizef{\cdot}$ and show the theorems using size.
+  \item Interestingly, we can later discard $\formulaSizef{\cdot}$ and show the theorems using $\left|\cdot\right|$.
   \end{itemize}
 \end{frame}
 
 \begin{frame}{Conclusion}{}
   We formalized the exponential blowup of the formula size when transforming a formula into DNF or CNF in Isabelle/HOL.
 
+  \medskip
+  
+  Our formalization consists of 1100 nonempty lines and is available in the AFP.
+  
   \pause
   \medskip
 
-  Our formalization may serve as a basis for further formalizations of quantitative results in propositional logic.
+  It may serve as a basis for further formalizations of quantitative results in propositional logic.
 
   \medskip
 
-  Future work: Proof complexity lower bounds (e.g., for resolution proofs of the pigeonhole principle)
+  Future work: Formalize lower bounds on proof complexity (e.g., for resolution proofs of the pigeonhole principle).
 
   \pause
   \bigskip
